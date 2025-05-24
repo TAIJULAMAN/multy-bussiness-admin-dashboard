@@ -1,0 +1,174 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+@import "tailwindcss";
+
+:root {
+  --bg-pink-high: #0091ff;
+  --text-dark: #111;
+  --text-light: #fff;
+  --text-gray: #f9f9f9;
+  --bg-primary: #f9f9f9;
+  --text: #363636;
+  --color-white: #fff;
+  --color-white: #ffffff;
+  --color-gray: #6d6d6d;
+  --primary-bg: #242424;
+  --bg-gray-20: #e6e6e6;
+  --bg-white-20: #f2f2f2;
+  --bg-black: #050505;
+  --bg-white: #fefefe;
+}
+
+* {
+  font-family: "Poppins";
+}
+
+.scroll-bar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+body::-webkit-scrollbar {
+  display: none;
+}
+
+#doctor_table::-webkit-scrollbar {
+  display: block;
+  background: var(--text);
+  height: 4px;
+  border-radius: 3px;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+}
+
+@layer utilities {
+  .start-start {
+    @apply flex justify-start items-start;
+  }
+
+  .start-center {
+    @apply flex justify-start items-center;
+  }
+
+  .center-center {
+    @apply flex justify-center items-center;
+  }
+
+  .between-center {
+    @apply flex justify-between items-center;
+  }
+
+  .end-center {
+    @apply flex justify-end items-center;
+  }
+
+  .grid-5 {
+    @apply md:grid md:grid-cols-2 flex flex-col justify-start items-start md:items-center lg:grid-cols-3 xl:grid-cols-5 gap-4;
+  }
+
+  .grid-4 {
+    @apply md:grid md:grid-cols-2 flex flex-col justify-start items-start md:items-center lg:grid-cols-3 xl:grid-cols-4 gap-4;
+  }
+
+  .grid-3 {
+    @apply md:grid md:grid-cols-2 flex flex-col justify-start items-start md:items-center lg:grid-cols-3 gap-4;
+  }
+
+  .grid-2 {
+    @apply md:grid md:grid-cols-2 flex flex-col justify-start items-start md:items-center gap-4;
+  }
+
+  .grid-3 {
+    @apply md:grid md:grid-cols-2 xl:grid-cols-3 flex flex-col justify-start items-start md:items-center gap-4;
+  }
+
+  .grid-2-start {
+    @apply md:grid md:grid-cols-2 flex flex-col justify-start items-start gap-4;
+  }
+
+  .button-white {
+    @apply px-8 py-3 rounded-md flex justify-start items-center w-fit gap-2 bg-[var(--color-white)] text-[var(--bg-black)] hover:scale-102 transition-all active:scale-95 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:active:scale-100;
+  }
+
+  .button-red {
+    @apply px-8 py-3 rounded-md flex justify-center items-center w-fit gap-2 text-[var(--color-white)] hover:scale-105 transition-all active:scale-95 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:active:scale-100;
+  }
+
+  .button-green {
+    @apply px-4 py-1 rounded-3xl flex justify-center items-center w-fit gap-2 bg-[var(--color-white)] text-[var(--color-white)] hover:scale-105 transition-all active:scale-95 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:active:scale-100;
+  }
+
+  .button-blue {
+    @apply px-4 py-1 rounded-3xl flex justify-center items-center w-fit gap-2 bg-[var(--color-white)] text-[var(--color-blue)] hover:scale-105 transition-all active:scale-95 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:active:scale-100;
+  }
+
+  .links.active {
+    @apply relative;
+  }
+
+  .links:hover {
+    @apply relative;
+  }
+
+  .links.active::after {
+    @apply h-full w-2 bg-[var(--bg-pink-high)] rounded-br-full rounded-tr-full absolute -left-4;
+  }
+}
+
+.links::after {
+  content: "";
+}
+
+.ant-upload {
+  width: 100% !important;
+}
+
+.ant-pagination-item-link {
+  color: white !important;
+}
+
+.ant-pagination-item a {
+  color: black !important;
+}
+
+.modal-container .ant-modal-content {
+  background-image: url("./assets/icons/alert.svg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  padding: 40px;
+  text-align: center;
+}
+
+.user-unverified .ant-select-selector {
+  background-color: #ffcccc !important;
+  color: red !important;
+}
+
+.user-verified .ant-select-selector {
+  background-color: #ccf0eb !important;
+  color: #00b69b !important;
+}
+
+.ant-pagination {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  margin-top: 20px !important;
+}
+
+.ant-pagination-item-link {
+  border-radius: 100% !important;
+  background-color: white !important;
+  color: #111 !important;
+}
+
+.ant-pagination-item-active {
+  background-color: #0091ff !important;
+  color: white !important;
+}
+
+.car_upload .ant-upload {
+  width: fit-content !important;
+  padding: 0px 20px !important;
+}
