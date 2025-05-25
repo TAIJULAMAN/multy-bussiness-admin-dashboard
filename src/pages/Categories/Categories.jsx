@@ -31,9 +31,7 @@ export default function Categories() {
   const showModal = () => {
     setIsModalOpen(true);
   };
-  const showModal2 = () => {
-    setAddModalOpen(true);
-  };
+
   const showModal3 = () => {
     setUpdateModalOpen(true);
   };
@@ -81,12 +79,13 @@ export default function Categories() {
       <div className="flex justify-between items-center mb-5">
         <PageHeading title="Catagories Management" />
         <div className="text-white">
-          <button
-            onClick={showModal2}
+         <Link to="/categories/add">
+         <button
             className="bg-[#0091FF] px-6 py-3 rounded cursor-pointer "
           >
             + Add New Formation
           </button>
+         </Link>
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-5">
@@ -108,13 +107,13 @@ export default function Categories() {
               </div>
               {/* Action Buttons */}
               <div className="flex items-center justify-between pt-2 border-t border-gray-200 mt-4">
-          <Link to={`/categories/${category?.id}`}>
-            <button
-              className="p-2 text-green-600 hover:text-green-800"
-            >
-              <IoMdInformationCircleOutline size={24} className="text-[#0091FF]" />
-            </button>
-          </Link>
+                <Link to={`/categories/${category?.id}`}>
+                  <button
+                    className="p-2 text-green-600 hover:text-green-800"
+                  >
+                    <IoMdInformationCircleOutline size={24} className="text-[#0091FF]" />
+                  </button>
+                </Link>
 
                 <div className="h-6 w-px bg-gray-200"></div>
 

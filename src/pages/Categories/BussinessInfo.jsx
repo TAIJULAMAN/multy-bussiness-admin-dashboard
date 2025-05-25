@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import img1 from "../../assets/cover.png";
 import img2 from "../../assets/cover1.png";
 import img3 from "../../assets/cover2.png";
+import PageHeading from '../../Components/Shared/PageHeading';
 
 const BusinessInfo = () => {
           const { id } = useParams();
@@ -76,7 +77,6 @@ const BusinessInfo = () => {
 
                     }
           ];
-
           useEffect(() => {
                     const service = formationServices.find(s => s.id === parseInt(id));
                     setServiceDetails(service);
@@ -88,6 +88,16 @@ const BusinessInfo = () => {
 
           return (
                     <>
+                              <div className="flex justify-between items-center mb-5">
+                                        <PageHeading title="Bank Account Opening Services" />
+                                        <div className="text-white">
+                                                  <button
+                                                            className="bg-[#0091FF] px-6 py-3 rounded cursor-pointer "
+                                                  >
+                                                            + Edit Formation
+                                                  </button>
+                                        </div>
+                              </div>
                               <Card className="">
                                         <div className="space-y-5">
                                                   {/* Header Section */}
@@ -103,7 +113,7 @@ const BusinessInfo = () => {
 
                                                   {/* Features Section */}
                                                   <div className="border-t pt-6">
-                                                            <h2 className="text-xl font-semibold text-gray-800 mb-4">Assets Included</h2>
+                                                            <h2 className="text-xl font-semibold text-gray-800 mb-4">──Assets Included</h2>
                                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                                       {serviceDetails.features.map((feature, index) => (
                                                                                 <div key={index} className="flex items-start space-x-2">
@@ -116,7 +126,7 @@ const BusinessInfo = () => {
 
                                                   {/* Requirements Section */}
                                                   <div className="border-t pt-6">
-                                                            <h2 className="text-xl font-semibold text-gray-800 mb-4">Requirements</h2>
+                                                            <h2 className="text-xl font-semibold text-gray-800 mb-4">── Financial Summary (Approximate)</h2>
                                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                                       {serviceDetails.requirements.map((requirement, index) => (
                                                                                 <div key={index} className="flex items-start space-x-2">
