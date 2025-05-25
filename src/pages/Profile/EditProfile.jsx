@@ -9,19 +9,19 @@ function EditProfile() {
 
           });
 
-          const { data: AdminProfileData } = useGetAdminProfileQuery()
+          // const { data: AdminProfileData } = useGetAdminProfileQuery()
 
-          useEffect(() => {
-                    if (AdminProfileData) {
-                              setFormData({
-                                        name: AdminProfileData?.data?.name || "",
-                                        email: AdminProfileData?.data?.email || "",
-                              });
+          // useEffect(() => {
+          //           if (AdminProfileData) {
+          //                     setFormData({
+          //                               name: AdminProfileData?.data?.name || "",
+          //                               email: AdminProfileData?.data?.email || "",
+          //                     });
 
-                    }
-          }, [AdminProfileData]);
+          //           }
+          // }, [AdminProfileData]);
 
-          const [updateProfile] = useUpdateProfileMutation();
+          // const [updateProfile] = useUpdateProfileMutation();
 
           const handleChange = (e) => {
                     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -30,32 +30,32 @@ function EditProfile() {
           const handleSubmit = async (e) => {
                     e.preventDefault();
 
-                    if (!AdminProfileData?.data?._id) {
-                              Swal.fire({
-                                        icon: "error",
-                                        title: "Error",
-                                        text: "User information is missing. Please log in again.",
-                              });
-                              return;
-                    }
+                    // if (!AdminProfileData?.data?._id) {
+                    //           Swal.fire({
+                    //                     icon: "error",
+                    //                     title: "Error",
+                    //                     text: "User information is missing. Please log in again.",
+                    //           });
+                    //           return;
+                    // }
 
-                    try {
-                              const formDataToSend = new FormData();
-                              formDataToSend.append("name", formData.name);
-                              await updateProfile(formDataToSend).unwrap();
+                    // try {
+                    //           const formDataToSend = new FormData();
+                    //           formDataToSend.append("name", formData.name);
+                    //           await updateProfile(formDataToSend).unwrap();
 
-                              Swal.fire({
-                                        icon: "success",
-                                        title: "Profile Updated",
-                                        text: "Your profile has been updated successfully!",
-                              });
-                    } catch (error) {
-                              Swal.fire({
-                                        icon: "error",
-                                        title: "Error updating profile",
-                                        text: error?.data?.message || "Something went wrong!",
-                              });
-                    }
+                    //           Swal.fire({
+                    //                     icon: "success",
+                    //                     title: "Profile Updated",
+                    //                     text: "Your profile has been updated successfully!",
+                    //           });
+                    // } catch (error) {
+                    //           Swal.fire({
+                    //                     icon: "error",
+                    //                     title: "Error updating profile",
+                    //                     text: error?.data?.message || "Something went wrong!",
+                    //           });
+                    // }
           };
 
           return (
@@ -91,7 +91,7 @@ function EditProfile() {
                                                   />
                                         </div>
                                         <div className="text-center py-5 text-white">
-                                                  <button className="bg-[#14803c] text-white font-semibold w-full py-3 rounded-lg">
+                                                  <button className="bg-[#0091FF] text-white font-semibold w-full py-3 rounded-lg">
                                                             Save Changes
                                                   </button>
                                         </div>

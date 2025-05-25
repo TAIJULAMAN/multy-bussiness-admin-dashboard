@@ -7,7 +7,7 @@ import PageHeading from "../../Components/Shared/PageHeading";
 import { useSelector } from "react-redux";
 import { decodeAuthToken } from "../../Utils/decode-access-token";
 import { useGetProfileQuery, useUpdateProfileMutation } from "../../redux/api/profileApi";
-import { imageUrl } from "../../Utils/server";
+// import { imageUrl } from "../../Utils/server";
 import { message } from "antd";
 
 function Profile() {
@@ -47,22 +47,22 @@ function Profile() {
             <div className="relative">
               <div className="w-[122px] h-[122px] bg-gray-300 rounded-full border-4 border-white shadow-xl flex justify-center items-center">
                 <img
-                  src={imageUrl(profileData?.data?.img)}
+                  src={profileData?.data?.img || "https://avatar.iran.liara.run/public/46"}
                   className=" object-cover rounded-full"
                   alt="User Avatar"
                 />
                 {/* Upload Icon */}
                 <div className="absolute bottom-2 right-2 bg-white p-2 rounded-full shadow-md cursor-pointer">
                   <label htmlFor="profilePicUpload" className="cursor-pointer">
-                    <FaCamera className="text-[#575757]" />
+                    <FaCamera className="text-[#0091FF]" />
                   </label>
                   <input onChange={(e) => handleProfilePicUpload(e)} type="file" id="profilePicUpload" className="hidden" />
                 </div>
               </div>
             </div>
             <div className="flex flex-col justify-center text-center">
-              <span className="text-xl text-gray-800 md:text-3xl font-bold">{profileData?.data?.name}</span>
-              <span className="text-xl font-semibold text-gray-600"> {profileData?.data?.role}</span>
+              <span className="text-xl text-gray-800 md:text-3xl font-bold">{profileData?.data?.name || "Shah Aman"}</span>
+              <span className="text-xl font-semibold text-gray-600"> {profileData?.data?.role || "Admin"}</span>
             </div>
           </div>
 
@@ -71,7 +71,7 @@ function Profile() {
             <p
               onClick={() => setActiveTab("editProfile")}
               className={`cursor-pointer pb-1 ${activeTab === "editProfile"
-                ? "text-[#14803c] border-b-2 border-[#14803c]"
+                ? "text-[#0091FF] border-b-2 border-[#0091FF]"
                 : "text-[#6A6D76]"
                 }`}
             >
@@ -80,7 +80,7 @@ function Profile() {
             <p
               onClick={() => setActiveTab("changePassword")}
               className={`cursor-pointer pb-1 ${activeTab === "changePassword"
-                ? "text-[#14803c] border-b-2 border-[#14803c]"
+                ? "text-[#0091FF] border-b-2 border-[#0091FF]"
                 : "text-[#6A6D76]"
                 }`}
             >

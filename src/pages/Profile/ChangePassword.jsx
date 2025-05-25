@@ -1,8 +1,8 @@
 import React from "react";
 import { useState } from "react";
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
-import { useChangeAdminPasswordMutation, useGetAdminProfileQuery } from "../../redux/api/profileApi";
-import Swal from "sweetalert2";
+// import { useChangeAdminPasswordMutation, useGetAdminProfileQuery } from "../../redux/api/profileApi";
+// import Swal from "sweetalert2";
 
 function ChangePassword() {
           const [showPassword, setShowPassword] = useState(false);
@@ -11,9 +11,9 @@ function ChangePassword() {
                     password: "",
                     confirm_password: "",
           });
-          const { data: AdminProfileData } = useGetAdminProfileQuery()
-          console.log("admin profile data", AdminProfileData)
-          const [changeAdminPassword] = useChangeAdminPasswordMutation();
+          // const { data: AdminProfileData } = useGetAdminProfileQuery()
+          // console.log("admin profile data", AdminProfileData)
+          // const [changeAdminPassword] = useChangeAdminPasswordMutation();
 
           const handleChange = (e) => {
                     const { name, value } = e.target;
@@ -25,54 +25,54 @@ function ChangePassword() {
           const handleSubmit = (e) => {
                     e.preventDefault();
 
-                    const { old_password, password, confirm_password } = formValues;
+                    // const { old_password, password, confirm_password } = formValues;
 
                     // Password validation
-                    if (password !== confirm_password) {
-                              Swal.fire({
-                                        icon: "error",
-                                        title: "Password Mismatch",
-                                        text: "The passwords do not match. Please try again.",
-                              });
-                              return;
-                    }
+                    // if (password !== confirm_password) {
+                    //           Swal.fire({
+                    //                     icon: "error",
+                    //                     title: "Password Mismatch",
+                    //                     text: "The passwords do not match. Please try again.",
+                    //           });
+                    //           return;
+                    // }
 
-                    if (!AdminProfileData?.data?.email) {
-                              Swal.fire({
-                                        icon: "error",
-                                        title: "Error",
-                                        text: "User information is missing. Please log in again.",
-                              });
-                              return;
-                    }
+                    // if (!AdminProfileData?.data?.email) {
+                    //           Swal.fire({
+                    //                     icon: "error",
+                    //                     title: "Error",
+                    //                     text: "User information is missing. Please log in again.",
+                    //           });
+                    //           return;
+                    // }
 
                     // Submit the password change request
 
-                    changeAdminPassword({
-                              old_password,
-                              password,
-                              confirm_password,
-                    })
-                              .unwrap()
-                              .then(() => {
-                                        Swal.fire({
-                                                  icon: "success",
-                                                  title: "Password Updated",
-                                                  text: "Your password has been updated successfully.",
-                                        });
-                                        setFormValues({
-                                                  old_password: "",
-                                                  password: "",
-                                                  confirm_password: "",
-                                        });
-                              })
-                              .catch((error) => {
-                                        Swal.fire({
-                                                  icon: "error",
-                                                  title: "Error",
-                                                  text: error?.data?.message || "An error occurred. Please try again.",
-                                        });
-                              });
+                    // changeAdminPassword({
+                    //           old_password,
+                    //           password,
+                    //           confirm_password,
+                    // })
+                    //           .unwrap()
+                    //           .then(() => {
+                    //                     Swal.fire({
+                    //                               icon: "success",
+                    //                               title: "Password Updated",
+                    //                               text: "Your password has been updated successfully.",
+                    //                     });
+                    //                     setFormValues({
+                    //                               old_password: "",
+                    //                               password: "",
+                    //                               confirm_password: "",
+                    //                     });
+                    //           })
+                    //           .catch((error) => {
+                    //                     Swal.fire({
+                    //                               icon: "error",
+                    //                               title: "Error",
+                    //                               text: error?.data?.message || "An error occurred. Please try again.",
+                    //                     });
+                    //           });
           };
 
           return (
@@ -172,7 +172,7 @@ function ChangePassword() {
                                                   </div>
                                         </div>
                                         <div className="text-center py-5 text-white">
-                                                  <button className="bg-[#14803c] text-white font-semibold w-full py-3 rounded-md">
+                                                  <button className="bg-[#0091FF] text-white font-semibold w-full py-3 rounded-md">
                                                             Save Changes
                                                   </button>
                                         </div>
