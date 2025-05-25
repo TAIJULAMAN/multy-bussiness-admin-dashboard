@@ -11,6 +11,8 @@ import Category_update_modal from './Category_update_modal';
 import img1 from "../../assets/cover.png"
 import img2 from "../../assets/cover1.png"
 import img3 from "../../assets/cover2.png"
+import { IoMdInformationCircleOutline } from "react-icons/io";
+import { Link } from "react-router-dom";
 
 
 export default function Categories() {
@@ -106,15 +108,13 @@ export default function Categories() {
               </div>
               {/* Action Buttons */}
               <div className="flex items-center justify-between pt-2 border-t border-gray-200 mt-4">
-                <button
-                  onClick={() => {
-                    showModal3();
-                    setCategory(category);
-                  }}
-                  className="p-2 text-green-600 hover:text-green-800"
-                >
-                  <FaPencilAlt size={18} />
-                </button>
+          <Link to={`/categories/${category?.id}`}>
+            <button
+              className="p-2 text-green-600 hover:text-green-800"
+            >
+              <IoMdInformationCircleOutline size={24} className="text-[#0091FF]" />
+            </button>
+          </Link>
 
                 <div className="h-6 w-px bg-gray-200"></div>
 

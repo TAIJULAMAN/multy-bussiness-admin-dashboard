@@ -16,6 +16,7 @@ import Profile from '../pages/Profile/Profile';
 import PrivacyPolicy from '../pages/PrivacyPolicy/PrivacyPolicy';
 import TermsCondition from '../pages/TermsCondition/TermsCondition';
 import Faq from '../pages/Faq/Faq';
+import BusinessInfo from '../pages/Categories/BussinessInfo';
 
 
 export const Routes = createBrowserRouter([
@@ -50,6 +51,10 @@ export const Routes = createBrowserRouter([
       {
         path: '/categories',
         element: <Categories />,
+      },
+      {
+        path: '/categories/:id',
+        element: <BusinessInfo />,
       },
       {
         path: 'locations',
