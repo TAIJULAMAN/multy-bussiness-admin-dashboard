@@ -83,7 +83,7 @@ function Header() {
         {/* Notifications */}
         <button
           onClick={showModal}
-          className="relative bg-[#cce9ff] p-[15px] rounded-full hover:bg-[#d3f7e8] transition"
+          className="relative bg-[#cce9ff] p-[15px] rounded-full transition"
         >
           <IoIosNotificationsOutline size={22} />
           {notificationsData?.length > 0 && (
@@ -118,8 +118,8 @@ function Header() {
         title="Notifications"
       >
         <div className="py-4 max-h-[70vh] overflow-y-auto">
-          {notificationsData?.data?.length > 0 ? (
-            notificationsData?.data.map((notification) => (
+          {notificationsData?.length > 0 ? (
+            notificationsData?.map((notification) => (
               <div
                 key={notification?._id}
                 className="relative p-3 bg-white border rounded-lg mb-3"
@@ -133,8 +133,8 @@ function Header() {
                 </button>
                 <div className="flex gap-3">
                   <img
-                    src={imageUrl(notification?.user?.img)}
-                    alt={notification?.user?.name}
+                    src={notification?.avatar}
+                    alt={notification?.title}
                     className="w-12 h-12 object-cover"
                   />
                   <div className="flex-1">
@@ -144,7 +144,7 @@ function Header() {
                     <p className="text-sm text-gray-700">{notification?.description}</p>
                     <p className="text-xs text-gray-500 mt-1">
                       {notification?.createdAt
-                        ? `${new Date(notification.createdAt).getMonth() + 1}/${new Date(notification.createdAt).getDate()}/${new Date(notification.createdAt).getFullYear()} ${new Date(notification.createdAt).getHours()}:${new Date(notification.createdAt).getMinutes().toString().padStart(2, '0')}:${new Date(notification.createdAt).getSeconds().toString().padStart(2, '0')}`
+                        ? `${new Date(notification.date).getMonth() + 1}/${new Date(notification.createdAt).getDate()}/${new Date(notification.createdAt).getFullYear()} ${new Date(notification.createdAt).getHours()}:${new Date(notification.createdAt).getMinutes().toString().padStart(2, '0')}:${new Date(notification.createdAt).getSeconds().toString().padStart(2, '0')}`
                         : null}
                     </p>
                   </div>

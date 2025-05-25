@@ -114,9 +114,9 @@ const FAQ = () => {
                     }
           };
 
-          if (isLoading || isFaqLoading) {
-                    return <Loader />;
-          }
+          // if (isLoading || isFaqLoading) {
+          //           return <Loader />;
+          // }
 
           return (
                     <>
