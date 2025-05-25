@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from 'antd';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import img1 from "../../assets/cover.png";
 import img2 from "../../assets/cover1.png";
 import img3 from "../../assets/cover2.png";
@@ -91,14 +91,16 @@ const BusinessInfo = () => {
                               <div className="flex justify-between items-center mb-5">
                                         <PageHeading title="Bank Account Opening Services" />
                                         <div className="text-white">
+                                               <Link to="/categories/add">
                                                   <button
                                                             className="bg-[#0091FF] px-6 py-3 rounded cursor-pointer "
                                                   >
                                                             + Edit Formation
                                                   </button>
+                                               </Link>
                                         </div>
                               </div>
-                              <Card className="">
+                              <Card>
                                         <div className="space-y-5">
                                                   {/* Header Section */}
                                                   <div className="mb-5">

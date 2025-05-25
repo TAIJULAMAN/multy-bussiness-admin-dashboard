@@ -4,9 +4,9 @@ import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
 import PageHeading from "../../Components/Shared/PageHeading";
 // import { getImageUrl } from '../../config/envConfig';
 // import { useGet_all_categoriesQuery } from '../../redux/api/categoryApis';
-import Category_add_modal from './Category_add_modal';
-import Category_delete_modal from './Category_delete_modal';
-import Category_update_modal from './Category_update_modal';
+// import Category_add_modal from './Category_add_modal';
+// import Category_delete_modal from './Category_delete_modal';
+// import Category_update_modal from './Category_update_modal';
 // import Sub_category from './Sub_category';
 import img1 from "../../assets/cover.png"
 import img2 from "../../assets/cover1.png"
@@ -160,24 +160,24 @@ export default function Categories() {
           </div>
         </Modal>
 
-        <Modal
+        {/* <Modal
           open={addModalOpen}
           centered
           onCancel={handleCancel2}
           footer={null}
         >
           <Category_add_modal onclose={handleCancel2} />
-        </Modal>
+        </Modal> */}
 
-        <Modal
+        {/* <Modal
           open={updateModalOpen}
           centered
           onCancel={handleCancel3}
           footer={null}
         >
           <Category_update_modal category={category} onclose={handleCancel3} />
-        </Modal>
-        <Modal
+        </Modal> */}
+        {/* <Modal
           open={deleteModalOpen}
           centered
           footer={null}
@@ -190,7 +190,7 @@ export default function Categories() {
             setCategory(null);
             setDeleteModalOpen(false);
           }} />
-        </Modal>
+        </Modal> */}
       </div>
     </>
   );
