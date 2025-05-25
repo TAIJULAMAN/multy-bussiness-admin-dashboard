@@ -1,32 +1,49 @@
 import React from "react";
 import GrowthChart from "../../Components/charts/UserGrowthChart";
 import ActivityChart from "../../Components/charts/ActivityChart";
-import Loader from "../../Components/Shared/Loaders/Loader";
+// import Loader from "../../Components/Shared/Loaders/Loader";
 import RecentlyJoinedUsers from "../User/RecentlyJoinedUsers";
-import { useGetAllDashboardQuery } from "../../redux/api/dashboard";
+// import { useGetAllDashboardQuery } from "../../redux/api/dashboard";
 import user from "../../assets/icons/user.png";
 import list from "../../assets/icons/list.png";
 import category from "../../assets/icons/category.png";
 
 function DashboardHome() {
-  const { data: dashboardData, isLoading } = useGetAllDashboardQuery();
-  if (isLoading) {
-    return <Loader />;
-  }
+  // const { data: dashboardData, isLoading } = useGetAllDashboardQuery();
+  // if (isLoading) {
+  //   return <Loader />;
+  // }
+  // const cardData = [
+  //   {
+  //     title: "Total Users",
+  //     value: isLoading ? <Loader /> : dashboardData?.user || 110,
+  //     icon: <img src={user} alt="Driver Icon" />,
+  //   },
+  //   {
+  //     title: "Total Listings",
+  //     value: isLoading ? <Loader /> : dashboardData?.active_listing || 20,
+  //     icon: <img src={list} alt="User Icon" />,
+  //   },
+  //   {
+  //     title: "Categories",
+  //     value: isLoading ? <Loader /> : dashboardData?.category || 30,
+  //     icon: <img src={category} alt="Car Icon" />,
+  //   },
+  // ];
   const cardData = [
     {
       title: "Total Users",
-      value: isLoading ? <Loader /> : dashboardData?.user || 0,
+      value: 110,
       icon: <img src={user} alt="Driver Icon" />,
     },
     {
       title: "Total Listings",
-      value: isLoading ? <Loader /> : dashboardData?.active_listing || 0,
+      value: 20,
       icon: <img src={list} alt="User Icon" />,
     },
     {
       title: "Categories",
-      value: isLoading ? <Loader /> : dashboardData?.category || 0,
+      value: 30,
       icon: <img src={category} alt="Car Icon" />,
     },
   ];
@@ -34,7 +51,7 @@ function DashboardHome() {
   return (
     <div>
       {/* Card Section */}
-      <div className="flex items-center justify-between bg-gradient-to-tr from-[#ffffff] via-white to-[#62e391] p-12 rounded-xl">
+      <div className="flex items-center justify-between bg-gradient-to-tr from-[#ffffff] via-white to-[#0091FF] p-12 rounded-xl">
         {cardData.map((card, index) => (
           <div
             className={`w-full ${

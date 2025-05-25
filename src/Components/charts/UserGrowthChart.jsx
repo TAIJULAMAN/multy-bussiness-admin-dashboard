@@ -10,41 +10,45 @@ import {
 } from "recharts";
 import React, { useEffect, useMemo, useState } from "react";
 import { Select } from "antd";
-import { useGetDashboardUserQuery } from "../../redux/api/dashboard";
-import Loader from "../Shared/Loaders/Loader";
+// import { useGetDashboardUserQuery } from "../../redux/api/dashboard";
+// import Loader from "../Shared/Loaders/Loader";
 
 const UserGrowthChart = () => {
   const currentYear = new Date().getFullYear();
   const [year, setYear] = useState(currentYear);
-  const [years, setYears] = useState([]);
-  const { data, isLoading } = useGetDashboardUserQuery({ year_user: year });
-  // console.log(data);
+  const [years] = useState([2023, 2024, 2025]);
 
-  useEffect(() => {
-    if (data?.users_year) {
-      const yearsArray = data?.users_year.map((year) => year);
-      setYears(yearsArray);
-    }
-  }, [data]);
+  const monthMap = {
+    "January": 1,
+    "February": 2,
+    "March": 3,
+    "April": 4,
+    "May": 5,
+    "June": 6,
+    "July": 7,
+    "August": 8,
+    "September": 9,
+    "October": 10,
+    "November": 11,
+    "December": 12,
+  };
+  const userGrowthData = [45, 62, 78, 95, 110, 125, 140, 158, 172, 188, 195, 210];
 
   const { monthlyData, maxUsers } = useMemo(() => {
-    const monthMap = data?.userGrowth?.monthNames || {};
-    const userGrowthData = data?.userGrowth?.data || [];
-
-    const maxUsers = Math.max(...Object.values(monthMap), 0) + 4;
+    const maxUsers = Math.max(...userGrowthData) + 20;
 
     return {
-      monthlyData: Object.keys(monthMap).map((month) => ({
-        name: monthMap,
-        totalUser: userGrowthData[month],
+      monthlyData: Object.keys(monthMap).map((month, index) => ({
+        name: month,
+        totalUser: userGrowthData[index],
       })),
       maxUsers,
     };
-  }, [data]);
+  }, []);
 
-  if (isLoading) {
-    return <Loader />;
-  }
+  // if (isLoading) {
+  //   return <Loader />;
+  // }
 
   return (
     <div
