@@ -5,9 +5,9 @@ import { FaRegQuestionCircle } from "react-icons/fa";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { CiEdit } from "react-icons/ci";
 import Swal from "sweetalert2";
-import { useCreateFaqMutation, useDeleteFaqMutation, useGetAllFaqQuery, useUpdateFaqMutation } from "../../redux/api/faqApi";
+// import { useCreateFaqMutation, useDeleteFaqMutation, useGetAllFaqQuery, useUpdateFaqMutation } from "../../redux/api/faqApi";
 import PageHeading from "../../Components/Shared/PageHeading";
-import Loader from '../../Components/Shared/Loaders/Loader';
+// import Loader from '../../Components/Shared/Loaders/Loader';
 
 const FAQ = () => {
           const [isAccordionOpen, setIsAccordionOpen] = useState(null);
@@ -16,10 +16,10 @@ const FAQ = () => {
           const [form] = Form.useForm();
           const [editForm] = Form.useForm();
 
-          const { data: faqData, isLoading, isFaqLoading, refetch } = useGetAllFaqQuery();
-          const [createFaq, { isLoading: isCreating }] = useCreateFaqMutation();
-          const [updateFaq, { isLoading: isUpdating }] = useUpdateFaqMutation();
-          const [deleteFaq, { isLoading: isDeleting }] = useDeleteFaqMutation();
+          // const { data: faqData, isLoading, isFaqLoading, refetch } = useGetAllFaqQuery();
+          // const [createFaq, { isLoading: isCreating }] = useCreateFaqMutation();
+          // const [updateFaq, { isLoading: isUpdating }] = useUpdateFaqMutation();
+          // const [deleteFaq, { isLoading: isDeleting }] = useDeleteFaqMutation();
 
           const handleClick = (index) => {
                     setIsAccordionOpen((prevIndex) => (prevIndex === index ? null : index));
@@ -27,54 +27,54 @@ const FAQ = () => {
 
           // delete faq
           const handleDeleteAdmin = (faq) => {
-                    Swal.fire({
-                              title: "Are you sure?",
-                              text: "You are about to delete this FAQ",
-                              icon: "warning",
-                              showCancelButton: true,
-                              confirmButtonColor: "#d33",
-                              cancelButtonColor: "#3085d6",
-                              confirmButtonText: "Yes, delete it!",
-                    }).then(async (result) => {
-                              if (result.isConfirmed) {
-                                        try {
-                                                  await deleteFaq(faq?._id).unwrap();
-                                                  Swal.fire({
-                                                            icon: "success",
-                                                            title: "Deleted!",
-                                                            text: "FAQ has been deleted successfully.",
-                                                  });
-                                                  refetch();
-                                        } catch (error) {
-                                                  Swal.fire({
-                                                            icon: "error",
-                                                            title: "Error",
-                                                            text: error?.data?.message || "Failed to delete FAQ",
-                                                  });
-                                        }
-                              }
-                    });
+                    // Swal.fire({
+                    //           title: "Are you sure?",
+                    //           text: "You are about to delete this FAQ",
+                    //           icon: "warning",
+                    //           showCancelButton: true,
+                    //           confirmButtonColor: "#d33",
+                    //           cancelButtonColor: "#3085d6",
+                    //           confirmButtonText: "Yes, delete it!",
+                    // }).then(async (result) => {
+                    //           if (result.isConfirmed) {
+                    //                     try {
+                    //                               await deleteFaq(faq?._id).unwrap();
+                    //                               Swal.fire({
+                    //                                         icon: "success",
+                    //                                         title: "Deleted!",
+                    //                                         text: "FAQ has been deleted successfully.",
+                    //                               });
+                    //                               refetch();
+                    //                     } catch (error) {
+                    //                               Swal.fire({
+                    //                                         icon: "error",
+                    //                                         title: "Error",
+                    //                                         text: error?.data?.message || "Failed to delete FAQ",
+                    //                               });
+                    //                     }
+                    //           }
+                    // });
           };
 
           // add faq
           const handleAddFaq = async (values) => {
-                    try {
-                              await createFaq(values).unwrap();
-                              Swal.fire({
-                                        icon: "success",
-                                        title: "FAQ Added",
-                                        text: "New FAQ was added successfully!",
-                              });
-                              setIsAddModalVisible(false);
-                              form.resetFields();
-                              refetch();
-                    } catch (error) {
-                              Swal.fire({
-                                        icon: "error",
-                                        title: "Error",
-                                        text: error?.data?.message || "Failed to add FAQ",
-                              });
-                    }
+                    // try {
+                    //           await createFaq(values).unwrap();
+                    //           Swal.fire({
+                    //                     icon: "success",
+                    //                     title: "FAQ Added",
+                    //                     text: "New FAQ was added successfully!",
+                    //           });
+                    //           setIsAddModalVisible(false);
+                    //           form.resetFields();
+                    //           refetch();
+                    // } catch (error) {
+                    //           Swal.fire({
+                    //                     icon: "error",
+                    //                     title: "Error",
+                    //                     text: error?.data?.message || "Failed to add FAQ",
+                    //           });
+                    // }
           };
 
           // edit faq
@@ -88,35 +88,58 @@ const FAQ = () => {
           };
 
           const handleEditFaq = async (values) => {
-                    try {
-                              await updateFaq({
-                                        _id: values._id,
-                                        data: {
-                                                  question: values.question,
-                                                  answer: values.answer,
-                                        },
-                              }).unwrap();
+                    // try {
+                    //           await updateFaq({
+                    //                     _id: values._id,
+                    //                     data: {
+                    //                               question: values.question,
+                    //                               answer: values.answer,
+                    //                     },
+                    //           }).unwrap();
 
-                              Swal.fire({
-                                        icon: "success",
-                                        title: "FAQ Updated",
-                                        text: "FAQ has been updated successfully!",
-                              });
-                              setIsEditModalVisible(false);
-                              editForm.resetFields();
-                              refetch();
-                    } catch (error) {
-                              Swal.fire({
-                                        icon: "error",
-                                        title: "Error",
-                                        text: error?.data?.message || "Failed to update FAQ",
-                              });
-                    }
+                    //           Swal.fire({
+                    //                     icon: "success",
+                    //                     title: "FAQ Updated",
+                    //                     text: "FAQ has been updated successfully!",
+                    //           });
+                    //           setIsEditModalVisible(false);
+                    //           editForm.resetFields();
+                    //           refetch();
+                    // } catch (error) {
+                    //           Swal.fire({
+                    //                     icon: "error",
+                    //                     title: "Error",
+                    //                     text: error?.data?.message || "Failed to update FAQ",
+                    //           });
+                    // }
           };
 
           // if (isLoading || isFaqLoading) {
           //           return <Loader />;
           // }
+          const faqData = [
+                    {
+                              question: "What is your return policy?",
+                              answer: "You can return any item within 30 days of purchase for a full refund."
+                    },
+                    {
+                              question: "Do you offer international shipping?",
+                              answer: "Yes, we ship to most countries worldwide. Shipping fees apply."
+                    },
+                    {
+                              question: "How can I track my order?",
+                              answer: "Once your order ships, you will receive an email with the tracking number."
+                    },
+                    {
+                              question: "Can I change or cancel my order?",
+                              answer: "Orders can be changed or canceled within 2 hours of placing them."
+                    },
+                    {
+                              question: "What payment methods do you accept?",
+                              answer: "We accept credit cards, PayPal, and Apple Pay."
+                    }
+          ];
+
 
           return (
                     <>
@@ -125,7 +148,7 @@ const FAQ = () => {
                                         <div className="text-white">
                                                   <button
                                                             onClick={() => setIsAddModalVisible(true)}
-                                                            className="bg-[#14803c] text-white font-semibold px-5 py-2 rounded transition duration-200"
+                                                            className="bg-[#0091FF] text-white font-semibold px-5 py-2 rounded transition duration-200"
                                                   >
                                                             + Add FAQ
                                                   </button>
@@ -133,7 +156,7 @@ const FAQ = () => {
                               </div>
                               <div className="relative p-5 z-0 bg-white">
                                         <div className="flex gap-2 flex-col w-[90%] mt-5">
-                                                  {faqData?.data?.map((faq, index) => (
+                                                  {faqData?.map((faq, index) => (
                                                             <section
                                                                       key={index}
                                                                       className="border-b border-[#e5eaf2] rounded py-3"
@@ -153,15 +176,15 @@ const FAQ = () => {
                                                                                                               }`}
                                                                                           />
                                                                                           <div className="flex gap-2">
-                                                                                                    <div className="border-2 px-1.5 py-1 rounded border-[#14803c] bg-[#f0fcf4]">
+                                                                                                    <div className="border-2 px-1.5 py-1 rounded border-[#0091FF] bg-[#f0fcf4]">
                                                                                                               <button onClick={() => handleOpenEditModal(faq)}>
-                                                                                                                        <CiEdit className="text-2xl cursor-pointer text-[#14803c] font-bold transition-all" />
+                                                                                                                        <CiEdit className="text-2xl cursor-pointer text-[#0091FF] font-bold transition-all" />
                                                                                                               </button>
                                                                                                     </div>
-                                                                                                    <div className="border-2 px-1.5 py-1 rounded border-[#14803c] bg-[#f0fcf4]">
+                                                                                                    <div className="border-2 px-1.5 py-1 rounded border-[#0091FF] bg-[#f0fcf4]">
                                                                                                               <button
                                                                                                                         onClick={() => handleDeleteAdmin(faq)}
-                                                                                                                        disabled={isDeleting}
+                                                                                                                        // disabled={isDeleting}
                                                                                                               >
                                                                                                                         <RiDeleteBin6Line className="text-2xl cursor-pointer text-red-500 transition-all" />
                                                                                                               </button>
@@ -224,7 +247,7 @@ const FAQ = () => {
 
                                                                                           <button
                                                                                                     key="submit"
-                                                                                                    loading={isCreating}
+                                                                                                    // loading={isCreating}
                                                                                                     onClick={() => form.submit()}
                                                                                                     className="py-2 px-4 rounded-lg bg-green-600 !text-white"
                                                                                           >
@@ -292,7 +315,7 @@ const FAQ = () => {
 
                                                                                           <button
                                                                                                     key="submit"
-                                                                                                    loading={isCreating}
+                                                                                                    // loading={isCreating}
                                                                                                     onClick={() => editForm.submit()}
                                                                                                     className="py-2 px-4 rounded-lg bg-green-600 !text-white"
                                                                                           >
