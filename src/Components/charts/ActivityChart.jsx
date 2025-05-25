@@ -1,13 +1,13 @@
 import React from "react";
 import { Cell, Pie, PieChart } from "recharts";
-import { useGetAllDashboardQuery } from "../../redux/api/dashboard";
+// import { useGetAllDashboardQuery } from "../../redux/api/dashboard";
 
 const ActivityStatisticsChart = () => {
-  const { data: dashboardData } = useGetAllDashboardQuery();
+  // const { data: dashboardData } = useGetAllDashboardQuery();
 
   const data = [
-    { name: "Active User", value: dashboardData?.user || 0 },
-    { name: "Active Listings", value: dashboardData?.active_listing || 0 },
+    { name: "Active User", value: 2458 },
+    { name: "Active Listings", value: 1879 },
   ];
 
   const totalValue = data.reduce((sum, item) => sum + item.value, 0);
@@ -45,30 +45,23 @@ const ActivityStatisticsChart = () => {
         </PieChart>
 
         {/* Center Total Value */}
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-          <div className="text-xl xl:text-3xl font-bold text-gray-800">
-            {totalValue}
-          </div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+          <p className="text-3xl font-bold text-gray-800">{totalValue}</p>
+          <p className="text-sm text-gray-600">Total Activities</p>
         </div>
       </div>
 
-      {/* Legend Section */}
-      <div className="mt-6 space-y-4">
+      {/* Legend */}
+      <div className="flex flex-col gap-4 mt-8">
         {data.map((entry, index) => (
-          <div
-            key={`legend-${index}`}
-            className="flex items-center justify-between"
-          >
-            <div className="flex items-center">
-              <div
-                className="w-4 h-4 rounded-full mr-3"
-                style={{ backgroundColor: COLORS[index % COLORS.length] }}
-              ></div>
-              <span className="text-xl text-gray-800">{entry.name}</span>
-            </div>
-            <div className="bg-[#bcf7d1] rounded-lg px-4 py-1 text-xl text-[#14803c]">
-              {entry.value}
-            </div>
+          <div key={entry.name} className="flex items-center gap-2">
+            <div
+              className="w-3 h-3 rounded-full"
+              style={{ backgroundColor: COLORS[index] }}
+            />
+            <span className="text-sm font-medium text-gray-700">
+              {entry.name}: {entry.value}
+            </span>
           </div>
         ))}
       </div>
