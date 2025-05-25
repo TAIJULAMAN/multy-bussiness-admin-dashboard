@@ -12,10 +12,10 @@ const ActivityStatisticsChart = () => {
 
   const totalValue = data.reduce((sum, item) => sum + item.value, 0);
 
-  const COLORS = ["#166635", "#059668"];
+  const COLORS = ["#cce9ff", "#0091ff"];
 
   return (
-    <div className="bg-gradient-to-tr from-[#ffffff] via-white to-[#62e391] rounded-xl p-6 w-full h-[450px]">
+    <div className="bg-gradient-to-tr from-[#ffffff] via-white to-[#0091ff] rounded-xl p-6 w-full h-[450px]">
       <h1 className="!text-sm xl:!text-2xl font-bold text-purple-950 mb-6">
         Activity Statistics
       </h1>

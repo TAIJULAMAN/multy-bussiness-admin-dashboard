@@ -93,8 +93,8 @@ const UserGrowthChart = () => {
         >
           <defs>
             <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#14803c" stopOpacity={1} />
-              <stop offset="95%" stopColor="#14803c" stopOpacity={1} />
+              <stop offset="5%" stopColor="#0091ff" stopOpacity={1} />
+              <stop offset="95%" stopColor="#0091ff" stopOpacity={1} />
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="#E0E0E0" />
@@ -110,7 +110,7 @@ const UserGrowthChart = () => {
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: "#fff",
+              backgroundColor: "#0091ff",
               border: "1px solid #ddd",
               borderRadius: "8px",
               padding: "8px",
