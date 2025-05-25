@@ -17,7 +17,7 @@ function EarningPage() {
         </div>
       </div>
       <div className="mt-12">
-        <h1 className="text-2xl font-bold text-[#14803c] mb-5 text-start">
+        <h1 className="text-2xl font-bold text-[#0091FF] mb-5 text-start">
           Last Transections history
         </h1>
         <TransactionTable />

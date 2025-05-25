@@ -1,18 +1,18 @@
 import React from "react";
 import { ConfigProvider, Modal, Space, Table } from "antd";
 import { useState } from "react";
-import { MdBlockFlipped } from "react-icons/md";
+// import { MdBlockFlipped } from "react-icons/md";
 import { IoIosMail } from "react-icons/io";
 import img from "../../assets/block.png";
-import { useGetTransactionsQuery } from "../../redux/api/transactionApi";
+// import { useGetTransactionsQuery } from "../../redux/api/transactionApi";
 import { imageUrl } from "../../Utils/server";
 import Loader from "../../Components/Shared/Loaders/Loader";
 
 const TransactionTable = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { data: transactionsData, isLoading } = useGetTransactionsQuery();
-  console.log("transactionsData", transactionsData);
+  // const { data: transactionsData, isLoading } = useGetTransactionsQuery();
+  // console.log("transactionsData", transactionsData);
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -20,6 +20,58 @@ const TransactionTable = () => {
   const handleCancel = () => {
     setIsModalOpen(false);
   };
+  // Demo transaction data
+  const transactionsData = {
+    data: [
+      {
+        _id: "1",
+        name: "John Doe",
+        img: "https://randomuser.me/api/portraits/men/1.jpg",
+        updatedAt: "2025-05-25",
+        amount: 1500,
+        email: "john.doe@example.com",
+        status: "completed"
+      },
+      {
+        _id: "2",
+        name: "Sarah Wilson",
+        img: "https://randomuser.me/api/portraits/women/2.jpg",
+        updatedAt: "2025-05-24",
+        amount: 2300,
+        email: "sarah.wilson@example.com",
+        status: "pending"
+      },
+      {
+        _id: "3",
+        name: "Michael Brown",
+        img: "https://randomuser.me/api/portraits/men/3.jpg",
+        updatedAt: "2025-05-23",
+        amount: 3200,
+        email: "michael.brown@example.com",
+        status: "completed"
+      },
+      {
+        _id: "4",
+        name: "Emma Davis",
+        img: "https://randomuser.me/api/portraits/women/4.jpg",
+        updatedAt: "2025-05-22",
+        amount: 1800,
+        email: "emma.davis@example.com",
+        status: "completed"
+      },
+      {
+        _id: "5",
+        name: "James Wilson",
+        img: "https://randomuser.me/api/portraits/men/5.jpg",
+        updatedAt: "2025-05-21",
+        amount: 2700,
+        email: "james.wilson@example.com",
+        status: "pending"
+      }
+    ]
+  };
+
+
   const dataSource =
     transactionsData?.data?.slice(0, 5).map((transaction, index) => ({
 
@@ -73,9 +125,9 @@ const TransactionTable = () => {
     }
   ];
 
-  if (isLoading) {
-    return <Loader />;
-  }
+  // if (isLoading) {
+  //   return <Loader />;
+  // }
 
   return (
     <>
@@ -86,10 +138,10 @@ const TransactionTable = () => {
               activeBorderColor: "#14803c",
             },
             Table: {
-              headerBg: "#14803c",
+              headerBg: "#0091FF",
               headerColor: "rgb(255,255,255)",
               cellFontSize: 16,
-              headerSplitColor: "#14803c",
+              headerSplitColor: "#0091FF",
             },
           },
         }}
