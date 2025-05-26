@@ -402,7 +402,7 @@ function ListingTable() {
       render: (_, record) => (
         <button
           onClick={() => showModal(record)}
-          className="border border-[#0091ff] rounded-lg p-1 bg-[#d3e8e6] text-[#0091ff]"
+          className="border border-[#0091ff] rounded-lg p-1 bg-[#cce9ff] text-[#0091ff]"
         >
           <FaRegEye className="w-8 h-8 text-[#0091ff]" />
         </button>
@@ -469,8 +469,8 @@ function ListingTable() {
               <div>
                 <h1 className="text-3xl font-bold">{selectedListing?.productName}</h1>
                 <div className="flex items-center mt-2">
-                  <span className="text-2xl font-semibold">$ {selectedListing?.price}</span>
-                  <p className="ml-2 text-green-500">In Stock</p>
+                  <span className="text-2xl font-semibold">{selectedListing?.price}</span>
+                  <p className="ml-2 text-[#0091ff]">In Stock</p>
                 </div>
               </div>
 
@@ -484,7 +484,7 @@ function ListingTable() {
                     <h3 className="text-sm font-medium text-gray-500">
                       Product Category
                     </h3>
-                    <p className="mt-1 bg-green-50 text-green-700 hover:bg-green-50">
+                    <p className="mt-1 bg-[#cce9ff] text-[#0091ff]">
                       {selectedListing?.catrgory}
                     </p>
                   </div>
@@ -492,7 +492,7 @@ function ListingTable() {
                     <h3 className="text-sm font-medium text-gray-500">
                       Status
                     </h3>
-                    <p className="mt-1 bg-green-50 text-green-700 hover:bg-green-50">
+                    <p className="mt-1 bg-[#cce9ff] text-[#0091ff]">
                       {selectedListing?.status}
                     </p>
                   </div>
@@ -500,7 +500,7 @@ function ListingTable() {
                     <h3 className="text-sm font-medium text-gray-500">
                       Seller Name
                     </h3>
-                    <p className="mt-1 bg-green-50 text-green-700 hover:bg-green-50">
+                    <p className="mt-1 bg-[#cce9ff] text-[#0091ff]">
                       {selectedListing?.userName}
                     </p>
                   </div>
@@ -508,7 +508,7 @@ function ListingTable() {
                     <h3 className="text-sm font-medium text-gray-500">
                       Seller Email
                     </h3>
-                    <p className="mt-1 bg-green-50 text-green-700 hover:bg-green-50">
+                    <p className="mt-1 bg-[#cce9ff] text-[#0091ff]">
                       {selectedListing?.email}
                     </p>
                   </div>
@@ -516,7 +516,7 @@ function ListingTable() {
                     <h3 className="text-sm font-medium text-gray-500">
                       Condition
                     </h3>
-                    <p className="mt-1 bg-green-50 text-green-700 hover:bg-green-50">
+                    <p className="mt-1 bg-[#cce9ff] text-[#0091ff]">
                       {selectedListing?.condition}
                     </p>
                   </div>

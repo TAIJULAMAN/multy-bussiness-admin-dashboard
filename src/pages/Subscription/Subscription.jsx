@@ -156,7 +156,7 @@ export default function SubscriptionManagement() {
 
       {/* Plan Tabs */}
       <div className="w-full">
-        <div className="grid grid-cols-3 mb-8 border rounded-md overflow-hidden">
+        <div className="grid grid-cols-3 mb-8 border border-[#0091FF] rounded-md overflow-hidden">
           {Object.keys(plans).map((planKey) => (
             <button
               key={planKey}
@@ -178,7 +178,7 @@ export default function SubscriptionManagement() {
             key={planKey}
             className={`mt-0 ${selectedPlan !== planKey ? 'hidden' : ''}`}
           >
-            <div className="border-2 rounded-lg shadow-sm">
+            <div className="border-2 border-[#0091FF] rounded-lg shadow-sm">
               <div className="p-6 border-b">
                 <div>
                   <div className="flex justify-between items-center">

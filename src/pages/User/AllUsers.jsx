@@ -444,19 +444,19 @@ const AllUsers = ({ search }) => {
             onClick={() => showModal(record)}
             className={`border rounded-lg p-1 ${record?.block == true
               ? "border-red-500 text-red-500 bg-red-100"
-              : "border-[#0091ff] text-[#0091ff] bg-[#d3e8e6]"
+              : "border-[#0091ff] text-[#0091ff] bg-[#cce9ff]"
               }`}
           >
             <MdBlockFlipped
               className={`w-8 h-8 ${record?.block == true
                 ? "border-red-500 text-red-500 bg-red-100"
-                : "border-[#0091ff] text-[#0091ff] bg-[#d3e8e6]"
+                : "border-[#0091ff] text-[#0091ff] bg-[#cce9ff]"
                 }`}
             />
           </button>
           <button
             onClick={() => showModal2(record)}
-            className="border border-[#0091ff] rounded-lg p-1 bg-[#d3e8e6] text-[#0091ff]"
+            className="border border-[#0091ff] rounded-lg p-1 bg-[#cce9ff] text-[#0091ff]"
           >
             <FaRegEye className="w-8 h-8 text-[#0091ff]" />
           </button>
