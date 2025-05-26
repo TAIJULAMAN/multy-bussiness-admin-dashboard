@@ -9,9 +9,7 @@ import UsersManage from '../pages/User/UsersManage';
 import EarningPage from '../pages/Earning/EarningPage';
 import VerificationCode from '../pages/Auth/Otp';
 import ListingsTab from '../pages/Listings/Listings';
-import Subscription from '../pages/Subscription/Subscription';
 import Categories from '../pages/Categories/Categories';
-import Location from '../pages/Locations/Locations';
 import Profile from '../pages/Profile/Profile';
 import PrivacyPolicy from '../pages/PrivacyPolicy/PrivacyPolicy';
 import TermsCondition from '../pages/TermsCondition/TermsCondition';
@@ -19,6 +17,7 @@ import Faq from '../pages/Faq/Faq';
 import BusinessInfo from '../pages/Categories/BussinessInfo';
 import AddFormation from '../pages/Categories/AddFormation';
 import MainSubscriptionPage from '../pages/Subscription/MainSubscriptionPage';
+import NDA from '../pages/NDA/NDA';
 
 
 export const Routes = createBrowserRouter([
@@ -64,8 +63,8 @@ export const Routes = createBrowserRouter([
       },
 
       {
-        path: 'locations',
-        element: <Location />,
+        path: '/NDA',
+        element: <NDA />,
       },
 
       {

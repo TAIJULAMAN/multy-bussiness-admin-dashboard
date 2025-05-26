@@ -35,8 +35,8 @@ export const SidebarLink = [
     icon: <LuChartNoAxesCombined size={24} />,
   },
   {
-    path: "/locations",
-    label: "Locations",
+    path: "/NDA",
+    label: "NDA",
     icon: <PiMapPinArea size={24} />,
   },
   {
