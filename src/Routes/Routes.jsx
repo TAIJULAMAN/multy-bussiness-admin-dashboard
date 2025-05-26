@@ -18,6 +18,7 @@ import TermsCondition from '../pages/TermsCondition/TermsCondition';
 import Faq from '../pages/Faq/Faq';
 import BusinessInfo from '../pages/Categories/BussinessInfo';
 import AddFormation from '../pages/Categories/AddFormation';
+import MainSubscriptionPage from '../pages/Subscription/MainSubscriptionPage';
 
 
 export const Routes = createBrowserRouter([
@@ -43,7 +44,7 @@ export const Routes = createBrowserRouter([
       },
       {
         path: '/subscription',
-        element: <Subscription />,
+        element: <MainSubscriptionPage />,
       },
       {
         path: '/earnings-management',
