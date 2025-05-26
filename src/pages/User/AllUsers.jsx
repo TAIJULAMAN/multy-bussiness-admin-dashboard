@@ -82,6 +82,7 @@ const AllUsers = ({ search }) => {
       phone: "123-456-7890",
       country: "Bangladesh",
       block: true,
+      email: "john.doe@example.com",
       userRole: "Business Asset Seller",
       totalListings: 10,
       activeListings: 5,
@@ -99,6 +100,7 @@ const AllUsers = ({ search }) => {
       country: "USA",
       userRole: "Business Asset Seller",
       block: false,
+      email: "jane.smith@example.com",
       totalListings: 8,
       activeListings: 6,
       approvedListings: 4,
@@ -238,7 +240,7 @@ const AllUsers = ({ search }) => {
             </button>
             <button
               onClick={handleBlock}
-              className="bg-[#14803c] text-white font-semibold w-1/3 py-3 px-5 rounded-lg"
+              className="bg-[#0091ff] !text-white font-semibold w-1/3 py-3 px-5 rounded-lg"
             >
               Confirm
             </button>
@@ -259,7 +261,8 @@ const AllUsers = ({ search }) => {
             <div className="w-24 h-24 rounded-full bg-blue-100 mb-3 overflow-hidden">
               <img
                 // src={imageUrl(selectedUser?.img)}
-                src={img}
+                // src={img}
+                src="https://avatar.iran.liara.run/public/44"
                 alt="Profile avatar"
                 className="w-full h-full object-cover"
               />
@@ -281,7 +284,7 @@ const AllUsers = ({ search }) => {
           <div className="flex mb-5">
             <button
               className={`pb-2 px-4 ${activeTab === "User Statics"
-                ? "border-b-2 border-green-600 text-green-600 font-medium"
+                ? "border-b-2 border-[#0091ff] text-[#0091ff] font-medium"
                 : "text-gray-500"
                 }`}
               onClick={() => setActiveTab("User Statics")}
@@ -290,7 +293,7 @@ const AllUsers = ({ search }) => {
             </button>
             <button
               className={`pb-2 px-4 ${activeTab === "Active Listings"
-                ? "border-b-2 border-green-600 text-green-600 font-medium"
+                ? "border-b-2 border-[#0091ff] text-[#0091ff] font-medium"
                 : "text-gray-500"
                 }`}
               onClick={() => setActiveTab("Active Listings")}

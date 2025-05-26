@@ -1,9 +1,9 @@
-import { ConfigProvider, Modal, Table } from 'antd';
+import { ConfigProvider, Modal, Table, Tag } from 'antd';
 import React, { useState } from 'react';
 import { FaRegEye } from 'react-icons/fa';
 import img from "../../assets/product.png"
-import { useGetSingleUserQuery } from '../../redux/api/userApi';
-import { imageUrl } from '../../Utils/server';
+// import { useGetSingleUserQuery } from '../../redux/api/userApi';
+// import { imageUrl } from '../../Utils/server';
 
 
 const ActiveListings = ({ setIsModalOpen2, selectedUser }) => {
@@ -37,6 +37,11 @@ const ActiveListings = ({ setIsModalOpen2, selectedUser }) => {
                               status: "Active",
                               user: "John Doe",
                               user_id: "12345",
+                              phone: "123-456-7890",
+                              country: "Bangladesh",
+                              userRole: "Business Asset Seller",
+                              block: true,
+                              email: "john.doe@example.com",
                     },
                     {
                               key: 2,
@@ -50,6 +55,11 @@ const ActiveListings = ({ setIsModalOpen2, selectedUser }) => {
                               status: "Active",
                               user: "Jane Smith",
                               user_id: "67890",
+                              phone: "987-654-3210",
+                              country: "USA",
+                              userRole: "Business Asset Seller",
+                              block: false,
+                              email: "jane.smith@example.com",
                     },
           ];
 
@@ -72,7 +82,16 @@ const ActiveListings = ({ setIsModalOpen2, selectedUser }) => {
           const columns = [
                     { title: "No", dataIndex: "no", key: "no" },
                     { title: "Name", dataIndex: "name", key: "name" },
-                    { title: "Price", dataIndex: "price", key: "price" },
+                    { title: "Contact Number", dataIndex: "phone", key: "phone" },
+                    {
+                              title: "User Role",
+                              dataIndex: "userRole",
+                              render: (_, record) => (
+                                        <Tag color="blue">{record?.userRole || "No Role"}</Tag>
+                              ),
+                    },
+                    { title: "Country", dataIndex: "country", key: "country" },
+
                     { title: "Category", dataIndex: "category_name", key: "category_name" },
                     {
                               title: "Action",
@@ -122,7 +141,7 @@ const ActiveListings = ({ setIsModalOpen2, selectedUser }) => {
                                         columns={columns}
                                         pagination={{ pageSize: 5 }}
                                         scroll={{ x: "max-content" }}
-                                        // loading={isLoading}
+                              // loading={isLoading}
                               />
                               <Modal open={isModalOpen} centered onCancel={handleCancel} footer={null}>
                                         <div className="container mx-auto px-4 py-8">
