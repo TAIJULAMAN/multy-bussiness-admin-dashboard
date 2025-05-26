@@ -21,7 +21,7 @@ const ActivityStatisticsChart = () => {
       </h1>
 
       <div className="relative h-64 flex justify-center">
-        {/* PieChart Component */}
+        {/* PieChart Component */} 
         <PieChart width={240} height={240}>
           <Pie
             data={data}

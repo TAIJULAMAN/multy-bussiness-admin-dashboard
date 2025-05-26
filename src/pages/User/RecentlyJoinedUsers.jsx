@@ -225,7 +225,7 @@ const RecentlyJoinedUsers = () => {
             </button>
             <button
               onClick={handleBlock}
-              className="bg-[#0091ff] text-white font-semibold w-1/3 py-3 px-5 rounded-lg"
+              className="bg-[#0091ff] !text-white font-semibold w-1/3 py-3 px-5 rounded-lg"
             >
               Confirm
             </button>

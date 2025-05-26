@@ -10,8 +10,8 @@ const ActiveListings = ({ setIsModalOpen2, selectedUser }) => {
           const [isModalOpen, setIsModalOpen] = useState(false)
           const [selectedItem, setSelectedItem] = useState(null);
           console.log("selectedItem", selectedItem);
-          const { data: singleUser, isLoading } = useGetSingleUserQuery({ user: selectedUser?.key });
-          console.log("singleUser", singleUser?.data);
+          // const { data: singleUser, isLoading } = useGetSingleUserQuery({ user: selectedUser?.key });
+          // console.log("singleUser", singleUser?.data);
 
 
           const showModal = (record) => {
@@ -24,22 +24,50 @@ const ActiveListings = ({ setIsModalOpen2, selectedUser }) => {
                     setIsModalOpen(false);
                     setSelectedItem(null);
           };
+          const dataSource = [
+                    {
+                              key: 1,
+                              no: 1,
+                              name: "John Doe",
+                              price: "$100",
+                              category_name: "Electronics",
+                              img: img,
+                              condition: "New",
+                              description: "This is a sample description.",
+                              status: "Active",
+                              user: "John Doe",
+                              user_id: "12345",
+                    },
+                    {
+                              key: 2,
+                              no: 2,
+                              name: "Jane Smith",
+                              price: "$200",
+                              category_name: "Clothing",
+                              img: img,
+                              condition: "Used",
+                              description: "This is another sample description.",
+                              status: "Active",
+                              user: "Jane Smith",
+                              user_id: "67890",
+                    },
+          ];
 
 
-          const dataSource = singleUser?.data?.map((item, index) => ({
-                    key: index + 1,
-                    no: index + 1,
-                    name: item?.name || "No Name",
-                    price: item?.price || "N/A",
-                    category_name: item?.category_name || "N/A",
-                    img: item?.img || "N/A",
-                    condition: item?.condition || "N/A",
-                    description: item?.description || "N/A",
-                    status: item?.status || "N/A",
-                    user: item?.user_name || "N/A",
-                    user_id: item?.user_id || "N/A",
+          // const dataSource = singleUser?.data?.map((item, index) => ({
+          //           key: index + 1,
+          //           no: index + 1,
+          //           name: item?.name || "No Name",
+          //           price: item?.price || "N/A",
+          //           category_name: item?.category_name || "N/A",
+          //           img: item?.img || "N/A",
+          //           condition: item?.condition || "N/A",
+          //           description: item?.description || "N/A",
+          //           status: item?.status || "N/A",
+          //           user: item?.user_name || "N/A",
+          //           user_id: item?.user_id || "N/A",
 
-          }));
+          // }));
 
           const columns = [
                     { title: "No", dataIndex: "no", key: "no" },
@@ -54,9 +82,9 @@ const ActiveListings = ({ setIsModalOpen2, selectedUser }) => {
                                                   <div className="flex gap-2">
                                                             <button
                                                                       onClick={() => showModal(record)}
-                                                                      className="border border-[#14803c] rounded-lg p-1 bg-[#d3e8e6] text-[#14803c]"
+                                                                      className="border border-[#0091ff] rounded-lg p-1 bg-[#d3e8e6] text-[#0091ff]"
                                                             >
-                                                                      <FaRegEye className="w-8 h-8 text-[#14803c]" />
+                                                                      <FaRegEye className="w-8 h-8 text-[#0091ff]" />
                                                             </button>
                                                   </div>
                                         );
@@ -81,10 +109,10 @@ const ActiveListings = ({ setIsModalOpen2, selectedUser }) => {
                                                             colorText: "#14803c",
                                                   },
                                                   Table: {
-                                                            headerBg: "#14803c",
+                                                            headerBg: "#0091ff",
                                                             headerColor: "rgb(255,255,255)",
                                                             cellFontSize: 16,
-                                                            headerSplitColor: "#14803c",
+                                                            headerSplitColor: "#0091ff",
                                                   },
                                         },
                               }}
@@ -94,7 +122,7 @@ const ActiveListings = ({ setIsModalOpen2, selectedUser }) => {
                                         columns={columns}
                                         pagination={{ pageSize: 5 }}
                                         scroll={{ x: "max-content" }}
-                                        loading={isLoading}
+                                        // loading={isLoading}
                               />
                               <Modal open={isModalOpen} centered onCancel={handleCancel} footer={null}>
                                         <div className="container mx-auto px-4 py-8">
@@ -104,7 +132,8 @@ const ActiveListings = ({ setIsModalOpen2, selectedUser }) => {
                                                                       {selectedItem?.img?.length > 0 && (
                                                                                 <div className="relative rounded-lg overflow-hidden">
                                                                                           <img
-                                                                                                    src={imageUrl(selectedItem.img[0])}
+                                                                                                    // src={imageUrl(selectedItem.img[0])}
+                                                                                                    src={img}
                                                                                                     alt="Profile avatar"
                                                                                                     className="w-full h-[300px] object-cover"
                                                                                           />
