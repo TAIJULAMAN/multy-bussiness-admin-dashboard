@@ -3,7 +3,7 @@ import PageHeading from "../../Components/Shared/PageHeading";
 import ListingTable from "../Listings/ListingTable";
 
 const NDA = () => {
-          const [activeTab, setActiveTab] = useState("allListings");
+          const [activeTab, setActiveTab] = useState("sellerNDA");
 
           const renderContent = () => {
                     switch (activeTab) {
@@ -17,7 +17,7 @@ const NDA = () => {
                                         return <div className="p-4"><ListingTable /></div>;
                               case "FranchisorNDA":
                                         return <div className="p-4"><ListingTable /></div>;
-                                        
+
                               default:
                                         return null;
                     }
