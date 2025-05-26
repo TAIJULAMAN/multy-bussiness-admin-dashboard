@@ -1,4 +1,4 @@
-import { ConfigProvider, Modal, Table } from "antd";
+import { ConfigProvider, Modal, Table, Tag } from "antd";
 import { useState } from "react";
 import { AiOutlineMail, AiOutlinePhone } from "react-icons/ai";
 import { FaRegEye } from "react-icons/fa";
@@ -7,12 +7,12 @@ import { MdBlockFlipped } from "react-icons/md";
 import img from "../../assets/block.png";
 import ActiveListings from "../../pages/User/ActiveListings";
 import UserStats from "../../pages/User/UserStatics";
-import {
-  useGetAllUserQuery,
-  useUpdateUserMutation,
-} from "../../redux/api/userApi";
-import { imageUrl } from "../../Utils/server";
-import Loader from "../../Components/Shared/Loaders/Loader";
+// import {
+//   useGetAllUserQuery,
+//   useUpdateUserMutation,
+// } from "../../redux/api/userApi";
+// import { imageUrl } from "../../Utils/server";
+// import Loader from "../../Components/Shared/Loaders/Loader";
 
 const AllUsers = ({ search }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -20,8 +20,8 @@ const AllUsers = ({ search }) => {
   const [isModalOpen2, setIsModalOpen2] = useState(false);
   const [activeTab, setActiveTab] = useState("User Statics");
   const [selectedUser, setSelectedUser] = useState(null);
-  const { data: userData, isLoading } = useGetAllUserQuery({ search, page });
-  const [updateUser] = useUpdateUserMutation();
+  // const { data: userData, isLoading } = useGetAllUserQuery({ search, page });
+  // const [updateUser] = useUpdateUserMutation();
 
   const showModal = (user) => {
     setSelectedUser(user);
@@ -55,32 +55,70 @@ const AllUsers = ({ search }) => {
     }
   };
 
-  const dataSource =
-    userData?.data?.map((user, index) => ({
-      key: user?._id || index.toString(),
-      no: index + 1,
-      name: user?.name || "No Name",
-      img: user?.img,
-      date: user?.joined || "N/A",
-      phone: user?.phone || "N/A",
-      email: user?.email || "N/A",
-      block: user?.block,
-      totalListings: user?.total_listing || 0,
-      activeListings: user?.active_listing || 0,
-      approvedListings: user?.active_listing || 0,
-      rejectedListings: user?.rejected_listing || 0,
-      soldListing: user?.sold_listing || 0,
-    })) || [];
+  // const dataSource =
+  //   userData?.data?.map((user, index) => ({
+  //     key: user?._id || index.toString(),
+  //     no: index + 1,
+  //     name: user?.name || "No Name",
+  //     img: user?.img,
+  //     date: user?.joined || "N/A",
+  //     phone: user?.phone || "N/A",
+  //     email: user?.email || "N/A",
+  //     block: user?.block,
+  //     totalListings: user?.total_listing || 0,
+  //     activeListings: user?.active_listing || 0,
+  //     approvedListings: user?.active_listing || 0,
+  //     rejectedListings: user?.rejected_listing || 0,
+  //     soldListing: user?.sold_listing || 0,
+  //   })) || [];
+
+  const dataSource = [
+    {
+      key: "1",
+      no: 1,
+      name: "John Doe",
+      img: img,
+      date: "2023-01-01",
+      phone: "123-456-7890",
+      country: "Bangladesh",
+      block: true,
+      userRole: "Business Asset Seller",
+      totalListings: 10,
+      activeListings: 5,
+      approvedListings: 3,
+      rejectedListings: 2,
+      soldListing: 1,
+    },
+    {
+      key: "2",
+      no: 2,
+      name: "Jane Smith",
+      img: img,
+      date: "2023-01-02",
+      phone: "987-654-3210",
+      country: "USA",
+      userRole: "Business Asset Seller",
+      block: false,
+      totalListings: 8,
+      activeListings: 6,
+      approvedListings: 4,
+      rejectedListings: 1,
+      soldListing: 3,
+    },
+  ]
+
+
 
   const columns = [
     { title: "No", dataIndex: "no", key: "no" },
     {
-      title: "Name",
+      title: "User Info",
       key: "name",
       render: (_, record) => (
         <div className="flex items-center gap-3">
           <img
-            src={imageUrl(record?.img)}
+            // src={imageUrl(record?.img)}
+            src={img}
             className="w-10 h-10 object-cover rounded-full"
             alt="User Avatar"
           />
@@ -97,10 +135,18 @@ const AllUsers = ({ search }) => {
         return formattedDate;
       },
     },
-    { title: "Phone Number", dataIndex: "phone", key: "phone" },
-    { title: "Email", dataIndex: "email", key: "email" },
+    { title: "Contact Number", dataIndex: "phone", key: "phone" },
+    {
+      title: "User Role",
+      dataIndex: "userRole",
+      render: (_, record) => (
+        <Tag color="blue">{record?.userRole || "No Role"}</Tag>
+      ),
+    },
+    { title: "Country", dataIndex: "country", key: "country" },
     {
       title: "Action",
+
       key: "action",
       render: (_, record) => (
         <div className="flex gap-2">
@@ -108,28 +154,28 @@ const AllUsers = ({ search }) => {
             onClick={() => showModal(record)}
             className={`border rounded-lg p-1 ${record?.block == true
               ? "border-red-500 text-red-500 bg-red-100"
-              : "border-[#14803c] text-[#14803c] bg-[#d3e8e6]"
+              : "border-[#0091ff] text-[#0091ff] bg-[#d3e8e6]"
               }`}
           >
             <MdBlockFlipped
               className={`w-8 h-8 ${record?.block == true
                 ? "border-red-500 text-red-500 bg-red-100"
-                : "border-[#14803c] text-[#14803c] bg-[#d3e8e6]"
+                : "border-[#0091ff] text-[#0091ff] bg-[#d3e8e6]"
                 }`}
             />
           </button>
           <button
             onClick={() => showModal2(record)}
-            className="border border-[#14803c] rounded-lg p-1 bg-[#d3e8e6] text-[#14803c]"
+            className="border border-[#0091ff] rounded-lg p-1 bg-[#d3e8e6] text-[#0091ff]"
           >
-            <FaRegEye className="w-8 h-8 text-[#14803c]" />
+            <FaRegEye className="w-8 h-8 text-[#0091ff]" />
           </button>
         </div>
       ),
     },
   ];
 
-  if (isLoading) return <Loader />;
+  // if (isLoading) return <Loader />;
 
   return (
     <ConfigProvider
@@ -139,18 +185,18 @@ const AllUsers = ({ search }) => {
             activeBorderColor: "#14803c",
           },
           Pagination: {
-            colorPrimary: "#14803c",
-            colorPrimaryHover: "#14803c",
-            itemActiveBg: "#14803c",
+            colorPrimary: "#0091ff",
+            colorPrimaryHover: "#0091ff",
+            itemActiveBg: "#0091ff",
             itemActiveColor: "#ffffff",
-            colorBgTextHover: "#14803c",
-            colorText: "#14803c",
+            colorBgTextHover: "#0091ff",
+            colorText: "#0091ff",
           },
           Table: {
-            headerBg: "#14803c",
+            headerBg: "#0091ff",
             headerColor: "rgb(255,255,255)",
             cellFontSize: 16,
-            headerSplitColor: "#14803c",
+            headerSplitColor: "#0091ff",
           },
         },
       }}
@@ -158,10 +204,17 @@ const AllUsers = ({ search }) => {
       <Table
         dataSource={dataSource}
         columns={columns}
+        // pagination={{
+        //   pageSize: userData?.pagination?.itemPerPage,
+        //   total: userData?.pagination?.totalItems,
+        //   current: userData?.pagination?.currentPage,
+        //   showSizeChanger: false,
+        //   onChange: (page) => setPage(page),
+        // }}
         pagination={{
-          pageSize: userData?.pagination?.itemPerPage,
-          total: userData?.pagination?.totalItems,
-          current: userData?.pagination?.currentPage,
+          pageSize: 10,
+          total: dataSource.length,
+          current: 1,
           showSizeChanger: false,
           onChange: (page) => setPage(page),
         }}
@@ -171,7 +224,7 @@ const AllUsers = ({ search }) => {
       {/* Block Modal */}
       <Modal open={isModalOpen} centered onCancel={handleCancel} footer={null}>
         <div className="flex flex-col justify-center items-center py-10">
-          <img src={img} alt="Confirmation" className="w-40 h-40 mb-5" />
+          <img src="https://avatar.iran.liara.run/public/44" alt="Confirmation" className="w-40 h-40 mb-5" />
           <p className="text-3xl text-center text-gray-800">Warning</p>
           <p className="text-xl text-center mt-5">
             Do you want to block this user?
@@ -205,7 +258,8 @@ const AllUsers = ({ search }) => {
           <div className="flex flex-col items-center mb-6">
             <div className="w-24 h-24 rounded-full bg-blue-100 mb-3 overflow-hidden">
               <img
-                src={imageUrl(selectedUser?.img)}
+                // src={imageUrl(selectedUser?.img)}
+                src={img}
                 alt="Profile avatar"
                 className="w-full h-full object-cover"
               />
