@@ -101,7 +101,7 @@ const ActiveListings = ({ setIsModalOpen2, selectedUser }) => {
                                                   <div className="flex gap-2">
                                                             <button
                                                                       onClick={() => showModal(record)}
-                                                                      className="border border-[#0091ff] rounded-lg p-1 bg-[#d3e8e6] text-[#0091ff]"
+                                                                      className="border border-[#0091ff] rounded-lg p-1 bg-[#cce9ff] text-[#0091ff]"
                                                             >
                                                                       <FaRegEye className="w-8 h-8 text-[#0091ff]" />
                                                             </button>
@@ -165,8 +165,8 @@ const ActiveListings = ({ setIsModalOpen2, selectedUser }) => {
                                                                       <div>
                                                                                 <h1 className="text-3xl font-bold">{selectedItem?.name}</h1>
                                                                                 <div className="flex items-center mt-2">
-                                                                                          <span className="text-2xl font-semibold">$ {selectedItem?.price}</span>
-                                                                                          <p className="ml-2 text-green-500">In Stock</p>
+                                                                                          <span className="text-2xl font-semibold">{selectedItem?.price}</span>
+                                                                                          <p className="ml-2 text-[#0091ff]">In Stock</p>
                                                                                 </div>
                                                                       </div>
 
@@ -181,19 +181,19 @@ const ActiveListings = ({ setIsModalOpen2, selectedUser }) => {
                                                                                 <div className="grid grid-cols-2 gap-4">
                                                                                           <div>
                                                                                                     <h3 className="text-sm font-medium text-gray-500">Product Category</h3>
-                                                                                                    <p className="mt-1 bg-green-50 text-green-700 hover:bg-green-50">{selectedItem?.category_name || "N/A"}</p>
+                                                                                                    <p className="mt-1 bg-[#cce9ff] text-[#0091ff]">{selectedItem?.category_name || "N/A"}</p>
                                                                                           </div>
                                                                                           <div>
                                                                                                     <h3 className="text-sm font-medium text-gray-500">Product Type</h3>
-                                                                                                    <p className="mt-1 bg-green-50 text-green-700 hover:bg-green-50">{selectedItem?.type_name || "N/A"}</p>
+                                                                                                    <p className="mt-1 bg-[#cce9ff] text-[#0091ff]">{selectedItem?.type_name || "N/A"}</p>
                                                                                           </div>
                                                                                           <div>
                                                                                                     <h3 className="text-sm font-medium text-gray-500">Condition</h3>
-                                                                                                    <p className="mt-1 bg-green-50 text-green-700 hover:bg-green-50">{selectedItem?.condition || "N/A"}</p>
+                                                                                                    <p className="mt-1 bg-[#cce9ff] text-[#0091ff]">{selectedItem?.condition || "N/A"}</p>
                                                                                           </div>
                                                                                           <div>
                                                                                                     <h3 className="text-sm font-medium text-gray-500">Material</h3>
-                                                                                                    <p className="mt-1 bg-green-50 text-green-700 hover:bg-green-50">{selectedItem?.material || "N/A"}</p>
+                                                                                                    <p className="mt-1 bg-[#cce9ff] text-[#0091ff]">{selectedItem?.material || "N/A"}</p>
                                                                                           </div>
                                                                                 </div>
                                                                       </div>

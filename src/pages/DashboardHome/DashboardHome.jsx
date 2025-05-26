@@ -65,7 +65,7 @@ function DashboardHome() {
               <h1>{card.icon}</h1>
               <div>
                 <h1 className="text-3xl font-semibold">{card.title}</h1>
-                <h1 className="text-3xl font-semibold text-[#15803D]">
+                <h1 className="text-3xl font-semibold text-[#0091ff]">
                   {card.value}
                 </h1>
               </div>
