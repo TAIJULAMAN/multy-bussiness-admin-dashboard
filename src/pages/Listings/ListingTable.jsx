@@ -4,6 +4,7 @@ import { useState } from "react";
 import { FaRegEye } from "react-icons/fa";
 // import { useGetAllListingQuery } from "../../redux/api/listApi";
 // import { imageUrl } from "../../Utils/server";
+import img from "../../assets/build.png"
 
 function ListingTable() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -456,7 +457,7 @@ function ListingTable() {
             <div className="space-y-4">
               <div className="relative rounded-lg overflow-hidden">
                 <img
-                  src="https://avatar.iran.liara.run/public/22"
+                  src={img}
                   alt={selectedListing?.productName}
                   className="w-full h-64 object-cover"
                 />
