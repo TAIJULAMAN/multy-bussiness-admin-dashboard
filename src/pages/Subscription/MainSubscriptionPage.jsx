@@ -134,7 +134,7 @@ const MainSubscriptionPage = () => {
                                                                       key={tab.key}
                                                                       onClick={() => setActiveTab(tab.key)}
                                                                       className={`px-10 py-2 text-sm font-medium transition-colors ${activeTab === tab.key
-                                                                                ? 'bg-[#0091FF] text-white'
+                                                                                ? 'bg-[#0091FF] !text-white'
                                                                                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
 
                                                                                 }`}

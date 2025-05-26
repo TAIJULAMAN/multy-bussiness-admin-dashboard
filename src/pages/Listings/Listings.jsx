@@ -24,7 +24,7 @@ const ListingsTabs = () => {
 
   const tabStyle = (tabKey) =>
     `px-4 py-2 rounded-t-md font-semibold transition-all duration-200 ${activeTab === tabKey
-      ? "bg-[#0091ff] text-white border border-[#0091ff] !border-b-0"
+      ? "bg-[#0091ff] !text-white border border-[#0091ff] !border-b-0"
       : "text-[#0091ff] hover:bg-[#0091ff]"
     }`;
 
