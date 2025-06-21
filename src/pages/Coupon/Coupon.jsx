@@ -1,5 +1,5 @@
 import React from "react";
-import { ConfigProvider, Modal, Table } from "antd";
+import { ConfigProvider, Modal, Table, Form, Input, DatePicker, Select, Button } from "antd";
 import { useState } from "react";
 import { FaRegEye } from "react-icons/fa";
 import img from "../../assets/build.png";
@@ -8,6 +8,7 @@ import PageHeading from "../../Components/Shared/PageHeading";
 import { CiEdit } from "react-icons/ci";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import Swal from 'sweetalert2';
+import dayjs from 'dayjs';
 
 function Coupon() {
           const [isModalOpen, setIsModalOpen] = useState(false);
@@ -95,8 +96,15 @@ function Coupon() {
                     },
           ]);
 
+          const [form] = Form.useForm();
+          const [editingRecord, setEditingRecord] = useState(null);
+          const { Option } = Select;
+          const { RangePicker } = DatePicker;
+
           const handleCancel = () => {
                     setIsModalOpen(false);
+                    form.resetFields();
+                    setEditingRecord(null);
           };
 
           const handleDeleteAdmin = (record) => {
@@ -110,11 +118,9 @@ function Coupon() {
                               confirmButtonText: "Yes, delete it!",
                     }).then((result) => {
                               if (result.isConfirmed) {
-                                        // Remove the coupon from the data source
-                                        setDataSource(prevData =>
+                                        setDataSource(prevData => 
                                                   prevData.filter(item => item.key !== record.key)
                                         );
-
                                         Swal.fire(
                                                   'Deleted!',
                                                   'Your coupon has been deleted.',
@@ -122,6 +128,67 @@ function Coupon() {
                                         );
                               }
                     });
+          };
+
+          const handleAdd = () => {
+                    setIsModalOpen(true);
+                    setEditingRecord(null);
+          };
+
+          const handleEdit = (record) => {
+                    setIsModalOpen(true);
+                    setEditingRecord(record);
+                    form.setFieldsValue({
+                              code: record.code,
+                              reason: record.reason,
+                              discount: parseInt(record.discount.replace('%', '')),
+                              dateRange: [
+                                        dayjs(record.startDate),
+                                        dayjs(record.endDate)
+                              ],
+                              status: record.status,
+                    });
+          };
+
+          const onFinish = async (values) => {
+                    try {
+                              const newRecord = {
+                                        key: editingRecord ? editingRecord.key : (dataSource.length + 1).toString(),
+                                        no: editingRecord ? editingRecord.no : dataSource.length + 1,
+                                        code: values.code,
+                                        reason: values.reason,
+                                        discount: `${values.discount}%`,
+                                        startDate: values.dateRange[0].format('YYYY-MM-DD'),
+                                        endDate: values.dateRange[1].format('YYYY-MM-DD'),
+                                        status: values.status,
+                              };
+
+                              if (editingRecord) {
+                                        setDataSource(prevData => 
+                                                  prevData.map(item => 
+                                                            item.key === editingRecord.key ? newRecord : item
+                                                  )
+                                        );
+                              } else {
+                                        setDataSource(prevData => [...prevData, newRecord]);
+                              }
+
+                              setIsModalOpen(false);
+                              form.resetFields();
+                              setEditingRecord(null);
+                              Swal.fire(
+                                        'Success!',
+                                        editingRecord ? 'Coupon updated successfully' : 'Coupon added successfully',
+                                        'success'
+                              );
+                    } catch (error) {
+                              console.error('Error saving coupon:', error);
+                              Swal.fire(
+                                        'Error!',
+                                        'Failed to save coupon',
+                                        'error'
+                              );
+                    }
           };
 
           const columns = [
@@ -167,12 +234,14 @@ function Coupon() {
                                         <div className="flex gap-2 justify-center item-center">
                                                   <div className="bg-[#0091FF] rounded  p-2">
                                                             <button
-                                                                    
+                                                                      onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                handleEdit(record);
+                                                                      }}
                                                             >
                                                                       <CiEdit className="text-xl text-white font-bold" />
                                                             </button>
                                                   </div>
-
                                                   <div className="bg-[#FEE2E2] rounded  p-2">
                                                             <button
                                                                       onClick={(e) => {
@@ -189,19 +258,17 @@ function Coupon() {
           ];
 
           return (
-
                     <div className="p-5">
                               <div className="flex items-center justify-between mb-5">
                                         <PageHeading title="Coupon Management" />
-                                        <button
-                                                  // type="submit"
-                                                  // onClick={() => setIsAddModalVisible(true)}
+                                        <Button
+                                                  type="primary"
+                                                  onClick={handleAdd}
                                                   className="bg-[#0091FF] !text-white px-5 py-2 rounded"
                                         >
                                                   + Add New Coupon
-                                        </button>
+                                        </Button>
                               </div>
-
 
                               <ConfigProvider
                                         theme={{
@@ -226,13 +293,6 @@ function Coupon() {
                                         <Table
                                                   dataSource={dataSource}
                                                   columns={columns}
-                                                  // pagination={{
-                                                  //   pageSize: listData?.pagination?.itemPerPage,
-                                                  //   total: listData?.pagination?.totalItems,
-                                                  //   current: listData?.pagination?.currentPage,
-                                                  //   showSizeChanger: false,
-                                                  //   onChange: (page) => setPage(page),
-                                                  // }}
                                                   pagination={{
                                                             pageSize: 10,
                                                             total: dataSource.length,
@@ -242,8 +302,86 @@ function Coupon() {
                                                   }}
                                                   scroll={{ x: "max-content" }}
                                         />
-
                               </ConfigProvider>
+
+                              <Modal
+                                        title={editingRecord ? "Edit Coupon" : "Add New Coupon"}
+                                        open={isModalOpen}
+                                        onCancel={handleCancel}
+                                        footer={null}
+                                        width={600}
+                              >
+                                        <Form
+                                                  form={form}
+                                                  layout="vertical"
+                                                  onFinish={onFinish}
+                                                  initialValues={{
+                                                            status: "Active",
+                                                  }}
+                                        >
+                                                  <Form.Item
+                                                            label="Coupon Code"
+                                                            name="code"
+                                                            rules={[{ required: true, message: 'Please enter coupon code' }]}
+                                                  >
+                                                            <Input placeholder="Enter coupon code" />
+                                                  </Form.Item>
+
+                                                  <Form.Item
+                                                            label="Reason"
+                                                            name="reason"
+                                                            rules={[{ required: true, message: 'Please enter reason' }]}
+                                                  >
+                                                            <Input.TextArea
+                                                                      placeholder="Enter reason for coupon"
+                                                                      rows={2}
+                                                            />
+                                                  </Form.Item>
+
+                                                  <Form.Item
+                                                            label="Discount (%)"
+                                                            name="discount"
+                                                            rules={[{ required: true, message: 'Please enter discount' }]}
+                                                  >
+                                                            <Input
+                                                                      type="number"
+                                                                      placeholder="Enter discount percentage"
+                                                                      addonAfter="%"
+                                                            />
+                                                  </Form.Item>
+
+                                                  <Form.Item
+                                                            label="Validity Period"
+                                                            name="dateRange"
+                                                            rules={[{ required: true, message: 'Please select validity period' }]}
+                                                  >
+                                                            <RangePicker
+                                                                      format="YYYY-MM-DD"
+                                                                      placeholder={["Start Date", "End Date"]}
+                                                            />
+                                                  </Form.Item>
+
+                                                  <Form.Item
+                                                            label="Status"
+                                                            name="status"
+                                                  >
+                                                            <Select
+                                                                      placeholder="Select status"
+                                                                      allowClear
+                                                            >
+                                                                      <Option value="Active">Active</Option>
+                                                                      <Option value="Expired">Expired</Option>
+                                                            </Select>
+                                                  </Form.Item>
+
+                                                  <div className="flex justify-end gap-3 mt-4">
+                                                            <Button onClick={handleCancel}>Cancel</Button>
+                                                            <Button type="primary" htmlType="submit">
+                                                                      {editingRecord ? "Update" : "Add"}
+                                                            </Button>
+                                                  </div>
+                                        </Form>
+                              </Modal>
                     </div>
           );
 }
