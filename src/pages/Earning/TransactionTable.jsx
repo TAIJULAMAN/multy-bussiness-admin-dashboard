@@ -30,6 +30,7 @@ const TransactionTable = () => {
         updatedAt: "2025-05-25",
         amount: 1500,
         email: "john.doe@example.com",
+        country : "Bangladesh",
         status: "completed"
       },
       {
@@ -39,6 +40,7 @@ const TransactionTable = () => {
         updatedAt: "2025-05-24",
         amount: 2300,
         email: "sarah.wilson@example.com",
+        country : "India",
         status: "pending"
       },
       {
@@ -48,6 +50,7 @@ const TransactionTable = () => {
         updatedAt: "2025-05-23",
         amount: 3200,
         email: "michael.brown@example.com",
+        country : "Nepal",
         status: "completed"
       },
       {
@@ -57,6 +60,7 @@ const TransactionTable = () => {
         updatedAt: "2025-05-22",
         amount: 1800,
         email: "emma.davis@example.com",
+        country : "Bhutan",
         status: "completed"
       },
       {
@@ -66,6 +70,7 @@ const TransactionTable = () => {
         updatedAt: "2025-05-21",
         amount: 2700,
         email: "james.wilson@example.com",
+        country : "Srilanka",
         status: "pending"
       }
     ]
@@ -82,6 +87,7 @@ const TransactionTable = () => {
       date: transaction?.updatedAt || "N/A",
       amount: transaction?.amount || "N/A",
       email: transaction?.email || "N/A",
+      country: transaction?.country || "N/A",
 
     })) || [];
 
@@ -114,6 +120,11 @@ const TransactionTable = () => {
       ),
     },
     {
+      title: "Country",
+      dataIndex: "country",
+      key: "country",
+    },
+    {
       title: "Date",
       dataIndex: "date",
       key: "date",
@@ -123,6 +134,7 @@ const TransactionTable = () => {
       dataIndex: "amount",
       key: "amount",
     }
+
   ];
 
   // if (isLoading) {

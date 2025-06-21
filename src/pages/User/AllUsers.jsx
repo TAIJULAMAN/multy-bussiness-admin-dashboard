@@ -77,7 +77,6 @@ const AllUsers = ({ search }) => {
       key: "1",
       no: 1,
       name: "John Doe",
-
       date: "2023-01-01",
       phone: "123-456-7890",
       country: "Bangladesh",

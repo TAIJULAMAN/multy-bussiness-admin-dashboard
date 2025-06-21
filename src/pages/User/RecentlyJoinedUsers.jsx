@@ -6,7 +6,7 @@ import { AiOutlinePhone, AiOutlineMail } from "react-icons/ai";
 
 import img from "../../assets/block.png";
 // import { useGetAllUserQuery, useUpdateUserMutation } from "../../redux/api/userApi";
-import { imageUrl } from "../../Utils/server";
+// import { imageUrl } from "../../Utils/server";
 import ActiveListings from "./ActiveListings";
 import UserStats from "./UserStatics";
 
@@ -25,6 +25,7 @@ const RecentlyJoinedUsers = () => {
       img: "https://randomuser.me/api/portraits/men/1.jpg",
       date: "2025-05-20",
       phone: "+1 (555) 123-4567",
+      country: "Bangladesh",
       email: "john.doe@example.com",
       block: false,
       totalListings: 15,
@@ -41,6 +42,7 @@ const RecentlyJoinedUsers = () => {
       date: "2025-05-19",
       phone: "+1 (555) 234-5678",
       email: "sarah.smith@example.com",
+      country: "USA",
       block: false,
       totalListings: 12,
       activeListings: 6,
@@ -55,6 +57,7 @@ const RecentlyJoinedUsers = () => {
       img: "https://randomuser.me/api/portraits/men/2.jpg",
       date: "2025-05-18",
       phone: "+1 (555) 345-6789",
+      country: "Canada",
       email: "michael.j@example.com",
       block: true,
       totalListings: 8,
@@ -71,6 +74,7 @@ const RecentlyJoinedUsers = () => {
       date: "2025-05-17",
       phone: "+1 (555) 456-7890",
       email: "emily.b@example.com",
+      country: "UK",
       block: false,
       totalListings: 20,
       activeListings: 12,
@@ -87,6 +91,7 @@ const RecentlyJoinedUsers = () => {
       phone: "+1 (555) 567-8901",
       email: "david.w@example.com",
       block: false,
+      country: "Australia",
       totalListings: 10,
       activeListings: 5,
       approvedListings: 7,
@@ -147,6 +152,7 @@ const RecentlyJoinedUsers = () => {
     },
     { title: "Phone Number", dataIndex: "phone", key: "phone" },
     { title: "Email", dataIndex: "email", key: "email" },
+    { title: "Country", dataIndex: "country", key: "country" },
     {
       title: "Action",
       key: "action",
@@ -154,16 +160,18 @@ const RecentlyJoinedUsers = () => {
         <div className="flex gap-2">
           <button
             onClick={() => showModal(record)}
-            className={`border rounded-lg p-1 ${record.block
-              ? "border-red-500 text-red-500 bg-red-100"
-              : "border-[#0091ff] text-[#0091ff] bg-[#cce9ff]"
-              }`}
-          >
-            <MdBlockFlipped
-              className={`w-8 h-8 ${record.block
+            className={`border rounded-lg p-1 ${
+              record.block
                 ? "border-red-500 text-red-500 bg-red-100"
                 : "border-[#0091ff] text-[#0091ff] bg-[#cce9ff]"
-                }`}
+            }`}
+          >
+            <MdBlockFlipped
+              className={`w-8 h-8 ${
+                record.block
+                  ? "border-red-500 text-red-500 bg-red-100"
+                  : "border-[#0091ff] text-[#0091ff] bg-[#cce9ff]"
+              }`}
             />
           </button>
           <button
@@ -250,7 +258,9 @@ const RecentlyJoinedUsers = () => {
                 className="w-full h-full object-cover"
               />
             </div>
-            <h3 className="text-2xl font-semibold mb-2">{selectedUser?.name}</h3>
+            <h3 className="text-2xl font-semibold mb-2">
+              {selectedUser?.name}
+            </h3>
             <div className="flex gap-4 text-gray-600">
               <span className="flex items-center gap-2">
                 <AiOutlinePhone /> {selectedUser?.phone}
@@ -290,7 +300,10 @@ const RecentlyJoinedUsers = () => {
             {activeTab === "User Statics" ? (
               <UserStats user={selectedUser} />
             ) : (
-              <ActiveListings user={selectedUser} setIsModalOpen2={setIsModalOpen2}  />
+              <ActiveListings
+                user={selectedUser}
+                setIsModalOpen2={setIsModalOpen2}
+              />
             )}
           </div>
         </div>

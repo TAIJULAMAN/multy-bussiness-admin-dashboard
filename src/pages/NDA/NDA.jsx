@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import PageHeading from "../../Components/Shared/PageHeading";
-import ListingTable from "../Listings/ListingTable";
+import NDATable from "./NDATable";
 
 const NDA = () => {
           const [activeTab, setActiveTab] = useState("sellerNDA");
@@ -8,15 +8,15 @@ const NDA = () => {
           const renderContent = () => {
                     switch (activeTab) {
                               case "sellerNDA":
-                                        return <div className="p-4"><ListingTable /></div>;
+                                        return <div className="p-4"><NDATable /></div>;
                               case "buyerNDA":
-                                        return <div className="p-4"><ListingTable /></div>;
+                                        return <div className="p-4"><NDATable /></div>;
                               case "businessAssetSellerNDA":
-                                        return <div className="p-4"><ListingTable /></div>;
-                              case "InvestorNDA":
-                                        return <div className="p-4"><ListingTable /></div>;
-                              case "FranchisorNDA":
-                                        return <div className="p-4"><ListingTable /></div>;
+                                        return <div className="p-4"><NDATable /></div>;
+                              case "investorNDA":
+                                        return <div className="p-4"><NDATable /></div>;
+                              case "franchisorNDA":
+                                        return <div className="p-4"><NDATable /></div>;
 
                               default:
                                         return null;
@@ -65,8 +65,6 @@ const NDA = () => {
                                                   Franchisor NDA
                                         </button>
                               </div>
-
-                              {/* content */}
                               {renderContent()}
                     </div>
           );
