@@ -18,6 +18,8 @@ import BusinessInfo from '../pages/Categories/BussinessInfo';
 import AddFormation from '../pages/Categories/AddFormation';
 import MainSubscriptionPage from '../pages/Subscription/MainSubscriptionPage';
 import NDA from '../pages/NDA/NDA';
+import DocumentPage from '../pages/NDA/DocumentPage';
+import Coupon from '../pages/Coupon/Coupon';
 
 
 export const Routes = createBrowserRouter([
@@ -65,6 +67,14 @@ export const Routes = createBrowserRouter([
       {
         path: '/NDA',
         element: <NDA />,
+      },
+      {
+        path: '/document',
+        element: <DocumentPage />,
+      },
+      {
+        path: '/coupon',
+        element: <Coupon />,
       },
 
       {

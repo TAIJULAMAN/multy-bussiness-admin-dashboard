@@ -3,36 +3,16 @@ import { ConfigProvider, Modal, Table } from "antd";
 import { useState } from "react";
 import { FaRegEye } from "react-icons/fa";
 import img from "../../assets/build.png"
+import { Link } from "react-router-dom";
 
 function NDATable() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedListing, setSelectedListing] = useState(null);
   const [page, setPage] = useState(1);
 
-  const showModal = (record) => {
-    setSelectedListing(record);
-    setIsModalOpen(true);
-  };
   const handleCancel = () => {
     setIsModalOpen(false);
   };
-  // const dataSource =
-  //   listData?.data?.map((list, index) => ({
-  //     key: list?._id || index.toString(),
-  //     no: index + 1,
-  //     userName: list?.user_name || "No Name",
-  //     userImg: list?.user_img,
-  //     productName: list?.name || "No Name",
-  //     productImg: list?.img,
-  //     price: list?.price,
-  //     product: list?.product,
-  //     catrgory: list?.category_name,
-  //     status: list?.status,
-  //     email: list?.user_email || "N/A",
-  //     description: list?.description,
-  //     condition: list?.condition,
-  //   })) || [];
-
   const dataSource = [
     {
       key: "1",
@@ -165,8 +145,6 @@ function NDATable() {
       condition: "New",
     },
   ];
-
-
   const columns = [
     {
       title: "No",
@@ -220,12 +198,13 @@ function NDATable() {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <button
-          onClick={() => showModal(record)}
-          className="border border-[#0091ff] rounded-lg p-1 bg-[#cce9ff] text-[#0091ff]"
-        >
-          <FaRegEye className="w-8 h-8 text-[#0091ff]" />
-        </button>
+        <Link to="/document">
+          <button
+            className="border border-[#0091ff] rounded-lg p-1 bg-[#cce9ff] text-[#0091ff]"
+          >
+            <FaRegEye className="w-8 h-8 text-[#0091ff]" />
+          </button>
+        </Link>
       ),
     },
   ];

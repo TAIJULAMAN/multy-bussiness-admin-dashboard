@@ -5,7 +5,7 @@ import { FaRegUserCircle } from "react-icons/fa";
 import { GoChecklist } from "react-icons/go";
 import { LuChartNoAxesCombined, LuClipboardList, LuCrown } from "react-icons/lu";
 import { PiMapPinArea } from "react-icons/pi";
-import { RiDashboard2Line, RiUserSettingsLine } from "react-icons/ri";
+import { RiCoupon4Line, RiDashboard2Line, RiUserSettingsLine } from "react-icons/ri";
 import { TbMessageQuestion } from "react-icons/tb";
 
 export const SidebarLink = [
@@ -38,6 +38,11 @@ export const SidebarLink = [
     path: "/NDA",
     label: "NDA",
     icon: <PiMapPinArea size={24} />,
+  },
+  {
+    path: "/coupon",
+    label: "Coupon",
+    icon: <RiCoupon4Line size={24} />,
   },
   {
     path: "/categories",
