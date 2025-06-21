@@ -2,34 +2,17 @@ import React from "react";
 import { ConfigProvider, Modal, Table } from "antd";
 import { useState } from "react";
 import { FaRegEye } from "react-icons/fa";
-import img from "../../assets/build.png"
+import img from "../../assets/build.png";
 import { Link } from "react-router-dom";
 import PageHeading from "../../Components/Shared/PageHeading";
 import { CiEdit } from "react-icons/ci";
 import { RiDeleteBin6Line } from "react-icons/ri";
+import Swal from 'sweetalert2';
 
 function Coupon() {
           const [isModalOpen, setIsModalOpen] = useState(false);
-          const [selectedListing, setSelectedListing] = useState(null);
           const [page, setPage] = useState(1);
-
-          const handleCancel = () => {
-                    setIsModalOpen(false);
-          };
-          const handleDeleteAdmin = (faq) => {
-                    Swal.fire({
-                              title: "Are you sure?",
-                              text: "You are about to delete this FAQ",
-                              icon: "warning",
-                              showCancelButton: true,
-                              confirmButtonColor: "#d33",
-                              cancelButtonColor: "#3085d6",
-                              confirmButtonText: "Yes, delete it!",
-                    });
-          };
-
-
-          const dataSource = [
+          const [dataSource, setDataSource] = useState([
                     {
                               key: "1",
                               no: 1,
@@ -90,7 +73,6 @@ function Coupon() {
                               endDate: "2023-10-15",
                               status: "Expired",
                     },
-
                     {
                               key: "9",
                               no: 9,
@@ -111,9 +93,36 @@ function Coupon() {
                               endDate: "2023-10-31",
                               status: "Active",
                     },
-          ];
+          ]);
 
+          const handleCancel = () => {
+                    setIsModalOpen(false);
+          };
 
+          const handleDeleteAdmin = (record) => {
+                    Swal.fire({
+                              title: "Are you sure?",
+                              text: `You are about to delete the coupon: ${record.code}`,
+                              icon: "warning",
+                              showCancelButton: true,
+                              confirmButtonColor: "#d33",
+                              cancelButtonColor: "#3085d6",
+                              confirmButtonText: "Yes, delete it!",
+                    }).then((result) => {
+                              if (result.isConfirmed) {
+                                        // Remove the coupon from the data source
+                                        setDataSource(prevData =>
+                                                  prevData.filter(item => item.key !== record.key)
+                                        );
+
+                                        Swal.fire(
+                                                  'Deleted!',
+                                                  'Your coupon has been deleted.',
+                                                  'success'
+                                        );
+                              }
+                    });
+          };
 
           const columns = [
                     {
@@ -132,7 +141,7 @@ function Coupon() {
                               key: "reason",
                     },
                     {
-                              title: "Discount (%)	",
+                              title: "Discount (%)",
                               dataIndex: "discount",
                               key: "discount",
                     },
@@ -151,7 +160,6 @@ function Coupon() {
                               dataIndex: "status",
                               key: "status",
                     },
-
                     {
                               title: "Action",
                               key: "action",
@@ -159,19 +167,17 @@ function Coupon() {
                                         <div className="flex gap-2 justify-center item-center">
                                                   <div className="bg-[#0091FF] rounded  p-2">
                                                             <button
-                                                            // onClick={(e) => {
-                                                            //           e.stopPropagation();
-                                                            //           handleOpenEditModal(faq);
-                                                            // }}
+                                                                    
                                                             >
                                                                       <CiEdit className="text-xl text-white font-bold" />
                                                             </button>
                                                   </div>
-                                                  <div className="bg-[#FECACA] border border-[#EF4444] rounded  p-2">
+
+                                                  <div className="bg-[#FEE2E2] rounded  p-2">
                                                             <button
                                                                       onClick={(e) => {
                                                                                 e.stopPropagation();
-                                                                                handleDeleteAdmin(faq);
+                                                                                handleDeleteAdmin(record);
                                                                       }}
                                                             >
                                                                       <RiDeleteBin6Line className="text-xl text-[#EF4444] font-bold" />
