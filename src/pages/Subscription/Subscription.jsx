@@ -110,7 +110,7 @@ export default function SubscriptionManagement() {
   const handleAddFeature = () => {
     if (newFeature.trim() === '')
       return toast.error('please add a valid feature');
-    if (tempFeatures.length >= 6) {
+    if (tempFeatures.length >= 8) {
       return toast.error('Feature limit reached.');
     }
     const newId =
@@ -151,7 +151,7 @@ export default function SubscriptionManagement() {
     <div className="">
       <div className="mb-8">
         <h1 className="text-3xl font-bold">Buyers Subscription Plan</h1>
-       
+
       </div>
 
       {/* Plan Tabs */}
@@ -161,11 +161,10 @@ export default function SubscriptionManagement() {
             <button
               key={planKey}
               onClick={() => setSelectedPlan(planKey)}
-              className={`py-3 px-4 text-center transition-colors ${
-                selectedPlan === planKey
+              className={`py-3 px-4 text-center transition-colors ${selectedPlan === planKey
                   ? 'bg-[#0091FF] !text-white'
                   : 'bg-white hover:bg-gray-50'
-              } cursor-pointer`}
+                } cursor-pointer`}
             >
               {planKey.charAt(0).toUpperCase() + planKey.slice(1)}
             </button>
@@ -290,82 +289,97 @@ export default function SubscriptionManagement() {
 
       {/* Feature Management Modal */}
       <Modal
-        title="Manage Features"
+        title={
+          <div className="flex items-center justify-between w-full">
+            <span className="text-lg font-semibold">Manage Features</span>
+            <span className="text-sm text-gray-500">
+              {tempFeatures.length}/8 Features
+            </span>
+          </div>
+        }
         open={isFeatureModalOpen}
         onCancel={() => setIsFeatureModalOpen(false)}
         footer={null}
+        width={600}
       >
-        <Form
-          layout="vertical"
-          onFinish={handleSaveFeatures}
-          className="mt-4"
-        >
-          <Form.List
-            name="features"
-            rules={[{ required: true, message: 'Please add at least one feature' }]}
-          >
-            {(fields, { add, remove }) => (
-              <div className="space-y-2">
-                {fields.map((field, index) => (
-                  <Form.Item
-                    required={false}
-                    key={field.key}
-                    className="flex items-center gap-2"
-                  >
-                    <Form.Item
-                      {...field}
-                      validateTrigger={['onChange', 'onBlur']}
-                      rules={[
-                        {
-                          required: true,
-                          message: 'Please input feature or delete this field',
-                        },
-                      ]}
-                      noStyle
-                    >
-                      <Input
-                        placeholder="Enter feature"
-                        className="flex-1"
-                        value={tempFeatures[index].text}
-                        onChange={(e) =>
-                          setTempFeatures(
-                            tempFeatures.map((feature, i) =>
-                              i === index
-                                ? { ...feature, text: e.target.value }
-                                : feature
-                            )
-                          )
-                        }
-                      />
-                    </Form.Item>
-                    {fields.length > 1 && (
-                      <Button
-                        type="text"
-                        onClick={() => remove(field.name)}
-                        icon={<XMarkIcon className="w-5 h-5 text-red-500" />}
-                      />
-                    )}
-                  </Form.Item>
-                ))}
-                <Button
-                  type="dashed"
-                  onClick={() => add()}
-                  icon={<PlusIcon className="w-5 h-5" />}
-                  className="w-full"
-                >
-                  Add Feature
-                </Button>
+        <div className="space-y-4">
+          {/* New Feature Input */}
+          <div className="border rounded-lg p-4">
+            <div className="flex items-center gap-2">
+              <Input
+                placeholder="Enter new feature"
+                value={newFeature}
+                onChange={(e) => setNewFeature(e.target.value)}
+                className="flex-1"
+              />
+              <Button
+                type="primary"
+                onClick={handleAddFeature}
+                icon={<PlusIcon className="w-4 h-4" />}
+                disabled={newFeature.trim() === '' || tempFeatures.length >= 8}
+              >
+                Add Feature
+              </Button>
+            </div>
+            {tempFeatures.length >= 8 && (
+              <div className="mt-2 text-sm text-red-500">
+                Maximum feature limit reached
               </div>
             )}
-          </Form.List>
+          </div>
 
-          <div className="flex justify-end gap-2 mt-6">
-            <Button onClick={() => setIsFeatureModalOpen(false)}>Cancel</Button>
-            <Button type="primary" htmlType="submit" className="bg-blue-500">
-              Save Features
+          {/* Existing Features List */}
+          <div className="space-y-3">
+            {tempFeatures.map((feature) => (
+              <div
+                key={feature.id}
+                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+              >
+                <div className="flex items-center gap-3 flex-1">
+                  <div className="flex-shrink-0 h-5 w-5 rounded-full bg-[#022C22] flex items-center justify-center">
+                    <CheckIcon className="h-3 w-3 text-white" />
+                  </div>
+                  <Input
+                    value={feature.text}
+                    onChange={(e) =>
+                      setTempFeatures(
+                        tempFeatures.map((feat) =>
+                          feat.id === feature.id
+                            ? { ...feat, text: e.target.value }
+                            : feat
+                        )
+                      )
+                    }
+                    placeholder="Feature description"
+                    className="flex-1"
+                  />
+                </div>
+                <Button
+                  type="text"
+                  onClick={() => handleRemoveFeature(feature.id)}
+                  icon={<XMarkIcon className="w-4 h-4 text-red-500" />}
+                  danger
+                >
+                  Remove
+                </Button>
+              </div>
+            ))}
+          </div>
+
+          {/* Modal Actions */}
+          <div className="flex justify-end gap-3 mt-6">
+            <Button onClick={() => setIsFeatureModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              type="primary"
+              onClick={handleSaveFeatures}
+              className="bg-[#0091FF] hover:bg-[#0073CC]"
+            >
+              Save Changes
             </Button>
           </div>
-        </Form>
+        </div>
       </Modal>
     </div>
   );
