@@ -41,19 +41,19 @@ const AllUsers = ({ search }) => {
     setIsModalOpen2(false);
   };
 
-  const handleBlock = async () => {
-    if (selectedUser) {
-      try {
-        await updateUser({
-          id: selectedUser?.key,
-          status: "blocked",
-        }).unwrap();
-        setIsModalOpen(false);
-      } catch (error) {
-        console.error("Failed to block user", error);
-      }
-    }
-  };
+  // const handleBlock = async () => {
+  //   if (selectedUser) {
+  //     try {
+  //       await updateUser({
+  //         id: selectedUser?.key,
+  //         status: "blocked",
+  //       }).unwrap();
+  //       setIsModalOpen(false);
+  //     } catch (error) {
+  //       console.error("Failed to block user", error);
+  //     }
+  //   }
+  // };
 
   // const dataSource =
   //   userData?.data?.map((user, index) => ({
@@ -345,73 +345,72 @@ const AllUsers = ({ search }) => {
     },
   ];
 
-  const columns = [
-    { title: "No", dataIndex: "no", key: "no" },
-    {
-      title: "User Info",
-      key: "name",
-      render: (_, record) => (
-        <div className="flex items-center gap-3">
-          <img
-            // src={imageUrl(record?.img)}
-            src="https://avatar.iran.liara.run/public/6"
-            className="w-10 h-10 object-cover rounded-full"
-            alt="User Avatar"
-          />
-          <span>{record?.name || "No Name"}</span>
-        </div>
-      ),
-    },
-    {
-      title: "Date",
-      dataIndex: "date",
-      key: "date",
-      render: (date) => {
-        const formattedDate = new Date(date).toLocaleDateString("en-GB");
-        return formattedDate;
-      },
-    },
-    { title: "Contact Number", dataIndex: "phone", key: "phone" },
-    {
-      title: "User Role",
-      dataIndex: "userRole",
-      render: (_, record) => (
-        <Tag color="blue">{record?.userRole || "No Role"}</Tag>
-      ),
-    },
-    { title: "Country", dataIndex: "country", key: "country" },
-    {
-      title: "Action",
-
-      key: "action",
-      render: (_, record) => (
-        <div className="flex gap-2">
-          <button
-            onClick={() => showModal(record)}
-            className={`border rounded-lg p-1 ${
-              record?.block == true
-                ? "border-red-500 text-red-500 bg-red-100"
-                : "border-[#0091ff] text-[#0091ff] bg-[#cce9ff]"
-            }`}
-          >
-            <MdBlockFlipped
-              className={`w-8 h-8 ${
-                record?.block == true
-                  ? "border-red-500 text-red-500 bg-red-100"
-                  : "border-[#0091ff] text-[#0091ff] bg-[#cce9ff]"
-              }`}
-            />
-          </button>
-          <button
-            onClick={() => showModal2(record)}
-            className="border border-[#0091ff] rounded-lg p-1 bg-[#cce9ff] text-[#0091ff]"
-          >
-            <FaRegEye className="w-8 h-8 text-[#0091ff]" />
-          </button>
-        </div>
-      ),
-    },
-  ];
+   const columns = [
+     { title: "No", dataIndex: "no", key: "no" },
+     {
+       title: "Name",
+       key: "name",
+       render: (_, record) => (
+         <div className="flex items-center gap-3">
+           <img
+             src={record.img}
+             className="w-10 h-10 object-cover rounded-full"
+             alt="User Avatar"
+           />
+           <div className="flex flex-col gap-[2px]">
+             <span className="leading-none">{record.name}</span>
+             <span className="leading-none">{record.email}</span>
+           </div>
+         </div>
+       ),
+     },
+     { title: "Contact Number", dataIndex: "phone", key: "phone" },
+     {
+       title: "User Role",
+       key: "userRole",
+       render: (_, record) => (
+         <Tag
+           className="!p-1 !w-full !flex !items-center !justify-center"
+           color="blue"
+         >
+           {record.userRole}
+         </Tag>
+       ),
+     },
+     { title: "Country", dataIndex: "country", key: "country" },
+     { title: "Subscription ", dataIndex: "subscription", key: "subscription" },
+ 
+     {
+       title: "Action",
+       key: "action",
+       render: (_, record) => (
+         <div className="flex gap-2">
+           <button
+             onClick={() => showModal(record)}
+             className={`border rounded-lg p-1 ${
+               record.block
+                 ? "border-red-500 text-red-500 bg-red-100"
+                 : "border-[#0091ff] text-[#0091ff] bg-[#cce9ff]"
+             }`}
+           >
+             <MdBlockFlipped
+               className={`w-8 h-8 ${
+                 record.block
+                   ? "border-red-500 text-red-500 bg-red-100"
+                   : "border-[#0091ff] text-[#0091ff] bg-[#cce9ff]"
+               }`}
+             />
+           </button>
+           <button
+             onClick={() => showModal2(record)}
+             className="border border-[#0091ff] rounded-lg p-1 bg-[#cce9ff] text-[#0091ff]"
+           >
+             <FaRegEye className="w-8 h-8 text-[#0091ff]" />
+           </button>
+         </div>
+       ),
+     },
+   ];
 
   // if (isLoading) return <Loader />;
 
@@ -463,11 +462,11 @@ const AllUsers = ({ search }) => {
       <Modal open={isModalOpen} centered onCancel={handleCancel} footer={null}>
         <div className="flex flex-col justify-center items-center py-10">
           <img
-            src="https://avatar.iran.liara.run/public/44"
+            src={img}
             alt="Confirmation"
             className="w-40 h-40 mb-5"
           />
-          <p className="text-3xl text-center text-gray-800">Warning</p>
+          <p className="text-3xl text-center text-gray-800">Warning!</p>
           <p className="text-xl text-center mt-5">
             Do you want to block this user?
           </p>
@@ -479,7 +478,10 @@ const AllUsers = ({ search }) => {
               Cancel
             </button>
             <button
-              onClick={handleBlock}
+              onClick={() => {
+                // handleBlock();
+                setIsModalOpen(false);
+              }}
               className="bg-[#0091ff] !text-white font-semibold w-1/3 py-3 px-5 rounded-lg"
             >
               Confirm
