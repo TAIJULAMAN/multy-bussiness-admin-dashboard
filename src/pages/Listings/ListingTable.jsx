@@ -4,7 +4,7 @@ import { useState } from "react";
 import { FaRegEye } from "react-icons/fa";
 // import { useGetAllListingQuery } from "../../redux/api/listApi";
 // import { imageUrl } from "../../Utils/server";
-import img from "../../assets/build.png"
+import img from "../../assets/build.png";
 
 function ListingTable() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -383,8 +383,10 @@ function ListingTable() {
     },
     {
       title: "Price",
-      dataIndex: "price",
       key: "price",
+      render: (_, record) => (
+        <span className="text-lg font-semibold">${record?.price}</span>
+      ),
     },
     {
       title: "Posted On",
@@ -392,7 +394,7 @@ function ListingTable() {
       key: "date",
     },
     {
-      title: "Country",
+      title: "business location",
       dataIndex: "country",
       key: "country",
     },
@@ -467,9 +469,13 @@ function ListingTable() {
             {/* Product Info */}
             <div className="space-y-6">
               <div>
-                <h1 className="text-3xl font-bold">{selectedListing?.productName}</h1>
+                <h1 className="text-3xl font-bold">
+                  {selectedListing?.productName}
+                </h1>
                 <div className="flex items-center mt-2">
-                  <span className="text-2xl font-semibold">{selectedListing?.price}</span>
+                  <span className="text-2xl font-semibold">
+                    {selectedListing?.price}
+                  </span>
                   <p className="ml-2 text-[#0091ff]">In Stock</p>
                 </div>
               </div>
@@ -520,15 +526,10 @@ function ListingTable() {
                       {selectedListing?.condition}
                     </p>
                   </div>
-
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold mb-2">
-                    Description
-                  </h2>
-                  <p className="mt-1">
-                    {selectedListing?.description}
-                  </p>
+                  <h2 className="text-xl font-bold mb-2">Description</h2>
+                  <p className="mt-1">{selectedListing?.description}</p>
                 </div>
               </div>
             </div>
