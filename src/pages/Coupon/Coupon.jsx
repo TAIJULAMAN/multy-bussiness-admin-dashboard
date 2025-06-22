@@ -1,5 +1,5 @@
 import React from "react";
-import { ConfigProvider, Modal, Table, Form, Input, DatePicker, Select, Button } from "antd";
+import { ConfigProvider, Modal, Table, Form, Input, Select, Button, DatePicker } from "antd";
 import { useState } from "react";
 import PageHeading from "../../Components/Shared/PageHeading";
 import { CiEdit } from "react-icons/ci";
@@ -96,7 +96,6 @@ function Coupon() {
           const [form] = Form.useForm();
           const [editingRecord, setEditingRecord] = useState(null);
           const { Option } = Select;
-          const { RangePicker } = DatePicker;
 
           const handleCancel = () => {
                     setIsModalOpen(false);
@@ -115,7 +114,7 @@ function Coupon() {
                               confirmButtonText: "Yes, delete it!",
                     }).then((result) => {
                               if (result.isConfirmed) {
-                                        setDataSource(prevData => 
+                                        setDataSource(prevData =>
                                                   prevData.filter(item => item.key !== record.key)
                                         );
                                         Swal.fire(
@@ -139,10 +138,8 @@ function Coupon() {
                               code: record.code,
                               reason: record.reason,
                               discount: parseInt(record.discount.replace('%', '')),
-                              dateRange: [
-                                        dayjs(record.startDate),
-                                        dayjs(record.endDate)
-                              ],
+                              validFrom: dayjs(record.startDate),
+                              validTo: dayjs(record.endDate),
                               status: record.status,
                     });
           };
@@ -155,14 +152,14 @@ function Coupon() {
                                         code: values.code,
                                         reason: values.reason,
                                         discount: `${values.discount}%`,
-                                        startDate: values.dateRange[0].format('YYYY-MM-DD'),
-                                        endDate: values.dateRange[1].format('YYYY-MM-DD'),
+                                        startDate: values.validFrom.format('YYYY-MM-DD'),
+                                        endDate: values.validTo.format('YYYY-MM-DD'),
                                         status: values.status,
                               };
 
                               if (editingRecord) {
-                                        setDataSource(prevData => 
-                                                  prevData.map(item => 
+                                        setDataSource(prevData =>
+                                                  prevData.map(item =>
                                                             item.key === editingRecord.key ? newRecord : item
                                                   )
                                         );
@@ -228,27 +225,27 @@ function Coupon() {
                               title: "Action",
                               key: "action",
                               render: (_, record) => (
-                                        <div className="flex gap-2 justify-center item-center">
-                                                  <div className="bg-[#0091FF] rounded  p-2">
-                                                            <button
-                                                                      onClick={(e) => {
-                                                                                e.stopPropagation();
-                                                                                handleEdit(record);
-                                                                      }}
-                                                            >
-                                                                      <CiEdit className="text-xl text-white font-bold" />
-                                                            </button>
-                                                  </div>
-                                                  <div className="bg-[#FEE2E2] rounded  p-2">
-                                                            <button
-                                                                      onClick={(e) => {
-                                                                                e.stopPropagation();
-                                                                                handleDeleteAdmin(record);
-                                                                      }}
-                                                            >
-                                                                      <RiDeleteBin6Line className="text-xl text-[#EF4444] font-bold" />
-                                                            </button>
-                                                  </div>
+                                        <div className="flex gap-2 justify-center item-center items-center">
+
+                                                  <button
+                                                            onClick={(e) => {
+                                                                      e.stopPropagation();
+                                                                      handleEdit(record);
+                                                            }}
+                                                            className="bg-[#0091FF] rounded-lg  p-2"
+                                                  >
+                                                            <CiEdit className="text-xl text-white font-bold leading-none cursor-pointer" />
+                                                  </button>
+
+                                                  <button
+                                                            onClick={(e) => {
+                                                                      e.stopPropagation();
+                                                                      handleDeleteAdmin(record);
+                                                            }}
+                                                            className="bg-[#FEE2E2] rounded-lg  p-2"
+                                                  >
+                                                            <RiDeleteBin6Line className="text-xl text-[#EF4444] font-bold leading-none cursor-pointer" />
+                                                  </button>
                                         </div>
                               ),
                     },
@@ -258,13 +255,12 @@ function Coupon() {
                     <div className="p-5">
                               <div className="flex items-center justify-between mb-5">
                                         <PageHeading title="Coupon Management" />
-                                        <Button
-                                                  type="primary"
+                                        <button
                                                   onClick={handleAdd}
-                                                  className="bg-[#0091FF] !text-white px-5 py-2 rounded"
+                                                  className="bg-[#0091FF] !text-white px-5 py-3 rounded"
                                         >
                                                   + Add New Coupon
-                                        </Button>
+                                        </button>
                               </div>
 
                               <ConfigProvider
@@ -302,12 +298,17 @@ function Coupon() {
                               </ConfigProvider>
 
                               <Modal
-                                        title={editingRecord ? "Edit Coupon" : "Add New Coupon"}
                                         open={isModalOpen}
                                         onCancel={handleCancel}
-                                        footer={null}
-                                        width={600}
+                                        footer={false}
+                                        width={700}
                               >
+
+
+                                        <div className="flex flex-col gap-2">
+                                                  <h1 className="text-2xl font-bold text-[#000000] mb-5 mt-10 text-center ">{editingRecord ? "Edit Coupon" : "Add New Coupon"}</h1>
+                                                  <p className="text-gray-500 text-sm text-center mb-5"> {editingRecord ? "Update your existing coupon details below." : "Create a new promotional coupon to offer discounts and boost engagement."}</p>
+                                        </div>
                                         <Form
                                                   form={form}
                                                   layout="vertical"
@@ -347,16 +348,37 @@ function Coupon() {
                                                             />
                                                   </Form.Item>
 
-                                                  <Form.Item
-                                                            label="Validity Period"
-                                                            name="dateRange"
-                                                            rules={[{ required: true, message: 'Please select validity period' }]}
-                                                  >
-                                                            <RangePicker
-                                                                      format="YYYY-MM-DD"
-                                                                      placeholder={["Start Date", "End Date"]}
-                                                            />
-                                                  </Form.Item>
+                                                  <div className="flex gap-2 w-full">
+                                                            <Form.Item
+                                                                      name="validFrom"
+                                                                      label="Valid From"
+                                                                      rules={[
+                                                                                { required: true, message: 'Please select valid from date' },
+                                                                      ]}
+                                                                      className="!w-1/2"
+
+                                                            >
+                                                                      <DatePicker
+                                                                                placeholder="Select valid from date"
+
+                                                                      />
+                                                            </Form.Item>
+
+                                                            <Form.Item
+                                                                      name="validTo"
+                                                                      label="Valid To"
+                                                                      rules={[
+                                                                                { required: true, message: 'Please select valid to date' },
+                                                                      ]}
+                                                                      className="!w-1/2"
+
+                                                            >
+                                                                      <DatePicker
+                                                                                placeholder="Select valid to date"
+
+                                                                      />
+                                                            </Form.Item>
+                                                  </div>
 
                                                   <Form.Item
                                                             label="Status"
@@ -371,13 +393,18 @@ function Coupon() {
                                                             </Select>
                                                   </Form.Item>
 
-                                                  <div className="flex justify-end gap-3 mt-4">
-                                                            <Button onClick={handleCancel}>Cancel</Button>
-                                                            <Button type="primary" htmlType="submit">
-                                                                      {editingRecord ? "Update" : "Add"}
-                                                            </Button>
-                                                  </div>
                                         </Form>
+                                        <div className="flex gap-2 mt-5 w-full">
+                                                  <button
+
+                                                            onClick={handleCancel}
+                                                            className="bg-[#FEF2F2] rounded  py-3 w-1/2  !text-[#EF4444] border-[1px] border-[#EF4444]"
+                                                  >Cancel</button>
+                                                  <button htmlType="submit" className="bg-[#0091FF] !text-white rounded  py-3 w-1/2">
+                                                            {editingRecord ? "Update" : "Add"}
+                                                  </button>
+                                        </div>
+
                               </Modal>
                     </div>
           );

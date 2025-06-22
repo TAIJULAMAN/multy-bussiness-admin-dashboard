@@ -335,7 +335,7 @@ const FAQ = () => {
                                                             </button>
                                                             <button
                                                                       onClick={() => form.submit()}
-                                                                      className="py-2 px-4 rounded-lg bg-green-600 !text-white"
+                                                                      className="py-2 px-4 rounded-lg bg-[#0091FF] !text-white"
                                                             >
                                                                       Save
                                                             </button>
@@ -399,7 +399,7 @@ const FAQ = () => {
                                                             </button>
                                                             <button
                                                                       onClick={() => editForm.submit()}
-                                                                      className="py-2 px-4 rounded-lg bg-green-600 !text-white"
+                                                                      className="py-2 px-4 rounded-lg bg-[#0091FF] !text-white"
                                                             >
                                                                       Save
                                                             </button>
