@@ -17,7 +17,7 @@ function EarningManage() {
         </div>
         <div className="flex flex-col items-start">
           <div className="bg-[#0091FF] rounded-md p-4 ">
-            <FaDollarSign />
+            <FaDollarSign className="text-white border border-white p-[2px] rounded-full" />
           </div>
           <h2 className="text-xl font-semibold !mt-5 text-gray-800 leading-none">
             Total Earnings

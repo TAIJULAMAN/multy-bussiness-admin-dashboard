@@ -20,109 +20,100 @@ const TransactionTable = () => {
   const handleCancel = () => {
     setIsModalOpen(false);
   };
+
+
+  // const dataSource =
+  //   transactionsData?.slice(0, 5).map((transaction, index) => ({
+
+  //     key: transaction?._id || index.toString(),
+  //     no: index + 1,
+  //     name: transaction?.name || "No Name",
+  //     img: transaction?.img,
+  //     date: transaction?.updatedAt || "N/A",
+  //     amount: transaction?.amount || "N/A",
+  //     email: transaction?.email || "N/A",
+  //     country: transaction?.country || "N/A",
+
+  //   })) || [];
+
   // Demo transaction data
-  const transactionsData = {
-    data: [
-      {
-        _id: "1",
-        name: "John Doe",
-        img: "https://randomuser.me/api/portraits/men/1.jpg",
-        updatedAt: "2025-05-25",
-        amount: 1500,
-        email: "john.doe@example.com",
-        country : "Bangladesh",
-        status: "completed"
-      },
-      {
-        _id: "2",
-        name: "Sarah Wilson",
-        img: "https://randomuser.me/api/portraits/women/2.jpg",
-        updatedAt: "2025-05-24",
-        amount: 2300,
-        email: "sarah.wilson@example.com",
-        country : "India",
-        status: "pending"
-      },
-      {
-        _id: "3",
-        name: "Michael Brown",
-        img: "https://randomuser.me/api/portraits/men/3.jpg",
-        updatedAt: "2025-05-23",
-        amount: 3200,
-        email: "michael.brown@example.com",
-        country : "Nepal",
-        status: "completed"
-      },
-      {
-        _id: "4",
-        name: "Emma Davis",
-        img: "https://randomuser.me/api/portraits/women/4.jpg",
-        updatedAt: "2025-05-22",
-        amount: 1800,
-        email: "emma.davis@example.com",
-        country : "Bhutan",
-        status: "completed"
-      },
-      {
-        _id: "5",
-        name: "James Wilson",
-        img: "https://randomuser.me/api/portraits/men/5.jpg",
-        updatedAt: "2025-05-21",
-        amount: 2700,
-        email: "james.wilson@example.com",
-        country : "Srilanka",
-        status: "pending"
-      }
-    ]
-  };
+  const dataSource = [
+    {
+      _id: "1",
+      name: "John Doe",
+      img: "https://randomuser.me/api/portraits/men/1.jpg",
+      date: "2025-05-25",
+      amount: 1500,
+      TR_ID: "TRX-84921A",
+      country: "Bangladesh",
+      status: "completed",
+      pay_On: "Stripe"
+    },
+    {
+      _id: "2",
+      name: "Jane Smith",
+      img: "https://randomuser.me/api/portraits/women/2.jpg",
+      date: "2025-06-01",
+      amount: 2200,
+      TR_ID: "TRX-58291B",
+      country: "USA",
+      status: "pending",
+      pay_On: "PayPal"
+    },
+    {
+      _id: "3",
+      name: "Michael Lee",
+      img: "https://randomuser.me/api/portraits/men/3.jpg",
+      date: "2025-06-15",
+      amount: 1750,
+      TR_ID: "TRX-11384C",
+      country: "Canada",
+      status: "completed",
+      pay_On: "Stripe"
+    },
+    {
+      _id: "4",
+      name: "Fatima Khan",
+      img: "https://randomuser.me/api/portraits/women/4.jpg",
+      date: "2025-06-10",
+      amount: 980,
+      TR_ID: "TRX-97263D",
+      country: "Pakistan",
+      status: "failed",
+      pay_On: "Razorpay"
+    },
+    {
+      _id: "5",
+      name: "Carlos Diaz",
+      img: "https://randomuser.me/api/portraits/men/5.jpg",
+      date: "2025-06-20",
+      amount: 3050,
+      TR_ID: "TRX-44182E",
+      country: "Mexico",
+      status: "completed",
+      pay_On: "Stripe"
+    }
+  ];
 
-
-  const dataSource =
-    transactionsData?.data?.slice(0, 5).map((transaction, index) => ({
-
-      key: transaction?._id || index.toString(),
-      no: index + 1,
-      name: transaction?.name || "No Name",
-      img: transaction?.img,
-      date: transaction?.updatedAt || "N/A",
-      amount: transaction?.amount || "N/A",
-      email: transaction?.email || "N/A",
-      country: transaction?.country || "N/A",
-
-    })) || [];
 
 
   const columns = [
     {
-      title: "User Name",
-      dataIndex: "name",
+      title: "User Info",
       key: "name",
       render: (_, record) => (
         <div className="flex items-center gap-3">
           <img
-            src={imageUrl(record?.img)}
+            src={record?.img || ""}
             className="w-10 h-10 object-cover rounded-full"
             alt="User Avatar"
           />
-          <span>{record?.name || "No Name"}</span>
+          <div className="flex flex-col gap-[2px]">
+            <span className="leading-none">{record.name}</span>
+            <span className="leading-none">{record.email}</span>
+          </div>
         </div>
       ),
-    },
-    {
-      title: "Email",
-      dataIndex: "email",
-      key: "email",
-      render: (email) => (
-        <Space size="middle">
-          <IoIosMail />
-          {email}
-        </Space>
-      ),
-    },
-    {
-      title: "Country",
-      dataIndex: "country",
-      key: "country",
     },
     {
       title: "Date",
@@ -130,9 +121,23 @@ const TransactionTable = () => {
       key: "date",
     },
     {
+      title: "Pay On",
+      dataIndex: "pay_On",
+      key: "pay_On",
+    },
+    {
+      title: "TR ID",
+      dataIndex: "TR_ID",
+      key: "TR_ID",
+    },
+    {
       title: "Amount",
-      dataIndex: "amount",
       key: "amount",
+      render: (_, record) => (
+        <div className="flex items-center gap-3">
+          <span className="leading-none">${record?.amount}</span>
+        </div>
+      ),
     }
 
   ];

@@ -162,8 +162,8 @@ export default function SubscriptionManagement() {
               key={planKey}
               onClick={() => setSelectedPlan(planKey)}
               className={`py-3 px-4 text-center transition-colors ${selectedPlan === planKey
-                  ? 'bg-[#0091FF] !text-white'
-                  : 'bg-white hover:bg-gray-50'
+                ? 'bg-[#0091FF] !text-white'
+                : 'bg-white hover:bg-gray-50'
                 } cursor-pointer`}
             >
               {planKey.charAt(0).toUpperCase() + planKey.slice(1)}
@@ -304,7 +304,7 @@ export default function SubscriptionManagement() {
       >
         <div className="space-y-4">
           {/* New Feature Input */}
-          <div className="border rounded-lg p-4">
+          <div className="rounded-lg p-4">
             <div className="flex items-center gap-2">
               <Input
                 placeholder="Enter new feature"
@@ -354,14 +354,13 @@ export default function SubscriptionManagement() {
                     className="flex-1"
                   />
                 </div>
-                <Button
+                <button
                   type="text"
                   onClick={() => handleRemoveFeature(feature.id)}
-                  icon={<XMarkIcon className="w-4 h-4 text-red-500" />}
                   danger
                 >
-                  Remove
-                </Button>
+                  <XMarkIcon className="w-4 h-4 text-red-500 ml-2" />
+                </button>
               </div>
             ))}
           </div>
