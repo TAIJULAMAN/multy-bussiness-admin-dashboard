@@ -1,5 +1,5 @@
 import React from "react";
-import { ConfigProvider, Modal, Table } from "antd";
+import { ConfigProvider, Modal, Table, Tag } from "antd";
 import { useState } from "react";
 import { FaRegEye } from "react-icons/fa";
 import img from "../../assets/build.png"
@@ -178,9 +178,15 @@ function NDATable() {
       title: "User Role",
       key: "userRole",
       render: (_, record) => (
-        <div className="px-5 py-2 bg-[#c2e1ff] border-2 border-[#0060FF] flex justify-center text-center">
+        // <div className="px-5 py-2 bg-[#c2e1ff] border-2 border-[#0060FF] flex justify-center text-center">
+        //   {record?.userRole}
+        // </div>
+        <Tag
+          className="!p-1 !w-full !flex !items-center !justify-center"
+          color="blue"
+        >
           {record?.userRole}
-        </div>
+        </Tag>
       )
     },
     {
@@ -189,7 +195,7 @@ function NDATable() {
       key: "date",
     },
     {
-      title: "business location",
+      title: "Business Location",
       dataIndex: "country",
       key: "country",
     },

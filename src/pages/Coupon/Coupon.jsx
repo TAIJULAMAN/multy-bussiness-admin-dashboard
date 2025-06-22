@@ -1,9 +1,6 @@
 import React from "react";
 import { ConfigProvider, Modal, Table, Form, Input, DatePicker, Select, Button } from "antd";
 import { useState } from "react";
-import { FaRegEye } from "react-icons/fa";
-import img from "../../assets/build.png";
-import { Link } from "react-router-dom";
 import PageHeading from "../../Components/Shared/PageHeading";
 import { CiEdit } from "react-icons/ci";
 import { RiDeleteBin6Line } from "react-icons/ri";
