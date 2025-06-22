@@ -1,4 +1,3 @@
-import React from "react";
 import Sidebar from "../Components/Shared/Sidebar.jsx";
 import Header from "../Components/Shared/Header.jsx";
 import { Outlet } from "react-router";

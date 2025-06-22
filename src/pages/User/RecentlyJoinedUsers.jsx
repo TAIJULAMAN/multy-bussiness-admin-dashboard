@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ConfigProvider, Modal, Table } from "antd";
+import { ConfigProvider, Modal, Table, Tag } from "antd";
 import { MdBlockFlipped } from "react-icons/md";
 import { FaRegEye } from "react-icons/fa";
 import { AiOutlinePhone, AiOutlineMail } from "react-icons/ai";
@@ -26,6 +26,8 @@ const RecentlyJoinedUsers = () => {
       date: "2025-05-20",
       phone: "+1 (555) 123-4567",
       country: "Bangladesh",
+      subscription: "Free",
+      userRole: "Business Asset Seller",
       email: "john.doe@example.com",
       block: false,
       totalListings: 15,
@@ -37,66 +39,74 @@ const RecentlyJoinedUsers = () => {
     {
       key: "2",
       no: 2,
-      name: "Sarah Smith",
-      img: "https://randomuser.me/api/portraits/women/1.jpg",
-      date: "2025-05-19",
-      phone: "+1 (555) 234-5678",
-      email: "sarah.smith@example.com",
-      country: "USA",
+      name: "Jane Smith",
+      img: "https://randomuser.me/api/portraits/women/2.jpg",
+      date: "2025-04-15",
+      phone: "+44 7700 900123",
+      country: "United Kingdom",
+      subscription: "Premium",
+      userRole: "Franchise Buyer",
+      email: "jane.smith@example.co.uk",
       block: false,
-      totalListings: 12,
-      activeListings: 6,
-      approvedListings: 8,
+      totalListings: 20,
+      activeListings: 12,
+      approvedListings: 18,
       rejectedListings: 1,
-      soldListing: 3,
+      soldListing: 5,
     },
     {
       key: "3",
       no: 3,
-      name: "Michael Johnson",
-      img: "https://randomuser.me/api/portraits/men/2.jpg",
-      date: "2025-05-18",
-      phone: "+1 (555) 345-6789",
-      country: "Canada",
-      email: "michael.j@example.com",
+      name: "Ahmed Khan",
+      img: "https://randomuser.me/api/portraits/men/3.jpg",
+      date: "2025-03-10",
+      phone: "+92 300 1234567",
+      country: "Pakistan",
+      subscription: "Free",
+      userRole: "Business Asset Buyer",
+      email: "ahmed.khan@example.pk",
       block: true,
-      totalListings: 8,
-      activeListings: 0,
-      approvedListings: 5,
-      rejectedListings: 3,
-      soldListing: 0,
+      totalListings: 5,
+      activeListings: 2,
+      approvedListings: 3,
+      rejectedListings: 2,
+      soldListing: 1,
     },
     {
       key: "4",
       no: 4,
-      name: "Emily Brown",
-      img: "https://randomuser.me/api/portraits/women/2.jpg",
-      date: "2025-05-17",
-      phone: "+1 (555) 456-7890",
-      email: "emily.b@example.com",
-      country: "UK",
+      name: "Maria Garcia",
+      img: "https://randomuser.me/api/portraits/women/4.jpg",
+      date: "2025-06-05",
+      phone: "+34 600 123 456",
+      country: "Spain",
+      subscription: "Standard",
+      userRole: "Franchise Seller",
+      email: "maria.garcia@example.es",
       block: false,
-      totalListings: 20,
-      activeListings: 12,
-      approvedListings: 15,
-      rejectedListings: 2,
-      soldListing: 3,
+      totalListings: 12,
+      activeListings: 6,
+      approvedListings: 9,
+      rejectedListings: 1,
+      soldListing: 4,
     },
     {
       key: "5",
       no: 5,
-      name: "David Wilson",
-      img: "https://randomuser.me/api/portraits/men/3.jpg",
-      date: "2025-05-16",
-      phone: "+1 (555) 567-8901",
-      email: "david.w@example.com",
+      name: "David Lee",
+      img: "https://randomuser.me/api/portraits/men/5.jpg",
+      date: "2025-02-28",
+      phone: "+1 (213) 555-7890",
+      country: "United States",
+      subscription: "Premium",
+      userRole: "Business Broker",
+      email: "david.lee@example.com",
       block: false,
-      country: "Australia",
-      totalListings: 10,
-      activeListings: 5,
-      approvedListings: 7,
-      rejectedListings: 1,
-      soldListing: 2,
+      totalListings: 30,
+      activeListings: 20,
+      approvedListings: 25,
+      rejectedListings: 3,
+      soldListing: 10,
     },
   ];
 
@@ -137,22 +147,29 @@ const RecentlyJoinedUsers = () => {
             className="w-10 h-10 object-cover rounded-full"
             alt="User Avatar"
           />
-          <span>{record.name}</span>
+          <div className="flex flex-col gap-[2px]">
+            <span className="leading-none">{record.name}</span>
+            <span className="leading-none">{record.email}</span>
+          </div>
         </div>
       ),
     },
+    { title: "Contact Number", dataIndex: "phone", key: "phone" },
     {
-      title: "Date",
-      dataIndex: "date",
-      key: "date",
-      render: (date) => {
-        const formattedDate = new Date(date).toLocaleDateString("en-GB");
-        return formattedDate;
-      },
+      title: "User Role",
+      key: "userRole",
+      render: (_, record) => (
+        <Tag
+          className="!p-1 !w-full !flex !items-center !justify-center"
+          color="blue"
+        >
+          {record.userRole}
+        </Tag>
+      ),
     },
-    { title: "Phone Number", dataIndex: "phone", key: "phone" },
-    { title: "Email", dataIndex: "email", key: "email" },
     { title: "Country", dataIndex: "country", key: "country" },
+    { title: "Subscription ", dataIndex: "subscription", key: "subscription" },
+
     {
       title: "Action",
       key: "action",
