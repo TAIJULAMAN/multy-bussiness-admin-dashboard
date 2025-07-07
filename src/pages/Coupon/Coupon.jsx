@@ -1,5 +1,5 @@
 import React from "react";
-import { ConfigProvider, Modal, Table, Form, Input, Select, Button, DatePicker } from "antd";
+import { ConfigProvider, Modal, Table, Form, Input, Select, Button, DatePicker, Checkbox } from "antd";
 import { useState } from "react";
 import PageHeading from "../../Components/Shared/PageHeading";
 import { CiEdit } from "react-icons/ci";
@@ -20,6 +20,9 @@ function Coupon() {
                               startDate: "2023-01-01",
                               endDate: "2023-01-31",
                               status: "Active",
+                              useLimit: 100,
+                              currentUses: 42,
+                              subscriberLimit: 1,
                     },
                     {
                               key: "2",
@@ -30,6 +33,9 @@ function Coupon() {
                               startDate: "2023-06-01",
                               endDate: "2023-08-31",
                               status: "Active",
+                              useLimit: 500,
+                              currentUses: 120,
+                              subscriberLimit: 0,
                     },
                     {
                               key: "4",
@@ -40,6 +46,9 @@ function Coupon() {
                               startDate: "2023-12-25",
                               endDate: "2024-01-05",
                               status: "Active",
+                              useLimit: null,
+                              currentUses: 0,
+                              subscriberLimit: 1,
                     },
                     {
                               key: "5",
@@ -50,6 +59,9 @@ function Coupon() {
                               startDate: "2023-11-24",
                               endDate: "2023-11-25",
                               status: "Expired",
+                              useLimit: 1000,
+                              currentUses: 1000,
+                              subscriberLimit: 0,
                     },
                     {
                               key: "6",
@@ -60,6 +72,9 @@ function Coupon() {
                               startDate: "2023-03-01",
                               endDate: "2023-04-30",
                               status: "Expired",
+                              useLimit: 200,
+                              currentUses: 200,
+                              subscriberLimit: 1,
                     },
                     {
                               key: "7",
@@ -70,6 +85,9 @@ function Coupon() {
                               startDate: "2023-09-01",
                               endDate: "2023-10-15",
                               status: "Expired",
+                              useLimit: 300,
+                              currentUses: 300,
+                              subscriberLimit: 0,
                     },
                     {
                               key: "9",
@@ -80,6 +98,9 @@ function Coupon() {
                               startDate: "2023-01-01",
                               endDate: "2023-06-30",
                               status: "Expired",
+                              useLimit: 400,
+                              currentUses: 400,
+                              subscriberLimit: 1,
                     },
                     {
                               key: "10",
@@ -90,6 +111,9 @@ function Coupon() {
                               startDate: "2023-10-01",
                               endDate: "2023-10-31",
                               status: "Active",
+                              useLimit: null,
+                              currentUses: 0,
+                              subscriberLimit: 0,
                     },
           ]);
 
@@ -141,6 +165,7 @@ function Coupon() {
                               validFrom: dayjs(record.startDate),
                               validTo: dayjs(record.endDate),
                               status: record.status,
+                              useLimit: record.useLimit,
                     });
           };
 
@@ -155,6 +180,9 @@ function Coupon() {
                                         startDate: values.validFrom.format('YYYY-MM-DD'),
                                         endDate: values.validTo.format('YYYY-MM-DD'),
                                         status: values.status,
+                                        useLimit: values.useLimit || null,
+                                        currentUses: editingRecord ? (editingRecord.currentUses || 0) : 0,
+                                        subscriberLimit: values.subscriberOnly ? 1 : 0,
                               };
 
                               if (editingRecord) {
@@ -205,6 +233,15 @@ function Coupon() {
                               title: "Discount (%)",
                               dataIndex: "discount",
                               key: "discount",
+                    },
+                    {
+                              title: "Uses",
+                              key: "uses",
+                              render: (_, record) => (
+                                        <span>
+                                                  {record.currentUses || 0}/{record.useLimit || '∞'}
+                                        </span>
+                              ),
                     },
                     {
                               title: "Valid From",
@@ -379,6 +416,26 @@ function Coupon() {
                                                                       />
                                                             </Form.Item>
                                                   </div>
+
+                                                  <Form.Item
+                                                            label="Usage Limit"
+                                                            name="useLimit"
+                                                            tooltip="Maximum number of times this coupon can be used. Leave empty for unlimited uses."
+                                                  >
+                                                            <Input
+                                                                      type="number"
+                                                                      min="1"
+                                                                      placeholder="Leave empty for unlimited"
+                                                            />
+                                                  </Form.Item>
+
+                                                  <Form.Item
+                                                            name="subscriberOnly"
+                                                            valuePropName="checked"
+                                                            initialValue={false}
+                                                  >
+                                                            <Checkbox>Subscriber Only</Checkbox>
+                                                  </Form.Item>
 
                                                   <Form.Item
                                                             label="Status"
