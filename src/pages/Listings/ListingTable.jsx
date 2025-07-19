@@ -2,16 +2,10 @@ import React from "react";
 import { ConfigProvider, Modal, Table } from "antd";
 import { useState } from "react";
 import { FaRegEye } from "react-icons/fa";
-import {
-  FaTag,
-  FaBuilding,
-  FaMapMarkerAlt,
-  FaUser,
-  FaInfoCircle,
-  FaTrash,
-} from "react-icons/fa";
+import { FaTrash } from "react-icons/fa";
 
 import { dataSource } from "../../data/Data";
+import { Link } from "react-router-dom";
 
 export default function ListingTable() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -140,12 +134,17 @@ export default function ListingTable() {
         centered
         onCancel={handleCancel}
         footer={null}
-        width={"800px"}
-        bodyStyle={{ padding: "0", height: "90vh" }}
+        width="800px"
+        style={{ top: 20 }}
+        bodyStyle={{
+          padding: 0,
+          maxHeight: "calc(100vh - 40px)",
+          overflowY: "auto",
+        }}
       >
         <div className="container mx-auto p-5 bg-white">
           {/* Image Gallery Section */}
-          <div className="mb-8">
+          <div className="mb-5">
             {/* Main Image */}
             <div className="mb-4">
               <img
@@ -178,14 +177,14 @@ export default function ListingTable() {
           </div>
 
           {/* Business Information */}
-          <div className="space-y-6">
+          <div className="space-y-5">
             {/* Title and Price */}
             <div>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
                 Trendy Urban Café in Dhaka City
               </h1>
               <div className="flex items-center gap-2 text-2xl font-semibold text-gray-800">
-                <FaTag className="text-green-600" />
+                {/* <FaTag className="text-green-600" /> */}
                 <span>Price: $75,000 USD</span>
               </div>
             </div>
@@ -200,7 +199,7 @@ export default function ListingTable() {
                 {/* Business Type */}
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <FaBuilding className="text-gray-600" />
+                    {/* <FaBuilding className="text-gray-600" /> */}
                     <span className="font-medium text-gray-700">
                       Business Type
                     </span>
@@ -213,7 +212,7 @@ export default function ListingTable() {
                 {/* Industry */}
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <FaMapMarkerAlt className="text-gray-600" />
+                    {/* <FaMapMarkerAlt className="text-gray-600" /> */}
                     <span className="font-medium text-gray-700">Industry</span>
                   </div>
                   <span className="text-gray-600">
@@ -224,7 +223,7 @@ export default function ListingTable() {
                 {/* Ownership Type */}
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <FaUser className="text-gray-600" />
+                    {/* <FaUser className="text-gray-600" /> */}
                     <span className="font-medium text-gray-700">
                       Ownership Type
                     </span>
@@ -235,7 +234,7 @@ export default function ListingTable() {
                 {/* Reason for Selling */}
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <FaInfoCircle className="text-gray-600" />
+                    {/* <FaInfoCircle className="text-gray-600" /> */}
                     <span className="font-medium text-gray-700">
                       Reason for Selling
                     </span>
@@ -246,7 +245,7 @@ export default function ListingTable() {
                 {/* Location */}
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <FaMapMarkerAlt className="text-gray-600" />
+                    {/* <FaMapMarkerAlt className="text-gray-600" /> */}
                     <span className="font-medium text-gray-700">Location</span>
                   </div>
                   <span className="text-gray-600">
@@ -318,45 +317,46 @@ export default function ListingTable() {
               <h3 className="text-lg font-semibold text-gray-900 mb-3">
                 Financial Summary (Approximate)
               </h3>
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-700">Monthly Revenue:</span>
-                    <span className="font-semibold text-green-600">$4,500</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-700">Monthly Expenses:</span>
-                    <span className="font-semibold text-red-600">$2,000</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-700">Net Profit:</span>
-                    <span className="font-semibold text-green-600">$2,500</span>
-                  </div>
+
+              <div className="space-y-3">
+                <div className="">
+                  <span className="text-gray-700">Monthly Revenue:</span>
+                  <span className="font-semibold">$4,500</span>
                 </div>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-700">Inventory Value:</span>
-                    <span className="font-semibold text-gray-900">$2,000</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-700">Lease Terms:</span>
-                    <span className="text-gray-600 text-sm">
-                      3 years remaining, renewable
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-700">Royalty Fee:</span>
-                    <span className="text-gray-600">5% of monthly revenue</span>
-                  </div>
+                <div className="">
+                  <span className="text-gray-700">Monthly Expenses:</span>
+                  <span className="font-semibold">$2,000</span>
+                </div>
+                <div className="">
+                  <span className="text-gray-700">Net Profit:</span>
+                  <span className="font-semibold">$2,500</span>
+                </div>
+                <div className="">
+                  <span className="text-gray-700">Inventory Value:</span>
+                  <span className="font-semibold">$2,000</span>
+                </div>
+                <div className="">
+                  <span className="text-gray-700">Lease Terms:</span>
+                  <span className="text-gray-600 text-sm">
+                    3 years remaining, renewable
+                  </span>
+                </div>
+                <div className="">
+                  <span className="text-gray-700">Royalty Fee:</span>
+                  <span className="text-gray-600">5% of monthly revenue</span>
                 </div>
               </div>
             </div>
 
             {/* Remove From Listing Button */}
-            <div className="pt-6 border-t border-gray-200">
-              <button className="w-full bg-red-50 hover:bg-red-100 text-red-600 font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 border border-red-200">
-                <FaTrash className="text-sm" />
-                Remove From Listing
+            <div className="pt-5 border-t border-gray-200 flex gap-2">
+              <Link to="/edit-listing-management">
+                <button className=" w-full px-5 py-2 border border-[#0091ff] text-[#0091ff] ">
+                  Edit
+                </button>
+              </Link>
+              <button className=" w-full px-5 py-2 border border-[#0091ff] bg-[#0091ff] !text-white">
+                Mark as Approved
               </button>
             </div>
           </div>

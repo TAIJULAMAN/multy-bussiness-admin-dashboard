@@ -21,6 +21,7 @@ import NDA from '../pages/NDA/NDA';
 import DocumentPage from '../pages/NDA/DocumentPage';
 import Coupon from '../pages/Coupon/Coupon';
 import AllSubscriber from '../pages/AllSubscriber/AllSubscriber';
+import EditListing from '../pages/Listings/EditListing';
 
 
 export const Routes = createBrowserRouter([
@@ -43,6 +44,10 @@ export const Routes = createBrowserRouter([
       {
         path: '/listing-management',
         element: <ListingsTab />,
+      },
+      {
+        path: '/edit-listing-management',
+        element: <EditListing />,
       },
       {
         path: '/subscription',
