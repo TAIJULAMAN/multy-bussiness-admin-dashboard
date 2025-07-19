@@ -1,17 +1,17 @@
 import React from "react";
 import { ConfigProvider, Modal, Table } from "antd";
 import { useState } from "react";
-import { FaRegEye } from "react-icons/fa";
-// import { useGetAllListingQuery } from "../../redux/api/listApi";
-// import { imageUrl } from "../../Utils/server";
-import img from "../../assets/build.png";
+import { FaRegEye } from "react-icons/fa" 
+import { FaTag, FaBuilding, FaMapMarkerAlt } from "react-icons/fa";
 
-function ListingTable() {
+export default function ListingTable() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedListing, setSelectedListing] = useState(null);
   const [page, setPage] = useState(1);
-  // const { data: listData } = useGetAllListingQuery({ page });
-  // console.log("listdata", listData);
+  const [selectedImage, setSelectedImage] = useState("/bus1.png");
+
+  const thumbnails = ["/bus1.png", "/bus2.png", "/bus3.png", "/bus4.png"];
+ 
   const showModal = (record) => {
     setSelectedListing(record);
     setIsModalOpen(true);
@@ -19,22 +19,6 @@ function ListingTable() {
   const handleCancel = () => {
     setIsModalOpen(false);
   };
-  // const dataSource =
-  //   listData?.data?.map((list, index) => ({
-  //     key: list?._id || index.toString(),
-  //     no: index + 1,
-  //     userName: list?.user_name || "No Name",
-  //     userImg: list?.user_img,
-  //     productName: list?.name || "No Name",
-  //     productImg: list?.img,
-  //     price: list?.price,
-  //     product: list?.product,
-  //     catrgory: list?.category_name,
-  //     status: list?.status,
-  //     email: list?.user_email || "N/A",
-  //     description: list?.description,
-  //     condition: list?.condition,
-  //   })) || [];
 
   const dataSource = [
     {
@@ -453,85 +437,111 @@ function ListingTable() {
         scroll={{ x: "max-content" }}
       />
       <Modal open={isModalOpen} centered onCancel={handleCancel} footer={null}>
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex flex-col gap-5">
-            {/* Product Images */}
-            <div className="space-y-4">
-              <div className="relative rounded-lg overflow-hidden">
-                <img
-                  src={img}
-                  alt={selectedListing?.productName}
-                  className="w-full h-64 object-cover"
-                />
+        <div className="container mx-auto px-4 py-8 bg-white">
+          {/* Image Gallery Section */}
+          <div className="mb-8">
+            {/* Main Image */}
+            <div className="mb-4">
+              <img
+                src={selectedImage || "/placeholder.svg"}
+                alt="Trendy Urban Café"
+                className="w-full h-96 object-cover rounded-lg shadow-lg"
+              />
+            </div>
+
+            {/* Thumbnail Gallery */}
+            <div className="flex gap-3 overflow-x-auto">
+              {thumbnails.map((thumb, index) => (
+                <button
+                  key={index}
+                  onClick={() => setSelectedImage(thumb)}
+                  className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                    selectedImage === thumb
+                      ? "border-blue-500 shadow-md"
+                      : "border-gray-200 hover:border-gray-300"
+                  }`}
+                >
+                  <img
+                    src={thumb || "/placeholder.svg"}
+                    alt={`Café view ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Business Information */}
+          <div className="space-y-6">
+            {/* Title and Price */}
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                Trendy Urban Café in Dhaka City
+              </h1>
+              <div className="flex items-center gap-2 text-2xl font-semibold text-gray-800">
+                <FaTag className="text-green-600" />
+                <span>Price: $75,000 USD</span>
               </div>
             </div>
 
-            {/* Product Info */}
-            <div className="space-y-6">
-              <div>
-                <h1 className="text-3xl font-bold">
-                  {selectedListing?.productName}
-                </h1>
-                <div className="flex items-center mt-2">
-                  <span className="text-2xl font-semibold">
-                    {selectedListing?.price}
-                  </span>
-                  <p className="ml-2 text-[#0091ff]">In Stock</p>
-                </div>
-              </div>
+            {/* Business Details Section */}
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                Business Details
+              </h2>
 
               <div className="space-y-4">
-                <div>
-                  <h2 className="text-xl font-bold mb-2">Product Details</h2>
+                {/* Business Type */}
+                <div className="flex items-start gap-3">
+                  <FaBuilding className="text-gray-600 mt-1" />
+                  <div>
+                    <span className="font-medium text-gray-700">
+                      Business Type
+                    </span>
+                    <div className="mt-1">
+                      <span className="inline-block bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full">
+                        Franchise Resale
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                {/* Industry */}
+                <div className="flex items-start gap-3">
+                  <FaMapMarkerAlt className="text-gray-600 mt-1" />
                   <div>
-                    <h3 className="text-sm font-medium text-gray-500">
-                      Product Category
-                    </h3>
-                    <p className="mt-1 bg-[#cce9ff] text-[#0091ff]">
-                      {selectedListing?.catrgory}
+                    <span className="font-medium text-gray-700">Industry</span>
+                    <p className="text-gray-600 mt-1">
+                      Food & Beverage – Café & Coffee Shop
                     </p>
                   </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-500">
-                      Status
-                    </h3>
-                    <p className="mt-1 bg-[#cce9ff] text-[#0091ff]">
-                      {selectedListing?.status}
-                    </p>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-500">
-                      Seller Name
-                    </h3>
-                    <p className="mt-1 bg-[#cce9ff] text-[#0091ff]">
-                      {selectedListing?.userName}
-                    </p>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-500">
-                      Seller Email
-                    </h3>
-                    <p className="mt-1 bg-[#cce9ff] text-[#0091ff]">
-                      {selectedListing?.email}
-                    </p>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-500">
-                      Condition
-                    </h3>
-                    <p className="mt-1 bg-[#cce9ff] text-[#0091ff]">
-                      {selectedListing?.condition}
-                    </p>
-                  </div>
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold mb-2">Description</h2>
-                  <p className="mt-1">{selectedListing?.description}</p>
                 </div>
               </div>
+            </div>
+
+            {/* Additional Info Cards */}
+            <div className="grid md:grid-cols-2 gap-4 mt-8">
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h3 className="font-semibold text-gray-900 mb-2">Location</h3>
+                <p className="text-gray-600">Dhaka City, Bangladesh</p>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h3 className="font-semibold text-gray-900 mb-2">Status</h3>
+                <span className="inline-block bg-green-100 text-green-800 text-sm font-medium px-2 py-1 rounded">
+                  Available
+                </span>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-4 pt-6">
+              <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center gap-2">
+                Contact Seller
+              </button>
+              <button className="border border-gray-300 hover:border-gray-400 text-gray-700 font-semibold py-3 px-6 rounded-lg transition-colors">
+                Save Listing
+              </button>
             </div>
           </div>
         </div>
@@ -539,5 +549,3 @@ function ListingTable() {
     </ConfigProvider>
   );
 }
-
-export default ListingTable;
