@@ -1,5 +1,5 @@
 // Function to get the base API URL
-export const url = "http://10.0.60.189:5010/";
+export const url = "http://localhost:3000/";
 export const getBaseUrl = () => {
   return url;
 };

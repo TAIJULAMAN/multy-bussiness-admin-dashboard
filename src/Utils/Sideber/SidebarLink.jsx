@@ -30,6 +30,11 @@ export const SidebarLink = [
     icon: <LuCrown size={24} />,
   },
   {
+    path: "/all-subscriber",
+    label: "All Subscriber",
+    icon: <LuCrown size={24} />,
+  },
+  {
     path: "/earnings-management",
     label: "Earnings",
     icon: <LuChartNoAxesCombined size={24} />,
