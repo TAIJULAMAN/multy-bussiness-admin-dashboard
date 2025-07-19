@@ -2,6 +2,7 @@ import React from "react";
 import { BiCategory } from "react-icons/bi";
 import { CiCircleQuestion } from "react-icons/ci";
 import { FaRegUserCircle } from "react-icons/fa";
+import { FaListUl } from "react-icons/fa6";
 import { GoChecklist } from "react-icons/go";
 import { LuChartNoAxesCombined, LuClipboardList, LuCrown } from "react-icons/lu";
 import { PiMapPinArea } from "react-icons/pi";
@@ -32,7 +33,7 @@ export const SidebarLink = [
   {
     path: "/all-subscriber",
     label: "All Subscriber",
-    icon: <LuCrown size={24} />,
+    icon: <FaListUl size={24} />,
   },
   {
     path: "/earnings-management",

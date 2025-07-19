@@ -8,38 +8,72 @@ const ListingsTabs = () => {
   const renderContent = () => {
     switch (activeTab) {
       case "allListings":
-        return <div className="p-4"><ListingTable /></div>;
+        return (
+          <div className="p-4">
+            <ListingTable />
+          </div>
+        );
+      case "listingsUnderApproval":
+        return (
+          <div className="p-4">
+            <ListingTable />
+          </div>
+        );
       case "businessListings":
-        return <div className="p-4"><ListingTable /></div>;
+        return (
+          <div className="p-4">
+            <ListingTable />
+          </div>
+        );
       case "franchiseListings":
-        return <div className="p-4"><ListingTable /></div>;
+        return (
+          <div className="p-4">
+            <ListingTable />
+          </div>
+        );
       case "businessAssetListings":
-        return <div className="p-4"><ListingTable /></div>;
+        return (
+          <div className="p-4">
+            <ListingTable />
+          </div>
+        );
       case "businessIdeaListings":
-        return <div className="p-4"><ListingTable /></div>;
+        return (
+          <div className="p-4">
+            <ListingTable />
+          </div>
+        );
       default:
         return null;
     }
   };
 
   const tabStyle = (tabKey) =>
-    `px-4 py-2 rounded-t-md font-semibold transition-all duration-200 ${activeTab === tabKey
-      ? "bg-[#0091ff] !text-white border border-[#0091ff] !border-b-0"
-      : "text-[#0091ff] hover:bg-[#0091ff]"
+    `px-4 py-2 rounded-t-md font-semibold transition-all duration-200 ${
+      activeTab === tabKey
+        ? "bg-[#0091ff] !text-white border border-[#0091ff] !border-b-0"
+        : "text-[#0091ff] hover:bg-[#0091ff]"
     }`;
-
 
   return (
     <div>
-
       <div className="flex items-start justify-start mb-5">
         <PageHeading title="Listings Management" />
       </div>
 
       {/* Tab  */}
       <div className="border-b-2 border-[#0091ff] flex space-x-2 gap-2">
-        <button onClick={() => setActiveTab("allListings")} className={tabStyle("allListings")}>
+        <button
+          onClick={() => setActiveTab("allListings")}
+          className={tabStyle("allListings")}
+        >
           ALL Listings
+        </button>
+        <button
+          onClick={() => setActiveTab("listingsUnderApproval")}
+          className={tabStyle("listingsUnderApproval")}
+        >
+          Listings Under Approval
         </button>
         <button
           onClick={() => setActiveTab("businessListings")}
@@ -74,6 +108,3 @@ const ListingsTabs = () => {
 };
 
 export default ListingsTabs;
-
-
-
