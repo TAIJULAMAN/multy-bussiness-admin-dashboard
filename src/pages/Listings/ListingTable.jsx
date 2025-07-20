@@ -5,13 +5,14 @@ import { FaRegEye } from "react-icons/fa";
 import { FaTrash } from "react-icons/fa";
 
 import { dataSource } from "../../data/Data";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function ListingTable() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedListing, setSelectedListing] = useState(null);
   const [page, setPage] = useState(1);
   const [selectedImage, setSelectedImage] = useState("/bus1.png");
+  const navigate = useNavigate();
 
   const thumbnails = ["/bus1.png", "/bus2.png", "/bus3.png", "/bus4.png"];
 
@@ -349,13 +350,14 @@ export default function ListingTable() {
             </div>
 
             {/* Remove From Listing Button */}
-            <div className="pt-5 border-t border-gray-200 flex gap-2">
-              <Link to="/edit-listing-management">
-                <button className=" w-full px-5 py-2 border border-[#0091ff] text-[#0091ff] ">
-                  Edit
-                </button>
-              </Link>
-              <button className=" w-full px-5 py-2 border border-[#0091ff] bg-[#0091ff] !text-white">
+            <div className="w-full pt-5 border-t border-gray-200 flex gap-2">
+              <button
+                onClick={() => navigate("/edit-listing-management")}
+                className="w-1/2 px-5 py-2 border border-[#0091ff] text-[#0091ff] "
+              >
+                Edit
+              </button>
+              <button className="w-1/2 px-5 py-2 border border-[#0091ff] bg-[#0091ff] !text-white">
                 Mark as Approved
               </button>
             </div>

@@ -44,15 +44,24 @@ export default function AllSubscriber() {
 
 
     const columns = [
-        { title: "No", dataIndex: "no", key: "no" },
+        { title: <div className="flex items-center justify-center">
+            <span className="flex items-center justify-center">No</span>
+        </div>,
+            key: "no",
+            render: (text, record) => (
+                <div className="flex items-center justify-center">
+                    <span className="flex items-center justify-center">{record.no}</span>
+                </div>
+            ),
+        },
         {
-            title: <div className="flex items-center justify-end">
-                <span className="flex items-center justify-end">Email</span>
+            title: <div className="flex items-center justify-center">
+                <span className="flex items-center justify-center">Email</span>
             </div>,
             key: "email",
             render: (text, record) => (
-                <div className="flex items-center justify-end">
-                    <span className="flex items-center justify-end">{record.email}</span>
+                <div className="flex items-center justify-center">
+                    <span className="flex items-center justify-center">{record.email}</span>
                 </div>
             )
         },

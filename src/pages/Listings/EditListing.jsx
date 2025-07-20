@@ -316,6 +316,7 @@ const EditListing = () => {
                 <Input size="large" placeholder="Enter reason for listing" />
               </Form.Item>
 
+
               <Form.Item
                 label="Condition"
                 name="condition"
