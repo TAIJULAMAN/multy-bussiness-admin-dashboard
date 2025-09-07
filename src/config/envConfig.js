@@ -1,5 +1,5 @@
 // Function to get the base API URL
-export const url = "http://localhost:3000/";
+export const url = "http://10.10.20.57:8001/api/v1/";
 export const getBaseUrl = () => {
   return url;
 };
@@ -9,10 +9,9 @@ export const getImageBaseUrl = () => {
   return url;
 };
 
-
 export const getImageUrl = (imagePath) => {
   if (imagePath.includes("http")) {
     return imagePath;
   }
   return `${url}${imagePath}`;
-}
+};

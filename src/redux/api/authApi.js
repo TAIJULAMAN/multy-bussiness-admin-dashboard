@@ -6,42 +6,42 @@ const authApi = baseApi.injectEndpoints({
       query: (data) => {
         console.log("Data being sent to the API:", data);
         return {
-          url: "auth/sign-in",
+          url: "auth/login",
           method: "POST",
           body: data,
         };
       },
       invalidatesTags: ["admin"],
     }),
-    forgotPassword: builder.mutation({
-      query: (data) => ({
-        url: "verification/create",
-        method: "POST",
-        body: data,
-      }),
-    }),
-    verifyEmail: builder.mutation({
-      query: (data) => ({
-        url: "verification/verify",
-        method: "POST",
-        body: data,
-      }),
-    }),
-    resetPassword: builder.mutation({
-      query: (data) => ({
-        url: "auth/reset-password",
-        method: "POST",
-        body: data,
-        headers: {
-          Authorization: localStorage.getItem("resetToken"),
-        },
-      }),
+    // forgotPassword: builder.mutation({
+    //   query: (data) => ({
+    //     url: "verification/create",
+    //     method: "POST",
+    //     body: data,
+    //   }),
+    // }),
+    // verifyEmail: builder.mutation({
+    //   query: (data) => ({
+    //     url: "verification/verify",
+    //     method: "POST",
+    //     body: data,
+    //   }),
+    // }),
+    // resetPassword: builder.mutation({
+    //   query: (data) => ({
+    //     url: "auth/reset-password",
+    //     method: "POST",
+    //     body: data,
+    //     headers: {
+    //       Authorization: localStorage.getItem("resetToken"),
+    //     },
+    //   }),
 
-      invalidatesTags: ["admin"],
-    }),
+    //   invalidatesTags: ["admin"],
+    // }),
   }),
 });
 
-export const { useLogInMutation, useForgotPasswordMutation, useVerifyEmailMutation, useResetPasswordMutation } = authApi;
+export const { useLogInMutation } = authApi;
 
 export default authApi;

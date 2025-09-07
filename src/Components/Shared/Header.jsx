@@ -4,11 +4,11 @@ import logo from "../../assets/icons/logo.png";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import { Modal } from "antd";
 import { RxCross2 } from "react-icons/rx";
-import { useDeleteNotificationMutation, useGetAllNotificationQuery } from "../../redux/api/notificationApi";
+// import { useDeleteNotificationMutation, useGetAllNotificationQuery } from "../../redux/api/notificationApi";
 import { imageUrl } from "../../Utils/server";
 import { decodeAuthToken } from "../../Utils/decode-access-token";
-import { useGetProfileQuery } from "../../redux/api/profileApi";
-import toast from 'react-hot-toast';
+// import { useGetProfileQuery } from "../../redux/api/profileApi";
+import toast from "react-hot-toast";
 
 const notificationsData = [
   {
@@ -24,7 +24,8 @@ const notificationsData = [
     id: "2",
     type: "listing_request",
     title: "New Listing Request",
-    description: 'Michael Brown submitted a new listing: "Downtown Event Space"',
+    description:
+      'Michael Brown submitted a new listing: "Downtown Event Space"',
     date: "2024-12-14",
     time: "08:00 AM",
     avatar: "https://avatar.iran.liara.run/public/12",
@@ -49,7 +50,7 @@ function Header() {
   // console.log(token);
   const decodedToken = decodeAuthToken(token);
   // console.log(decodedToken);
-  const { data: profileData } = useGetProfileQuery({ _id: decodedToken?.id });
+  // const { data: profileData } = useGetProfileQuery({ _id: decodedToken?.id });
   // console.log("profileData from header", profileData);
 
   // const { data: notificationsData } = useGetAllNotificationQuery();
@@ -72,7 +73,6 @@ function Header() {
     // }
   };
 
-
   if (!isOpen) return null;
 
   return (
@@ -86,24 +86,24 @@ function Header() {
           className="relative bg-[#cce9ff] p-[15px] rounded-full transition"
         >
           <IoIosNotificationsOutline size={22} />
-          {notificationsData?.length > 0 && (
-            <span className="absolute top-1 right-1 bg-[#0091FF] text-xs text-white px-1 rounded-full">
-              {notificationsData?.length}
-            </span>
-          )}
+          {/* {notificationsData?.length > 0 && ( */}
+          <span className="absolute top-1 right-1 bg-[#0091FF] text-xs text-white px-1 rounded-full">
+            10
+          </span>
+          {/* )} */}
         </button>
 
         {/* Profile */}
         <Link to="/profile" className="flex items-center gap-2">
           <img
-            src={imageUrl(profileData?.data?.img || "https://avatar.iran.liara.run/public/26")}
+            src="https://avatar.iran.liara.run/public/26"
             className="w-8 md:w-12 h-8 md:h-12 object-cover rounded-full"
             alt="User Avatar"
           />
           <div className="hidden md:flex flex-col items-start">
-            <h3 className="text-gray-800 text-sm">{profileData?.data?.name || "Shah Aman"}</h3>
+            <h3 className="text-gray-800 text-sm">Shah Aman</h3>
             <p className="text-xs px-2 py-1 bg-[#cce9ff] text-[#0091FF] rounded">
-              {profileData?.data?.role ||  "Admin"}
+              Admin
             </p>
           </div>
         </Link>
@@ -121,11 +121,11 @@ function Header() {
           {notificationsData?.length > 0 ? (
             notificationsData?.map((notification) => (
               <div
-                key={notification?._id}
+                key={notification?.id}
                 className="relative p-3 bg-white border rounded-lg mb-3"
               >
                 <button
-                  onClick={() => handleDismiss(notification?._id)}
+                  onClick={() => handleDismiss(notification?.id)}
                   className="absolute top-2 right-2 p-1 rounded-full hover:bg-gray-100 transition-colors"
                   aria-label="Dismiss notification"
                 >
@@ -141,11 +141,11 @@ function Header() {
                     <h3 className="font-semibold text-gray-900">
                       {notification?.title}
                     </h3>
-                    <p className="text-sm text-gray-700">{notification?.description}</p>
+                    <p className="text-sm text-gray-700">
+                      {notification?.description}
+                    </p>
                     <p className="text-xs text-gray-500 mt-1">
-                      {notification?.createdAt
-                        ? `${new Date(notification.date).getMonth() + 1}/${new Date(notification.createdAt).getDate()}/${new Date(notification.createdAt).getFullYear()} ${new Date(notification.createdAt).getHours()}:${new Date(notification.createdAt).getMinutes().toString().padStart(2, '0')}:${new Date(notification.createdAt).getSeconds().toString().padStart(2, '0')}`
-                        : null}
+                      {notification?.date} {notification?.time}
                     </p>
                   </div>
                 </div>
