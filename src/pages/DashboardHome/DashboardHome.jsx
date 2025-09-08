@@ -1,7 +1,6 @@
 import React from "react";
 import GrowthChart from "../../Components/charts/UserGrowthChart";
 import ActivityChart from "../../Components/charts/ActivityChart";
-// import Loader from "../../Components/Shared/Loaders/Loader";
 import RecentlyJoinedUsers from "../User/RecentlyJoinedUsers";
 import user from "../../assets/icons/user.png";
 import list from "../../assets/icons/list.png";
@@ -11,7 +10,6 @@ import Loader from "../../Components/Shared/Loaders/Loader";
 
 function DashboardHome() {
   const { data: dashboardData, isLoading } = useGetAllDashboardQuery();
-  // console.log("dashboardData of dashboard home", dashboardData);
   if (isLoading) {
     return <Loader />;
   }

@@ -12,24 +12,29 @@ export const userApi = baseApi.injectEndpoints({
       }),
       providesTags: ["user"],
     }),
-    // updateUser: builder.mutation({
-    //   query: ({ id }) => ({
-    //     url: `/auth/block/${id}`,
-    //     method: "PATCH",
-    //   }),
-    //   invalidatesTags: ["user", "reports"],
-    // }),
-    // getSingleUser: builder.query({
-    //   query: ({ user }) => ({
-    //     url: `product/admin-get-all`,
-    //     method: "GET",
-    //     params: {
-    //       user,
-    //     },
-    //   }),
-    //   providesTags: ["user"],
-    // }),
+
+    getSingleUser: builder.query({
+      query: ({ userId }) => ({
+        url: "dashboard/users-business-statistics",
+        method: "GET",
+        params: {
+          userId,
+        },
+      }),
+      providesTags: ["user"],
+    }),
+
+    updateUser: builder.mutation({
+      query: (userId) => {
+        // console.log("updateUser API - userId:", userId);
+        return {
+          url: `dashboard/block-user?userId=${userId}`,
+          method: "PATCH",
+        };
+      },
+      invalidatesTags: ["user"],
+    }),
   }),
 });
 
-export const { useGetAllUserQuery } = userApi;
+export const { useGetAllUserQuery, useGetSingleUserQuery, useUpdateUserMutation } = userApi;
