@@ -27,18 +27,18 @@ const authApi = baseApi.injectEndpoints({
         body: data,
       }),
     }),
-    // resetPassword: builder.mutation({
-    //   query: (data) => ({
-    //     url: "auth/reset-password",
-    //     method: "POST",
-    //     body: data,
-    //     headers: {
-    //       Authorization: localStorage.getItem("resetToken"),
-    //     },
-    //   }),
+    resetPassword: builder.mutation({
+      query: (data) => ({
+        url: "auth/reset-password",
+        method: "PATCH",
+        body: data,
+        headers: {
+          Authorization: localStorage.getItem("resetToken"),
+        },
+      }),
 
-    //   invalidatesTags: ["admin"],
-    // }),
+      invalidatesTags: ["admin"],
+    }),
   }),
 });
 
@@ -46,6 +46,7 @@ export const {
   useLogInMutation,
   useForgotPasswordMutation,
   useVerifyEmailMutation,
+  useResetPasswordMutation,
 } = authApi;
 
 export default authApi;

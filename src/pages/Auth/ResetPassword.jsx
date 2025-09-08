@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import "antd/dist/reset.css";
-import BrandLogo from "../../Components/Shared/BrandLogo";
-import { useNavigate } from "react-router-dom";
-// import { useResetPasswordMutation } from "../../redux/api/authApi";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-// import Swal from "sweetalert2";
+import { useResetPasswordMutation } from "../../redux/api/authApi";
+import Swal from "sweetalert2";
+import BrandLogo from "../../Components/Shared/BrandLogo";
+
 // import { getResetToken } from "../../services/auth.service";
 
 const ResetPassword = () => {
@@ -12,33 +13,34 @@ const ResetPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [searchParams] = useSearchParams();
+  const email = searchParams.get("email");
 
-
-  // const [resetPassword, { isLoading }] = useResetPasswordMutation();
+  const [resetPassword] = useResetPasswordMutation();
 
   const navigate = useNavigate();
 
   const handleUpdatePassword = async (e) => {
     e.preventDefault();
-    navigate("/login");
 
-    // if (newPassword !== confirmPassword) {
-    //   Swal.fire({
-    //     icon: "error",
-    //     title: "Password Mismatch",
-    //     text: "The passwords do not match. Please try again.",
-    //   });
-    //   return;
-    // }
+    if (newPassword !== confirmPassword) {
+      Swal.fire({
+        icon: "error",
+        title: "Password Mismatch",
+        text: "The passwords do not match. Please try again.",
+      });
+      return;
+    }
 
-    // if (!newPassword || !confirmPassword) {
-    //   Swal.fire({
-    //     icon: "error",
-    //     title: "Invalid Request",
-    //     text: "Missing required fields.",
-    //   });
-    //   return;
-    // }
+    if (!newPassword || !confirmPassword) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid Request",
+        text: "Missing required fields.",
+      });
+      return;
+    }
+
     // const resetToken = getResetToken();
     // console.log("resetToken from reset password", resetToken);
     // if (!resetToken) {
@@ -50,24 +52,26 @@ const ResetPassword = () => {
     //   return;
     // }
 
-    // try {
-    //   await resetPassword({
-    //     confirm_password: confirmPassword,
-    //     password: newPassword,
-    //   }).unwrap();
+    try {
+      await resetPassword({
+        email,
+        confirm_password: confirmPassword,
+        password: newPassword,
+      }).unwrap();
 
-    //   Swal.fire({
-    //     icon: "success",
-    //     title: "Password Updated!",
-    //     text: "Your password has been successfully updated.",
-    //   });
-    // } catch (error) {
-    //   Swal.fire({
-    //     icon: "error",
-    //     title: "Password Reset Failed",
-    //     text: error?.message || "Please try again.",
-    //   });
-    // }
+      Swal.fire({
+        icon: "success",
+        title: "Password Updated!",
+        text: "Your password has been successfully updated.",
+      });
+      navigate("/login");
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Password Reset Failed",
+        text: error?.message || "Please try again.",
+      });
+    }
   };
   return (
     <div className="flex justify-center items-center min-h-screen bg-[#f0f6ff] p-5">
@@ -127,10 +131,8 @@ const ResetPassword = () => {
           <div className="flex justify-center items-center text-white">
             <button
               type="submit"
-              // disabled={isLoading}
               className="w-full bg-[#0091ff] font-semibold py-3 px-6 rounded-lg shadow-lg cursor-pointer mt-5"
             >
-              {/* {isLoading ? "Updating..." : "Update Password"} */}
               Update Password
             </button>
           </div>

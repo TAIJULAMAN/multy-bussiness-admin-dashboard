@@ -41,7 +41,8 @@ function VerificationCode() {
             title: "Verification successful!",
             text: "Your email has been successfully verified.",
           });
-          navigate("/reset-password");
+          // navigate("/reset-password");
+          navigate(`/reset-password?email=${email}`);
         })
         .catch((err) => {
           console.error("Verification error:", err);
