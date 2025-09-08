@@ -23,7 +23,7 @@ const authApi = baseApi.injectEndpoints({
     verifyEmail: builder.mutation({
       query: (data) => ({
         url: "auth/forget-password-check-otp",
-        method: "POST",
+        method: "PATCH",
         body: data,
       }),
     }),

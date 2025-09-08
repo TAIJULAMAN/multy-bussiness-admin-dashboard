@@ -2,7 +2,7 @@ import React from "react";
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useVerifyEmailMutation } from "../../redux/api/authApi";
-// import Swal from "sweetalert2";
+import Swal from "sweetalert2";
 
 function VerificationCode() {
   const [code, setCode] = useState(new Array(6).fill(""));
@@ -36,24 +36,24 @@ function VerificationCode() {
         .then((response) => {
           console.log("response from verify email", response);
           // localStorage.setItem("resetToken", response?.data?.resetToken);
-          // Swal.fire({
-          //   icon: "success",
-          //   title: "Verification successful!",
-          //   text: "Your email has been successfully verified.",
-          // });
-          // navigate("/reset-password");
+          Swal.fire({
+            icon: "success",
+            title: "Verification successful!",
+            text: "Your email has been successfully verified.",
+          });
+          navigate("/reset-password");
         })
         .catch((err) => {
           console.error("Verification error:", err);
-          // const errorMessage =
-          //   err?.data?.message ||
-          //   err.message ||
-          //   "Invalid code. Please try again.";
-          // Swal.fire({
-          //   icon: "error",
-          //   title: "Verification Failed",
-          //   text: errorMessage,
-          // });
+          const errorMessage =
+            err?.data?.message ||
+            err.message ||
+            "Invalid code. Please try again.";
+          Swal.fire({
+            icon: "error",
+            title: "Verification Failed",
+            text: errorMessage,
+          });
         });
     } else {
       Swal.fire({
@@ -93,7 +93,6 @@ function VerificationCode() {
           <div className="flex flex-col gap-5 justify-center items-center text-white">
             <button
               onClick={handleVerifyCode}
-              // disabled={isLoading}
               type="button"
               className="whitespace-nowrap w-full bg-[#0091ff] text-white font-semibold py-3 rounded-lg shadow-lg cursor-pointer my-5"
             >
