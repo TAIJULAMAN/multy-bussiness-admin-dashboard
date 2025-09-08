@@ -1,13 +1,13 @@
 import React from "react";
 import { Cell, Pie, PieChart } from "recharts";
-// import { useGetAllDashboardQuery } from "../../redux/api/dashboard";
+import { useGetAllDashboardQuery } from "../../redux/api/dashboardApi";
 
 const ActivityStatisticsChart = () => {
-  // const { data: dashboardData } = useGetAllDashboardQuery();
+  const { data: dashboardData } = useGetAllDashboardQuery();
 
   const data = [
-    { name: "Active User", value: 2458 },
-    { name: "Active Listings", value: 1879 },
+    { name: "Active User", value: dashboardData?.data?.totalUser },
+    { name: "Active Business", value: dashboardData?.data?.totalBusiness },
   ];
 
   const totalValue = data.reduce((sum, item) => sum + item.value, 0);
@@ -21,7 +21,7 @@ const ActivityStatisticsChart = () => {
       </h1>
 
       <div className="relative h-64 flex justify-center">
-        {/* PieChart Component */} 
+        {/* PieChart Component */}
         <PieChart width={240} height={240}>
           <Pie
             data={data}
@@ -45,7 +45,7 @@ const ActivityStatisticsChart = () => {
         </PieChart>
 
         {/* Center Total Value */}
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+        <div className="absolute top-[120px] left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
           <p className="text-3xl font-bold text-gray-800">{totalValue}</p>
           <p className="text-sm text-gray-600">Total Activities</p>
         </div>
