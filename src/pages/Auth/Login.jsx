@@ -44,7 +44,6 @@ const Login = () => {
             token: response?.data?.accessToken,
           })
         );
-        // localStorage.setItem("token", response?.token);
         Swal.fire({
           icon: "success",
           title: "Login successful!",

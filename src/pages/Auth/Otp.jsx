@@ -1,18 +1,17 @@
 import React from "react";
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-// import { useVerifyEmailMutation } from "../../redux/api/authApi";
+import { useVerifyEmailMutation } from "../../redux/api/authApi";
 // import Swal from "sweetalert2";
 
 function VerificationCode() {
   const [code, setCode] = useState(new Array(6).fill(""));
   const [searchParams] = useSearchParams();
+  const [verifyEmail] = useVerifyEmailMutation();
 
   const email = searchParams.get("email");
-  console.log(email);
+  console.log("email", email);
   const navigate = useNavigate();
-
-  // const [verifyEmail, { isLoading }] = useVerifyEmailMutation();
 
   const handleChange = (value, index) => {
     if (!isNaN(value)) {
@@ -25,43 +24,43 @@ function VerificationCode() {
     }
   };
   const enteredCode = code.join("");
-  // const otpData = {
-  //   email,
-  //   code: enteredCode,
-  // };
+  const otpData = {
+    email,
+    code: enteredCode,
+  };
 
   const handleVerifyCode = async () => {
     if (enteredCode.length === 6) {
-      navigate("/reset-password");
-      // await verifyEmail(otpData)
-      //   .unwrap()
-      //   .then((response) => {
-      //     localStorage.setItem("resetToken", response?.data?.resetToken);
-      //     Swal.fire({
-      //       icon: "success",
-      //       title: "Verification successful!",
-      //       text: "Your email has been successfully verified.",
-      //     });
-      //     navigate("/reset-password");
-      //   })
-    //     .catch((err) => {
-    //       console.error("Verification error:", err);
-    //       const errorMessage =
-    //         err?.data?.message ||
-    //         err.message ||
-    //         "Invalid code. Please try again.";
-    //       Swal.fire({
-    //         icon: "error",
-    //         title: "Verification Failed",
-    //         text: errorMessage,
-    //       });
-    //     });
-    // } else {
-    //   Swal.fire({
-    //     icon: "error",
-    //     title: "Oops...",
-    //     text: "Please enter a valid 6-digit code.",
-    //   });
+      await verifyEmail(otpData)
+        .unwrap()
+        .then((response) => {
+          console.log("response from verify email", response);
+          // localStorage.setItem("resetToken", response?.data?.resetToken);
+          // Swal.fire({
+          //   icon: "success",
+          //   title: "Verification successful!",
+          //   text: "Your email has been successfully verified.",
+          // });
+          // navigate("/reset-password");
+        })
+        .catch((err) => {
+          console.error("Verification error:", err);
+          // const errorMessage =
+          //   err?.data?.message ||
+          //   err.message ||
+          //   "Invalid code. Please try again.";
+          // Swal.fire({
+          //   icon: "error",
+          //   title: "Verification Failed",
+          //   text: errorMessage,
+          // });
+        });
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Please enter a valid 6-digit code.",
+      });
     }
   };
 

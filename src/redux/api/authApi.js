@@ -13,20 +13,20 @@ const authApi = baseApi.injectEndpoints({
       },
       invalidatesTags: ["admin"],
     }),
-    // forgotPassword: builder.mutation({
-    //   query: (data) => ({
-    //     url: "verification/create",
-    //     method: "POST",
-    //     body: data,
-    //   }),
-    // }),
-    // verifyEmail: builder.mutation({
-    //   query: (data) => ({
-    //     url: "verification/verify",
-    //     method: "POST",
-    //     body: data,
-    //   }),
-    // }),
+    forgotPassword: builder.mutation({
+      query: (data) => ({
+        url: "auth/forget-password",
+        method: "POST",
+        body: data,
+      }),
+    }),
+    verifyEmail: builder.mutation({
+      query: (data) => ({
+        url: "auth/forget-password-check-otp",
+        method: "POST",
+        body: data,
+      }),
+    }),
     // resetPassword: builder.mutation({
     //   query: (data) => ({
     //     url: "auth/reset-password",
@@ -42,6 +42,10 @@ const authApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useLogInMutation } = authApi;
+export const {
+  useLogInMutation,
+  useForgotPasswordMutation,
+  useVerifyEmailMutation,
+} = authApi;
 
 export default authApi;
