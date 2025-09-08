@@ -38,3 +38,12 @@ export const userApi = baseApi.injectEndpoints({
 });
 
 export const { useGetAllUserQuery, useGetSingleUserQuery, useUpdateUserMutation } = userApi;
+
+
+// updateUser: builder.mutation({
+//     query: ({ id }) => ({
+//       url: `/auth/block/${id}`,
+//       method: "PATCH",
+//     }),
+//     invalidatesTags: ["user", "reports"],
+//   })
