@@ -11,7 +11,7 @@ const termsAndConditionsApi = baseApi.injectEndpoints({
     }),
     updateTermsAndConditions: builder.mutation({
       query: ({ requestData }) => ({
-        url: "home/create-terms-condition",
+        url: "home/update-terms-condition",
         method: "PATCH",
         body: requestData,
       }),
