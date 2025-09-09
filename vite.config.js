@@ -4,7 +4,7 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   server: {
-    host: "localhost",
+    host: "10.10.20.72",
     port: '3000',
   },
   plugins: [react(), tailwindcss()],
