@@ -24,6 +24,7 @@ import {
   useGet_all_couponQuery,
   useAdd_couponMutation,
   useUpdate_couponMutation,
+  useDelete_couponMutation,
 } from "../../redux/api/couponApi";
 
 function Coupon() {
@@ -36,6 +37,7 @@ function Coupon() {
   const { data, isLoading } = useGet_all_couponQuery();
   const [addCoupon, { isLoading: isAddingCoupon }] = useAdd_couponMutation();
   const [updateCoupon, { isLoading: isUpdatingCoupon }] = useUpdate_couponMutation();
+  const [deleteCoupon, { isLoading: isDeletingCoupon }] = useDelete_couponMutation();
 
   const dataSource =
     data?.data?.map((coupon, index) => ({
@@ -105,22 +107,6 @@ function Coupon() {
     setEditingRecord(null);
   };
 
-  const handleDeleteAdmin = (record) => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: `You are about to delete the coupon: ${record.code}`,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, delete it!",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire("Deleted!", "Your coupon has been deleted.", "success");
-      }
-    });
-  };
-
   const handleEdit = (record) => {
     setIsModalOpen(true);
     setEditingRecord(record);
@@ -133,6 +119,31 @@ function Coupon() {
       status: record.status,
       useLimit: record.useLimit,
     });
+  };
+
+  const handleDeleteAdmin = async (record) => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: `You are about to delete the coupon: ${record.code}`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await deleteCoupon({ couponId: record._id }).unwrap();
+        Swal.fire("Deleted!", "Your coupon has been deleted.", "success");
+      } catch (error) {
+        Swal.fire(
+          "Error!",
+          error?.data?.message || error?.message || "Failed to delete coupon",
+          "error"
+        );
+      }
+    }
   };
 
   const columns = [

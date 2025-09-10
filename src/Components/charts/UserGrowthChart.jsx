@@ -16,7 +16,14 @@ import Loader from "../Shared/Loaders/Loader";
 const UserGrowthChart = () => {
   const currentYear = new Date().getFullYear();
   const [year, setYear] = useState(currentYear);
-  const [years] = useState([2023, 2024, 2025]);
+  const [years] = useState(() => {
+    const startYear = 2023;
+    const endYear = currentYear + 1;
+    return Array.from(
+      { length: endYear - startYear + 1 },
+      (_, i) => startYear + i
+    );
+  });
 
   const monthMap = {
     January: 1,
@@ -33,26 +40,32 @@ const UserGrowthChart = () => {
     December: 12,
   };
 
-  // Fetch user growth data from API
-  const { data: apiData, isLoading, error } = useGetUserGrowthQuery({ year });
-  // console.log("userGrowthData", apiData?.data?.result);
+  const { data: apiData, isLoading } = useGetUserGrowthQuery({ year });
 
   const { monthlyData, maxUsers } = useMemo(() => {
-    // Create an array with 12 months initialized to 0
     const monthlyValues = new Array(12).fill(0);
-
     if (apiData?.data?.result && Array.isArray(apiData.data.result)) {
       apiData.data.result.forEach((item) => {
+        let itemYear = null;
+        if (item.year) {
+          itemYear = item.year;
+        } else if (item.createdAt) {
+          itemYear = new Date(item.createdAt).getFullYear();
+        }
+
         if (item.month >= 1 && item.month <= 12) {
-          monthlyValues[item.month - 1] = item.totalBusinesses || 0;
+          if (year === 2025) {
+            monthlyValues[item.month - 1] = item.totalBusinesses || 0;
+          } else if (itemYear === year) {
+            monthlyValues[item.month - 1] = item.totalBusinesses || 0;
+          }
         }
       });
     }
 
     const processedData = monthlyValues;
-
     const maxUsers =
-      processedData.length > 0 ? Math.max(...processedData) + 5 : 50;
+      Math.max(...processedData) > 0 ? Math.max(...processedData) + 5 : 50;
 
     return {
       monthlyData: Object.keys(monthMap).map((month, index) => ({
@@ -61,48 +74,10 @@ const UserGrowthChart = () => {
       })),
       maxUsers,
     };
-  }, [apiData]);
+  }, [apiData, year]);
 
   if (isLoading) {
-    return (
-      <div
-        style={{
-          width: "100%",
-          height: "450px",
-          backgroundColor: "#fff",
-          borderRadius: "12px",
-          padding: "20px",
-          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <Loader />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div
-        style={{
-          width: "100%",
-          height: "450px",
-          backgroundColor: "#fff",
-          borderRadius: "12px",
-          padding: "20px",
-          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          color: "#ff4d4f",
-          fontSize: "16px",
-        }}
-      >
-        Error loading user growth data. Please try again later.
-      </div>
-    );
+    return <Loader />;
   }
 
   return (

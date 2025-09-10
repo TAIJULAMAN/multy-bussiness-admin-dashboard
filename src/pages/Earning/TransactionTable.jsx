@@ -1,101 +1,37 @@
 import React from "react";
-import { ConfigProvider, Modal, Space, Table } from "antd";
+import { ConfigProvider, Table } from "antd";
 import { useState } from "react";
-// import { MdBlockFlipped } from "react-icons/md";
-import { IoIosMail } from "react-icons/io";
-import img from "../../assets/block.png";
-// import { useGetTransactionsQuery } from "../../redux/api/transactionApi";
-import { imageUrl } from "../../Utils/server";
 import Loader from "../../Components/Shared/Loaders/Loader";
+import { useGetEarningQuery } from "../../redux/api/earningApi";
 
 const TransactionTable = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const currentYear = new Date().getFullYear();
 
-  // const { data: transactionsData, isLoading } = useGetTransactionsQuery();
-  // console.log("transactionsData", transactionsData);
+  const { data: earningData, isLoading } = useGetEarningQuery({
+    year: currentYear,
+  });
 
-  const showModal = () => {
-    setIsModalOpen(true);
-  };
   const handleCancel = () => {
     setIsModalOpen(false);
   };
 
-
-  // const dataSource =
-  //   transactionsData?.slice(0, 5).map((transaction, index) => ({
-
-  //     key: transaction?._id || index.toString(),
-  //     no: index + 1,
-  //     name: transaction?.name || "No Name",
-  //     img: transaction?.img,
-  //     date: transaction?.updatedAt || "N/A",
-  //     amount: transaction?.amount || "N/A",
-  //     email: transaction?.email || "N/A",
-  //     country: transaction?.country || "N/A",
-
-  //   })) || [];
-
-  // Demo transaction data
-  const dataSource = [
-    {
-      _id: "1",
-      name: "John Doe",
-      img: "https://randomuser.me/api/portraits/men/1.jpg",
-      date: "2025-05-25",
-      amount: 1500,
-      TR_ID: "TRX-84921A",
-      country: "Bangladesh",
-      status: "completed",
-      pay_On: "Stripe"
-    },
-    {
-      _id: "2",
-      name: "Jane Smith",
-      img: "https://randomuser.me/api/portraits/women/2.jpg",
-      date: "2025-06-01",
-      amount: 2200,
-      TR_ID: "TRX-58291B",
-      country: "USA",
-      status: "pending",
-      pay_On: "PayPal"
-    },
-    {
-      _id: "3",
-      name: "Michael Lee",
-      img: "https://randomuser.me/api/portraits/men/3.jpg",
-      date: "2025-06-15",
-      amount: 1750,
-      TR_ID: "TRX-11384C",
-      country: "Canada",
-      status: "completed",
-      pay_On: "Stripe"
-    },
-    {
-      _id: "4",
-      name: "Fatima Khan",
-      img: "https://randomuser.me/api/portraits/women/4.jpg",
-      date: "2025-06-10",
-      amount: 980,
-      TR_ID: "TRX-97263D",
-      country: "Pakistan",
-      status: "failed",
-      pay_On: "Razorpay"
-    },
-    {
-      _id: "5",
-      name: "Carlos Diaz",
-      img: "https://randomuser.me/api/portraits/men/5.jpg",
-      date: "2025-06-20",
-      amount: 3050,
-      TR_ID: "TRX-44182E",
-      country: "Mexico",
-      status: "completed",
-      pay_On: "Stripe"
-    }
-  ];
-
-
+  const dataSource = earningData?.data?.allPayment
+    ? [...earningData.data.allPayment]
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, 5)
+        .map((payment, index) => ({
+          key: payment._id,
+          _id: payment._id,
+          name: payment.user?.name || "No Name",
+          email: payment.user?.email || "No Email",
+          date: new Date(payment.createdAt).toLocaleDateString(),
+          amount: payment.amount,
+          TR_ID: payment?.payment_intent_id || "No TR ID",
+          status: payment.status,
+          pay_On: "Stripe",
+        }))
+    : [];
 
   const columns = [
     {
@@ -103,14 +39,10 @@ const TransactionTable = () => {
       key: "name",
       render: (_, record) => (
         <div className="flex items-center gap-3">
-          <img
-            src={record?.img || ""}
-            className="w-10 h-10 object-cover rounded-full"
-            alt="User Avatar"
-          />
           <div className="flex flex-col gap-[2px]">
-            <span className="leading-none">{record.name}</span>
-            <span className="leading-none">{record.email}</span>
+            <span className="leading-none text-sm font-medium">
+              {record.name}
+            </span>
           </div>
         </div>
       ),
@@ -138,13 +70,12 @@ const TransactionTable = () => {
           <span className="leading-none">${record?.amount}</span>
         </div>
       ),
-    }
-
+    },
   ];
 
-  // if (isLoading) {
-  //   return <Loader />;
-  // }
+  if (isLoading) {
+    return <Loader />;
+  }
 
   return (
     <>
@@ -169,36 +100,6 @@ const TransactionTable = () => {
           pagination={false}
           scroll={{ x: "max-content" }}
         />
-
-        {/*Block Modal */}
-        <Modal
-          open={isModalOpen}
-          centered
-          onCancel={handleCancel}
-          footer={null}
-        >
-          <div className="flex flex-col justify-center items-center py-10">
-            <img src={img} alt="Confirmation" className="w-40 h-40 mb-5" />
-            <p className="text-3xl text-center text-gray-800">Warning</p>
-            <p className="text-xl text-center mt-5">
-              Do you want to block this?
-            </p>
-            <div className="text-center py-5 w-full flex justify-center gap-4">
-              <button
-                onClick={handleCancel}
-                className="border-2 border-[#14803c] text-gray-800 font-semibold w-1/3 py-3 px-5 rounded-lg"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleCancel}
-                className="bg-[#14803c] text-white font-semibold w-1/3 py-3 px-5 rounded-lg"
-              >
-                Confirm
-              </button>
-            </div>
-          </div>
-        </Modal>
       </ConfigProvider>
     </>
   );

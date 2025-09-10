@@ -1,14 +1,15 @@
 import React from "react";
 import earn from "../../assets/icons/earn.png";
 import { FaDollarSign } from "react-icons/fa6";
-// import { useGetAllDashboardQuery } from "../../redux/api/dashboard";
-// import Loader from "../../Components/Shared/Loaders/Loader";
+import { useGetEarningQuery } from "../../redux/api/earningApi";
 
 function EarningManage() {
-  // const { data: dashboardData, isLoading } = useGetAllDashboardQuery();
-  // if (isLoading) {
-  //   return <Loader />;
-  // }
+  const currentYear = new Date().getFullYear();
+  const { data: earningData } = useGetEarningQuery({
+    year: currentYear,
+  });
+  console.log("earningData", earningData);
+
   return (
     <div>
       <div className="relative w-full flex z-[999] overflow-hidden h-[250px] items-center justify-between bg-gradient-to-tr from-white via-white to-[#0091FF]/70 p-10 rounded-xl">
@@ -22,7 +23,9 @@ function EarningManage() {
           <h2 className="text-xl font-semibold !mt-5 text-gray-800 leading-none">
             Total Earnings
           </h2>
-          <h1 className="text-3xl leading-none text-[#0091FF]">$20000</h1>
+          <h1 className="text-3xl leading-none text-[#0091FF]">
+            ${earningData?.data?.totalEarnings}
+          </h1>
         </div>
       </div>
     </div>

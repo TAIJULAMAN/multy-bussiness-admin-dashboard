@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   BarChart,
   Bar,
@@ -10,59 +10,68 @@ import {
   Legend,
 } from "recharts";
 import { Select } from "antd";
+import { useGetEarningQuery } from "../../redux/api/earningApi";
+import Loader from "../../Components/Shared/Loaders/Loader";
 
 const BookingChart = () => {
   const currentYear = new Date().getFullYear();
   const [year, setYear] = useState(currentYear);
+  const [years] = useState(() => {
+    const startYear = 2023;
+    const endYear = currentYear + 1;
+    return Array.from(
+      { length: endYear - startYear + 1 },
+      (_, i) => startYear + i
+    );
+  });
 
-  const demoData = {
-    2025: [
-      { name: "Jan", totalEarning: 4000 },
-      { name: "Feb", totalEarning: 5500 },
-      { name: "Mar", totalEarning: 4800 },
-      { name: "Apr", totalEarning: 6000 },
-      { name: "May", totalEarning: 7200 },
-      { name: "Jun", totalEarning: 8500 },
-      { name: "Jul", totalEarning: 9700 },
-      { name: "Aug", totalEarning: 8900 },
-      { name: "Sep", totalEarning: 9100 },
-      { name: "Oct", totalEarning: 10500 },
-      { name: "Nov", totalEarning: 11200 },
-      { name: "Dec", totalEarning: 12000 },
-    ],
-    2024: [
-      { name: "Jan", totalEarning: 3000 },
-      { name: "Feb", totalEarning: 4200 },
-      { name: "Mar", totalEarning: 3800 },
-      { name: "Apr", totalEarning: 5000 },
-      { name: "May", totalEarning: 6100 },
-      { name: "Jun", totalEarning: 7300 },
-      { name: "Jul", totalEarning: 8200 },
-      { name: "Aug", totalEarning: 7800 },
-      { name: "Sep", totalEarning: 8500 },
-      { name: "Oct", totalEarning: 9300 },
-      { name: "Nov", totalEarning: 10000 },
-      { name: "Dec", totalEarning: 11000 },
-    ],
-    2023: [
-      { name: "Jan", totalEarning: 2000 },
-      { name: "Feb", totalEarning: 3100 },
-      { name: "Mar", totalEarning: 2800 },
-      { name: "Apr", totalEarning: 4000 },
-      { name: "May", totalEarning: 5000 },
-      { name: "Jun", totalEarning: 6200 },
-      { name: "Jul", totalEarning: 7100 },
-      { name: "Aug", totalEarning: 6800 },
-      { name: "Sep", totalEarning: 7500 },
-      { name: "Oct", totalEarning: 8200 },
-      { name: "Nov", totalEarning: 9000 },
-      { name: "Dec", totalEarning: 9800 },
-    ],
+  const monthMap = {
+    January: 1,
+    February: 2,
+    March: 3,
+    April: 4,
+    May: 5,
+    June: 6,
+    July: 7,
+    August: 8,
+    September: 9,
+    October: 10,
+    November: 11,
+    December: 12,
   };
 
-  const years = Object.keys(demoData).map(Number).sort((a, b) => b - a);
-  const currentYearData = demoData[year] || [];
-  const maxEarning = Math.max(...currentYearData.map(item => item.totalEarning));
+  // Fetch earning data from API
+  const { data: apiData, isLoading } = useGetEarningQuery({ year });
+
+  const { monthlyData, maxEarning } = useMemo(() => {
+    // Create an array with 12 months initialized to 0
+    const monthlyValues = new Array(12).fill(0);
+
+    if (apiData?.data?.monthWiseEarnings && Array.isArray(apiData.data.monthWiseEarnings)) {
+      apiData.data.monthWiseEarnings.forEach((item) => {
+        // Only process if month is valid
+        if (item.month >= 1 && item.month <= 12) {
+          monthlyValues[item.month - 1] = item.totalEarnings || 0;
+        }
+      });
+    }
+
+    const processedData = monthlyValues;
+    const maxEarning =
+      Math.max(...processedData) > 0 ? Math.max(...processedData) + 1000 : 5000;
+
+    return {
+      monthlyData: Object.keys(monthMap).map((month, index) => ({
+        name: month.substring(0, 3), // Short month names
+        totalEarning: processedData[index] || 0,
+      })),
+      maxEarning,
+    };
+  }, [apiData, year]);
+
+  if (isLoading) {
+    return <Loader />;
+  }
 
   return (
     <div
@@ -104,7 +113,7 @@ const BookingChart = () => {
       </div>
       <ResponsiveContainer width="100%" height="85%">
         <BarChart
-          data={currentYearData}
+          data={monthlyData}
           margin={{ top: 20, right: 20, left: 0, bottom: 10 }}
         >
           <defs>
@@ -121,7 +130,7 @@ const BookingChart = () => {
           />
           <YAxis
             stroke="#333"
-            domain={[0, maxEarning + 1000]}
+            domain={[0, maxEarning]}
             tick={{ fontSize: 12, fontWeight: 500 }}
             tickFormatter={(value) => `$${value}`}
           />
