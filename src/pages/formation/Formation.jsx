@@ -1,11 +1,9 @@
 import { Modal, Form, Input, Upload, Button } from "antd";
 import { useState } from "react";
-import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
+import { FaTrashAlt } from "react-icons/fa";
 import { UploadOutlined } from "@ant-design/icons";
 import PageHeading from "../../Components/Shared/PageHeading";
 import Loader from "../../Components/Shared/Loaders/Loader";
-import { IoMdInformationCircleOutline } from "react-icons/io";
-import { Link } from "react-router-dom";
 import Category_delete_modal from "../Categories/Category_delete_modal";
 import {
   useGet_all_formationQuery,
@@ -18,7 +16,6 @@ import Swal from "sweetalert2";
 import { FiEdit } from "react-icons/fi";
 
 export default function Formation() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [updateModalOpen, setUpdateModalOpen] = useState(false);
   const [category, setCategory] = useState(null);
@@ -28,8 +25,7 @@ export default function Formation() {
     useAdd_formationMutation();
   const [updateFormation, { isLoading: isUpdating }] =
     useUpdate_formationMutation();
-  const [deleteFormation, { isLoading: isDeleting }] =
-    useDelete_formationMutation();
+  const [deleteFormation] = useDelete_formationMutation();
   const [form] = Form.useForm();
   const [updateForm] = Form.useForm();
   const [selectedFormation, setSelectedFormation] = useState(null);
@@ -83,7 +79,7 @@ export default function Formation() {
     try {
       // Check if image is being updated
       const hasNewImage = values?.["formation-image"]?.fileList?.length > 0;
-      
+
       if (hasNewImage) {
         // Use FormData if new image is uploaded
         const formData = new FormData();
@@ -91,7 +87,7 @@ export default function Formation() {
         formData.append("detail", values.detail);
         const file = values["formation-image"].fileList[0].originFileObj;
         formData.append("formation-image", file);
-        
+
         await updateFormation({
           formatId: selectedFormation?._id,
           data: formData,
@@ -102,7 +98,7 @@ export default function Formation() {
           title: values.title,
           detail: values.detail,
         };
-        
+
         await updateFormation({
           formatId: selectedFormation?._id,
           data: updateData,
