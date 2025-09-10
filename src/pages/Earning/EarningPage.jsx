@@ -5,6 +5,7 @@ import PageHeading from "../../Components/Shared/PageHeading";
 import TransactionTable from "./TransactionTable";
 
 function EarningPage() {
+ 
   return (
     <div>
       <PageHeading title={"Earnings"} />
