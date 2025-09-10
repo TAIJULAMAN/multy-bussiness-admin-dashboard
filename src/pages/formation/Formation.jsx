@@ -11,6 +11,7 @@ import {
   useGet_all_formationQuery,
   useAdd_formationMutation,
   useUpdate_formationMutation,
+  useDelete_formationMutation,
 } from "../../redux/api/formationApi";
 import { getImageBaseUrl } from "../../config/envConfig";
 import Swal from "sweetalert2";
@@ -27,6 +28,8 @@ export default function Formation() {
     useAdd_formationMutation();
   const [updateFormation, { isLoading: isUpdating }] =
     useUpdate_formationMutation();
+  const [deleteFormation, { isLoading: isDeleting }] =
+    useDelete_formationMutation();
   const [form] = Form.useForm();
   const [updateForm] = Form.useForm();
   const [selectedFormation, setSelectedFormation] = useState(null);
@@ -131,6 +134,35 @@ export default function Formation() {
     setUpdateModalOpen(true);
   };
 
+  const handleDeleteFormation = async (formation) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You are about to delete this formation",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await deleteFormation({ formatId: formation._id }).unwrap();
+          Swal.fire({
+            icon: "success",
+            title: "Deleted!",
+            text: "Formation has been deleted successfully!",
+          });
+        } catch (error) {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Failed to delete formation. Please try again.",
+          });
+        }
+      }
+    });
+  };
+
   if (isLoading) {
     return <Loader />;
   }
@@ -192,10 +224,7 @@ export default function Formation() {
                   <div className="h-6 w-px bg-gray-200"></div>
 
                   <button
-                    onClick={() => {
-                      setCategory(formation);
-                      setDeleteModalOpen(true);
-                    }}
+                    onClick={() => handleDeleteFormation(formation)}
                     className="p-2 text-red-500 hover:text-red-700"
                   >
                     <FaTrashAlt size={18} className="text-red-500" />

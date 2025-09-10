@@ -28,12 +28,12 @@ const formationApis = baseApi.injectEndpoints({
       invalidatesTags: ["formation"],
     }),
     delete_formation: builder.mutation({
-      query: ({ id, data }) => ({
-        url: `/formation/delete/${id}`,
+      query: ({ formatId }) => ({
+        url: `formation/delete-format`,
         method: "DELETE",
-        body: data,
+        params: { formatId },
       }),
-      invalidatesTags: ["categories"],
+      invalidatesTags: ["formation"],
     }),
   }),
 });
