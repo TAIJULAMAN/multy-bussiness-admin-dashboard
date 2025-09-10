@@ -349,16 +349,19 @@ export default function ListingTable() {
               </div>
             </div>
 
-            {/* Remove From Listing Button */}
+            {/* Action Buttons */}
             <div className="w-full pt-5 border-t border-gray-200 flex gap-2">
               <button
                 onClick={() => navigate("/edit-listing-management")}
-                className="w-1/2 px-5 py-2 border border-[#0091ff] text-[#0091ff] "
+                className="w-1/3 px-3 py-2 border border-[#0091ff] text-[#0091ff] text-sm"
               >
                 Edit
               </button>
-              <button className="w-1/2 px-5 py-2 border border-[#0091ff] bg-[#0091ff] !text-white">
+              <button className="w-1/3 px-3 py-2 border border-[#0091ff] bg-[#0091ff] !text-white text-sm">
                 Mark as Approved
+              </button>
+              <button className="w-1/3 px-3 py-2 border border-red-500 bg-red-500 !text-white text-sm">
+                Mark as Rejected
               </button>
             </div>
           </div>

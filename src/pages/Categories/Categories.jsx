@@ -1,20 +1,26 @@
-import { Modal, Table, Button, Image, Space, Pagination } from "antd";
+import { Modal, Table, Button, Image, Space, Pagination, Form, Input, Upload } from "antd";
 import { useState } from "react";
 import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
-import { EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { EyeOutlined, EditOutlined, DeleteOutlined, UploadOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 import PageHeading from "../../Components/Shared/PageHeading";
 import Category_delete_modal from "./Category_delete_modal";
 import img1 from "../../assets/cover.png";
 import img2 from "../../assets/cover1.png";
 import img3 from "../../assets/cover2.png";
-import { IoMdInformationCircleOutline } from "react-icons/io";
-import { Link } from "react-router-dom";
+import Swal from "sweetalert2";
 
 export default function Categories() {
+  const navigate = useNavigate();
   const [category, setCategory] = useState(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  const [updateModalOpen, setUpdateModalOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [form] = Form.useForm();
+  const [updateForm] = Form.useForm();
 
   // Mock data based on the screenshot
   const categoriesData = [
@@ -76,6 +82,55 @@ export default function Categories() {
     },
   ];
 
+  const handleAddCategory = async (values) => {
+    try {
+      // Mock API call - replace with actual API
+      console.log("Adding category:", values);
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: "Category added successfully!",
+      });
+      setAddModalOpen(false);
+      form.resetFields();
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Failed to add category. Please try again.",
+      });
+    }
+  };
+
+  const handleUpdateCategory = async (values) => {
+    try {
+      // Mock API call - replace with actual API
+      console.log("Updating category:", values);
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: "Category updated successfully!",
+      });
+      setUpdateModalOpen(false);
+      updateForm.resetFields();
+      setSelectedCategory(null);
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Failed to update category. Please try again.",
+      });
+    }
+  };
+
+  const handleOpenUpdateModal = (category) => {
+    setSelectedCategory(category);
+    updateForm.setFieldsValue({
+      categoryName: category.categoryName,
+    });
+    setUpdateModalOpen(true);
+  };
+
   const columns = [
     {
       title: "Sl",
@@ -120,7 +175,11 @@ export default function Categories() {
       width: 150,
       align: "center",
       render: (_, record) => (
-        <Button type="primary" className="bg-blue-500">
+        <Button 
+          type="primary" 
+          className="bg-blue-500"
+          onClick={() => navigate(`/subcategories?categoryId=${record.id}&categoryName=${record.categoryName}`)}
+        >
           View
         </Button>
       ),
@@ -137,6 +196,7 @@ export default function Categories() {
             icon={<EditOutlined />}
             size="small"
             className="bg-blue-500"
+            onClick={() => handleOpenUpdateModal(record)}
           />
           <Button
             type="primary"
@@ -162,6 +222,7 @@ export default function Categories() {
             type="primary" 
             size="large"
             className="bg-[#0091FF] border-[#0091FF] hover:bg-[#0077CC] hover:border-[#0077CC]"
+            onClick={() => setAddModalOpen(true)}
           >
             + Add New Category
           </Button>
@@ -194,6 +255,146 @@ export default function Categories() {
           />
         </div>
       </div>
+
+      {/* Add Category Modal */}
+      <Modal
+        title="Add New Category"
+        open={addModalOpen}
+        onCancel={() => {
+          setAddModalOpen(false);
+          form.resetFields();
+        }}
+        footer={null}
+        centered
+      >
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleAddCategory}
+          className="mt-4"
+        >
+          <Form.Item
+            name="categoryName"
+            label="Category Name"
+            rules={[
+              { required: true, message: "Please enter category name" },
+              { max: 100, message: "Category name cannot exceed 100 characters" },
+            ]}
+          >
+            <Input placeholder="Enter category name" />
+          </Form.Item>
+
+          <Form.Item
+            name="image"
+            label="Category Image"
+            rules={[{ required: true, message: "Please upload an image" }]}
+          >
+            <Upload
+              listType="picture"
+              maxCount={1}
+              beforeUpload={() => false}
+              accept="image/*"
+            >
+              <Button icon={<UploadOutlined />}>Upload Image</Button>
+            </Upload>
+          </Form.Item>
+
+          <div className="flex justify-end gap-3 mt-6">
+            <Button
+              onClick={() => {
+                setAddModalOpen(false);
+                form.resetFields();
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              className="bg-[#0091FF]"
+            >
+              Add Category
+            </Button>
+          </div>
+        </Form>
+      </Modal>
+
+      {/* Update Category Modal */}
+      <Modal
+        title="Update Category"
+        open={updateModalOpen}
+        onCancel={() => {
+          setUpdateModalOpen(false);
+          updateForm.resetFields();
+          setSelectedCategory(null);
+        }}
+        footer={null}
+        centered
+      >
+        <Form
+          form={updateForm}
+          layout="vertical"
+          onFinish={handleUpdateCategory}
+          className="mt-4"
+        >
+          <Form.Item
+            name="categoryName"
+            label="Category Name"
+            rules={[
+              { required: true, message: "Please enter category name" },
+              { max: 100, message: "Category name cannot exceed 100 characters" },
+            ]}
+          >
+            <Input placeholder="Enter category name" />
+          </Form.Item>
+
+          <Form.Item
+            name="image"
+            label="Category Image (Optional)"
+          >
+            <Upload
+              listType="picture"
+              maxCount={1}
+              beforeUpload={() => false}
+              accept="image/*"
+            >
+              <Button icon={<UploadOutlined />}>Upload New Image</Button>
+            </Upload>
+          </Form.Item>
+
+          {selectedCategory && (
+            <div className="mb-4">
+              <p className="text-sm text-gray-600 mb-2">Current Image:</p>
+              <Image
+                src={selectedCategory.image}
+                alt={selectedCategory.categoryName}
+                width={80}
+                height={80}
+                style={{ objectFit: "cover", borderRadius: "8px" }}
+              />
+            </div>
+          )}
+
+          <div className="flex justify-end gap-3 mt-6">
+            <Button
+              onClick={() => {
+                setUpdateModalOpen(false);
+                updateForm.resetFields();
+                setSelectedCategory(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              className="bg-[#0091FF]"
+            >
+              Update Category
+            </Button>
+          </div>
+        </Form>
+      </Modal>
 
       <Modal
         open={deleteModalOpen}
