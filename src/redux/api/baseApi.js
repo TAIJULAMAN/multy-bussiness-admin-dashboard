@@ -23,5 +23,6 @@ export const baseApi = createApi({
     "formation",
     "coupon",
     "earning",
+    "subscriber",
   ],
 });

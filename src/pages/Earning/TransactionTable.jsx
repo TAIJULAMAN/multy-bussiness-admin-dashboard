@@ -1,26 +1,19 @@
 import React from "react";
 import { ConfigProvider, Table } from "antd";
-import { useState } from "react";
 import Loader from "../../Components/Shared/Loaders/Loader";
 import { useGetEarningQuery } from "../../redux/api/earningApi";
 
 const TransactionTable = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const currentYear = new Date().getFullYear();
-
   const { data: earningData, isLoading } = useGetEarningQuery({
     year: currentYear,
   });
-
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
 
   const dataSource = earningData?.data?.allPayment
     ? [...earningData.data.allPayment]
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
         .slice(0, 5)
-        .map((payment, index) => ({
+        .map((payment) => ({
           key: payment._id,
           _id: payment._id,
           name: payment.user?.name || "No Name",
