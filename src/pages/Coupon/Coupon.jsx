@@ -23,6 +23,7 @@ import Loader from "../../Components/Shared/Loaders/Loader";
 import {
   useGet_all_couponQuery,
   useAdd_couponMutation,
+  useUpdate_couponMutation,
 } from "../../redux/api/couponApi";
 
 function Coupon() {
@@ -34,6 +35,7 @@ function Coupon() {
 
   const { data, isLoading } = useGet_all_couponQuery();
   const [addCoupon, { isLoading: isAddingCoupon }] = useAdd_couponMutation();
+  const [updateCoupon, { isLoading: isUpdatingCoupon }] = useUpdate_couponMutation();
 
   const dataSource =
     data?.data?.map((coupon, index) => ({
@@ -68,7 +70,17 @@ function Coupon() {
         subscriberLimit: values.subscriberOnly ? 1 : 0,
       };
 
-      await addCoupon(couponData).unwrap();
+      if (editingRecord) {
+        // Update existing coupon
+        await updateCoupon({
+          couponId: editingRecord._id,
+          data: couponData,
+        }).unwrap();
+      } else {
+        // Add new coupon
+        await addCoupon(couponData).unwrap();
+      }
+
       setIsModalOpen(false);
       form.resetFields();
       setEditingRecord(null);
@@ -364,16 +376,16 @@ function Coupon() {
               setEditingRecord(null);
             }}
             className="bg-[#FEF2F2] rounded  py-3 w-1/2  !text-[#EF4444] border-[1px] border-[#EF4444]"
-            disabled={isAddingCoupon}
+            disabled={isAddingCoupon || isUpdatingCoupon}
           >
             Cancel
           </button>
           <button
             onClick={() => form.submit()}
             className="bg-[#0091FF] !text-white rounded  py-3 w-1/2 disabled:opacity-50"
-            disabled={isAddingCoupon}
+            disabled={isAddingCoupon || isUpdatingCoupon}
           >
-            {isAddingCoupon ? (
+            {(isAddingCoupon || isUpdatingCoupon) ? (
               <div className="flex items-center justify-center gap-2">
                 <Spin size="small" />
                 {editingRecord ? "Updating..." : "Adding..."}
