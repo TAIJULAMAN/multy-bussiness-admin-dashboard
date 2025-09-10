@@ -24,5 +24,6 @@ export const baseApi = createApi({
     "coupon",
     "earning",
     "subscriber",
+    "profile",
   ],
 });

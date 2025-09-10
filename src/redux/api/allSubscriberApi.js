@@ -4,7 +4,7 @@ export const allSubscriberApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getAllSubscriber: builder.query({
       query: (params) => ({
-        url: "dashboard/get-all-user",
+        url: "subscriber/retrieve-subscriber",
         method: "GET",
         params: {
           ...params,
