@@ -12,19 +12,20 @@ const formationApis = baseApi.injectEndpoints({
 
     add_formation: builder.mutation({
       query: (data) => ({
-        url: "/formation/create",
+        url: "formation/create-format",
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["categories"],
+      invalidatesTags: ["formation"],
     }),
     update_formation: builder.mutation({
-      query: ({ id, data }) => ({
-        url: `/formation/update/${id}`,
+      query: ({ formatId, data }) => ({
+        url: `formation/update-format`,
         method: "PATCH",
+        params: { formatId },
         body: data,
       }),
-      invalidatesTags: ["categories"],
+      invalidatesTags: ["formation"],
     }),
     delete_formation: builder.mutation({
       query: ({ id, data }) => ({
