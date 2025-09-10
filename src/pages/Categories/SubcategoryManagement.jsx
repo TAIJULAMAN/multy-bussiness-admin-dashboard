@@ -1,16 +1,12 @@
 import { Modal, Table, Button, Image, Space, Pagination } from "antd";
 import { useState } from "react";
-import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
-import { EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import PageHeading from "../../Components/Shared/PageHeading";
-import Category_delete_modal from "./Category_delete_modal";
 import img1 from "../../assets/cover.png";
 import img2 from "../../assets/cover1.png";
 import img3 from "../../assets/cover2.png";
-import { IoMdInformationCircleOutline } from "react-icons/io";
-import { Link } from "react-router-dom";
 
-export default function Categories() {
+export default function SubcategoryManagement() {
   const [category, setCategory] = useState(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -85,45 +81,19 @@ export default function Categories() {
       render: (text, record, index) => (currentPage - 1) * pageSize + index + 1,
     },
     {
-      title: "Image",
-      dataIndex: "image",
-      key: "image",
-      width: 100,
-      render: (image) => (
-        <Image
-          src={image}
-          alt="Category"
-          width={60}
-          height={60}
-          style={{ objectFit: "cover", borderRadius: "8px" }}
-        />
-      ),
-    },
-    {
-      title: "Category Name",
+      title: "Subcategory Name",
       dataIndex: "categoryName",
       key: "categoryName",
       width: 200,
       render: (text) => <span className="font-medium">{text}</span>,
     },
     {
-      title: "Total Subcategories",
+      title: "Listings Count",
       dataIndex: "totalSubcategories",
       key: "totalSubcategories",
       width: 150,
       align: "center",
       render: (count) => <span className="font-semibold">{count}</span>,
-    },
-    {
-      title: "View Subcategories",
-      key: "viewSubcategories",
-      width: 150,
-      align: "center",
-      render: (_, record) => (
-        <Button type="primary" className="bg-blue-500">
-          View
-        </Button>
-      ),
     },
     {
       title: "Action",
@@ -158,8 +128,8 @@ export default function Categories() {
       <div className="flex justify-between items-center mb-5">
         <PageHeading title="Categories Management" />
         <div className="text-white">
-          <Button 
-            type="primary" 
+          <Button
+            type="primary"
             size="large"
             className="bg-[#0091FF] border-[#0091FF] hover:bg-[#0077CC] hover:border-[#0077CC]"
           >
@@ -176,7 +146,7 @@ export default function Categories() {
           scroll={{ x: 800 }}
           className="custom-table"
         />
-        
+
         <div className="flex justify-center py-5">
           <Pagination
             current={currentPage}
@@ -194,24 +164,6 @@ export default function Categories() {
           />
         </div>
       </div>
-
-      <Modal
-        open={deleteModalOpen}
-        centered
-        footer={null}
-        onCancel={() => {
-          setCategory(null);
-          setDeleteModalOpen(false);
-        }}
-      >
-        <Category_delete_modal
-          category={category}
-          onclose={() => {
-            setCategory(null);
-            setDeleteModalOpen(false);
-          }}
-        />
-      </Modal>
     </>
   );
 }

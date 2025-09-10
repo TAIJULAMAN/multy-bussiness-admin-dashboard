@@ -23,6 +23,7 @@ import Coupon from "../pages/Coupon/Coupon";
 import AllSubscriber from "../pages/AllSubscriber/AllSubscriber";
 import EditListing from "../pages/Listings/EditListing";
 import Formation from "../pages/formation/Formation";
+import SubcategoryManagement from "../pages/Categories/SubcategoryManagement";
 
 export const Routes = createBrowserRouter([
   {
@@ -63,6 +64,14 @@ export const Routes = createBrowserRouter([
       },
       {
         path: "/categories",
+        element: <Categories />,
+      },
+      {
+        path: "/subcategories",
+        element: <SubcategoryManagement />,
+      },
+      {
+        path: "/formation",
         element: <Formation />,
       },
       {

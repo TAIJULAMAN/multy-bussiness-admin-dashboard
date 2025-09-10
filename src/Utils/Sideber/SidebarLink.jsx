@@ -51,8 +51,13 @@ export const SidebarLink = [
     icon: <RiCoupon4Line size={24} />,
   },
   {
-    path: "/categories",
+    path: "/formation",
     label: "Formation",
+    icon: <BiCategory size={24} />,
+  },
+  {
+    path: "/categories",
+    label: "Manage category ",
     icon: <BiCategory size={24} />,
   },
   {

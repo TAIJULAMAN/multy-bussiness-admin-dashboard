@@ -166,7 +166,7 @@ export default function Formation() {
   return (
     <>
       <div className="flex justify-between items-center mb-5">
-        <PageHeading title="Catagories Management" />
+        <PageHeading title="Formation Management" />
         <div className="text-white">
           <button
             onClick={() => setAddModalOpen(true)}
