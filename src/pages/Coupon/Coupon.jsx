@@ -8,26 +8,32 @@ import {
   Select,
   DatePicker,
   Checkbox,
-  Alert,
   Spin,
 } from "antd";
 import { useState } from "react";
-import PageHeading from "../../Components/Shared/PageHeading";
-import { CiEdit } from "react-icons/ci";
-import { RiDeleteBin6Line } from "react-icons/ri";
 import Swal from "sweetalert2";
 import dayjs from "dayjs";
-import { useGet_all_couponQuery } from "../../redux/api/couponApi";
+
+import { CiEdit } from "react-icons/ci";
+import { RiDeleteBin6Line } from "react-icons/ri";
+
+import PageHeading from "../../Components/Shared/PageHeading";
+import Loader from "../../Components/Shared/Loaders/Loader";
+
+import {
+  useGet_all_couponQuery,
+  useAdd_couponMutation,
+} from "../../redux/api/couponApi";
 
 function Coupon() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [page, setPage] = useState(1);
-
   const [form] = Form.useForm();
   const [editingRecord, setEditingRecord] = useState(null);
   const { Option } = Select;
+
   const { data, isLoading } = useGet_all_couponQuery();
-  console.log(data);
+  const [addCoupon, { isLoading: isAddingCoupon }] = useAdd_couponMutation();
 
   const dataSource =
     data?.data?.map((coupon, index) => ({
@@ -49,9 +55,41 @@ function Coupon() {
       _id: coupon._id || coupon.id,
     })) || [];
 
-  const handleCancel = () => {
-    setIsModalOpen(false);
-    form.resetFields();
+  const onFinish = async (values) => {
+    try {
+      const couponData = {
+        couponCode: values.code,
+        reason: values.reason,
+        discount: values.discount,
+        validFrom: values.validFrom.format("YYYY-MM-DD"),
+        validTo: values.validTo.format("YYYY-MM-DD"),
+        status: values.status,
+        usageLimit: values.useLimit || null,
+        subscriberLimit: values.subscriberOnly ? 1 : 0,
+      };
+
+      await addCoupon(couponData).unwrap();
+      setIsModalOpen(false);
+      form.resetFields();
+      setEditingRecord(null);
+      Swal.fire(
+        "Success!",
+        editingRecord
+          ? "Coupon updated successfully"
+          : "Coupon added successfully",
+        "success"
+      );
+    } catch (error) {
+      Swal.fire(
+        "Error!",
+        error?.data?.message || error?.message || "Failed to save coupon",
+        "error"
+      );
+    }
+  };
+
+  const handleAdd = () => {
+    setIsModalOpen(true);
     setEditingRecord(null);
   };
 
@@ -71,11 +109,6 @@ function Coupon() {
     });
   };
 
-  const handleAdd = () => {
-    setIsModalOpen(true);
-    setEditingRecord(null);
-  };
-
   const handleEdit = (record) => {
     setIsModalOpen(true);
     setEditingRecord(record);
@@ -88,34 +121,6 @@ function Coupon() {
       status: record.status,
       useLimit: record.useLimit,
     });
-  };
-
-  const onFinish = async (values) => {
-    try {
-      const couponData = {
-        code: values.code,
-        reason: values.reason,
-        discount: values.discount,
-        startDate: values.validFrom.format("YYYY-MM-DD"),
-        endDate: values.validTo.format("YYYY-MM-DD"),
-        status: values.status,
-        useLimit: values.useLimit || null,
-        subscriberLimit: values.subscriberOnly ? 1 : 0,
-      };
-      setIsModalOpen(false);
-      form.resetFields();
-      setEditingRecord(null);
-      Swal.fire(
-        "Success!",
-        editingRecord
-          ? "Coupon updated successfully"
-          : "Coupon added successfully",
-        "success"
-      );
-    } catch (error) {
-      console.error("Error saving coupon:", error);
-      Swal.fire("Error!", "Failed to save coupon", "error");
-    }
   };
 
   const columns = [
@@ -192,6 +197,10 @@ function Coupon() {
     },
   ];
 
+  if (isLoading) {
+    return <Loader />;
+  }
+
   return (
     <div className="p-5">
       <div className="flex items-center justify-between mb-5">
@@ -228,33 +237,24 @@ function Coupon() {
           dataSource={dataSource}
           columns={columns}
           loading={isLoading}
+          scroll={{ x: "max-content" }}
           pagination={{
             pageSize: 10,
-            total: dataSource.length,
+            total: dataSource?.length,
             current: page,
             showSizeChanger: false,
             onChange: (page) => setPage(page),
-          }}
-          scroll={{ x: "max-content" }}
-          locale={{
-            emptyText: isLoading ? (
-              <div className="py-10">
-                <Spin size="large" />
-                <div className="mt-3 text-gray-500">Loading coupons...</div>
-              </div>
-            ) : (
-              <div className="py-10 text-gray-500">
-                No coupons found. Click "Add New Coupon" to create your first
-                coupon.
-              </div>
-            ),
           }}
         />
       </ConfigProvider>
 
       <Modal
         open={isModalOpen}
-        onCancel={handleCancel}
+        onCancel={() => {
+          setIsModalOpen(false);
+          form.resetFields();
+          setEditingRecord(null);
+        }}
         footer={false}
         width={700}
       >
@@ -358,16 +358,31 @@ function Coupon() {
         </Form>
         <div className="flex gap-2 mt-5 w-full">
           <button
-            onClick={handleCancel}
+            onClick={() => {
+              setIsModalOpen(false);
+              form.resetFields();
+              setEditingRecord(null);
+            }}
             className="bg-[#FEF2F2] rounded  py-3 w-1/2  !text-[#EF4444] border-[1px] border-[#EF4444]"
+            disabled={isAddingCoupon}
           >
             Cancel
           </button>
           <button
-            htmlType="submit"
-            className="bg-[#0091FF] !text-white rounded  py-3 w-1/2"
+            onClick={() => form.submit()}
+            className="bg-[#0091FF] !text-white rounded  py-3 w-1/2 disabled:opacity-50"
+            disabled={isAddingCoupon}
           >
-            {editingRecord ? "Update" : "Add"}
+            {isAddingCoupon ? (
+              <div className="flex items-center justify-center gap-2">
+                <Spin size="small" />
+                {editingRecord ? "Updating..." : "Adding..."}
+              </div>
+            ) : editingRecord ? (
+              "Update"
+            ) : (
+              "Add"
+            )}
           </button>
         </div>
       </Modal>
