@@ -4,18 +4,18 @@ const dashboardApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getAllDashboard: builder.query({
       query: (params) => ({
-        url: "dashboard/get-overview",
+        url: "dashboard/dashboard-data",
         method: "GET",
         params,
       }),
       providesTags: ["dashboard"],
     }),
-    getDashboardUser: builder.query({
-      query: ({ year_user }) => ({
-        url: "dashboard/get-overview",
+    getUserGrowth: builder.query({
+      query: ({ year }) => ({
+        url: "dashboard/dashboard-data",
         method: "GET",
         params: {
-          year_user,
+          year,
         },
       }),
       providesTags: ["dashboard"],
@@ -23,6 +23,6 @@ const dashboardApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useGetAllDashboardQuery,useGetDashboardUserQuery } = dashboardApi;
+export const { useGetAllDashboardQuery, useGetUserGrowthQuery } = dashboardApi;
 
 export default dashboardApi;

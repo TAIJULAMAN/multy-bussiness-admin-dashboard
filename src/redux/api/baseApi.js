@@ -4,7 +4,6 @@ import { getBaseUrl } from "../../config/envConfig";
 
 // Helper function to get the auth token
 export const baseApi = createApi({
-
   reducerPath: "baseApi",
   baseQuery: fetchBaseQuery({
     baseUrl: getBaseUrl(),
@@ -13,20 +12,5 @@ export const baseApi = createApi({
     },
   }),
   endpoints: () => ({}),
-  tagTypes: [
-    "admin",
-    "dashboard",
-    "user",
-    "list",
-    "transaction",
-    "subscription",
-    "termsAndConditions",
-    "privacy",
-    "faq",
-    "notification",
-    "profile",
-    "location",
-    "city",
-    "categories"
-  ],
+  tagTypes: ["admin", "dashboard", "user", "termsAndConditions", "faq", "privacy", "categories", "formation"],
 });

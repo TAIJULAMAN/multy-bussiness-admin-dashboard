@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useGetAdminProfileQuery, useUpdateProfileMutation } from "../../redux/api/profileApi";
-import Swal from "sweetalert2";
+// import { useGetAdminProfileQuery, useUpdateProfileMutation } from "../../redux/api/profileApi";
+// import Swal from "sweetalert2";
 
 function EditProfile() {
           const [formData, setFormData] = useState({
@@ -63,7 +63,7 @@ function EditProfile() {
                               <p className="text-gray-800 text-center font-bold text-2xl mb-5">
                                         Edit Your Profile
                               </p>
-                              <form onSubmit={handleSubmit} className="space-y-4">
+                              <form className="space-y-4">
                                         <div>
                                                   <label className="text-xl text-gray-800 mb-2">
                                                             Admin Name
@@ -75,7 +75,7 @@ function EditProfile() {
                                                             placeholder="Enter Admin Name"
                                                             required
                                                             value={formData?.name}
-                                                            onChange={handleChange}
+                                                            // onChange={handleChange}
                                                   />
                                         </div>
 

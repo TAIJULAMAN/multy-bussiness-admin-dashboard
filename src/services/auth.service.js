@@ -33,6 +33,7 @@ export const storeResetToken = ({ resetToken }) => {
     setToLocalStorage("resetToken", resetToken);
   }
 };
+
 export const getResetToken = () => {
   const token = getFromLocalStorage("resetToken");
   if (!token) {

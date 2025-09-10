@@ -1,49 +1,32 @@
 import React from "react";
 import GrowthChart from "../../Components/charts/UserGrowthChart";
 import ActivityChart from "../../Components/charts/ActivityChart";
-// import Loader from "../../Components/Shared/Loaders/Loader";
 import RecentlyJoinedUsers from "../User/RecentlyJoinedUsers";
-// import { useGetAllDashboardQuery } from "../../redux/api/dashboard";
 import user from "../../assets/icons/user.png";
 import list from "../../assets/icons/list.png";
 import category from "../../assets/icons/category.png";
+import { useGetAllDashboardQuery } from "../../redux/api/dashboardApi";
+import Loader from "../../Components/Shared/Loaders/Loader";
 
 function DashboardHome() {
-  // const { data: dashboardData, isLoading } = useGetAllDashboardQuery();
-  // if (isLoading) {
-  //   return <Loader />;
-  // }
-  // const cardData = [
-  //   {
-  //     title: "Total Users",
-  //     value: isLoading ? <Loader /> : dashboardData?.user || 110,
-  //     icon: <img src={user} alt="Driver Icon" />,
-  //   },
-  //   {
-  //     title: "Total Listings",
-  //     value: isLoading ? <Loader /> : dashboardData?.active_listing || 20,
-  //     icon: <img src={list} alt="User Icon" />,
-  //   },
-  //   {
-  //     title: "Categories",
-  //     value: isLoading ? <Loader /> : dashboardData?.category || 30,
-  //     icon: <img src={category} alt="Car Icon" />,
-  //   },
-  // ];
+  const { data: dashboardData, isLoading } = useGetAllDashboardQuery();
+  if (isLoading) {
+    return <Loader />;
+  }
   const cardData = [
     {
       title: "Total Users",
-      value: 110,
+      value: isLoading ? <Loader /> : dashboardData?.data?.totalUser || 110,
       icon: <img src={user} alt="Driver Icon" />,
     },
     {
-      title: "Total Listings",
-      value: 20,
+      title: "Total Business",
+      value: isLoading ? <Loader /> : dashboardData?.data?.totalBusiness || 20,
       icon: <img src={list} alt="User Icon" />,
     },
     {
-      title: "Categories",
-      value: 30,
+      title: "Total Category",
+      value: isLoading ? <Loader /> : dashboardData?.data?.totalCategory || 30,
       icon: <img src={category} alt="Car Icon" />,
     },
   ];

@@ -7,10 +7,12 @@ import { MdBlockFlipped } from "react-icons/md";
 import img from "../../assets/block.png";
 import ActiveListings from "../../pages/User/ActiveListings";
 import UserStats from "../../pages/User/UserStatics";
-// import {
-//   useGetAllUserQuery,
-//   useUpdateUserMutation,
-// } from "../../redux/api/userApi";
+import {
+  useGetAllUserQuery,
+  useUpdateUserMutation,
+} from "../../redux/api/userApi";
+import Loader from "../../Components/Shared/Loaders/Loader";
+
 // import { imageUrl } from "../../Utils/server";
 // import Loader from "../../Components/Shared/Loaders/Loader";
 
@@ -20,8 +22,13 @@ const AllUsers = ({ search }) => {
   const [isModalOpen2, setIsModalOpen2] = useState(false);
   const [activeTab, setActiveTab] = useState("User Statics");
   const [selectedUser, setSelectedUser] = useState(null);
+  console.log("selectedUser of user page", selectedUser?._id);
+
+  const { data: usersData, isLoading, refetch } = useGetAllUserQuery();
+  // console.log("usersData", usersData);
+  const users = usersData?.data;
   // const { data: userData, isLoading } = useGetAllUserQuery({ search, page });
-  // const [updateUser] = useUpdateUserMutation();
+  const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
 
   const showModal = (user) => {
     setSelectedUser(user);
@@ -41,378 +48,100 @@ const AllUsers = ({ search }) => {
     setIsModalOpen2(false);
   };
 
-  // const handleBlock = async () => {
-  //   if (selectedUser) {
-  //     try {
-  //       await updateUser({
-  //         id: selectedUser?.key,
-  //         status: "blocked",
-  //       }).unwrap();
-  //       setIsModalOpen(false);
-  //     } catch (error) {
-  //       console.error("Failed to block user", error);
-  //     }
-  //   }
-  // };
+  const userId = selectedUser?._id;
+  const handleBlock = async () => {
+    if (userId) {
+      try {
+        console.log("handleBlock - selectedUser._id:", selectedUser._id);
+        await updateUser(userId).unwrap();
+        await refetch(); // Refetch the user list to get updated data
+        setIsModalOpen(false);
+        console.log("User updated successfully");
+      } catch (error) {
+        console.error("Failed to update user:", error);
+      }
+    }
+  };
 
-  // const dataSource =
-  //   userData?.data?.map((user, index) => ({
-  //     key: user?._id || index.toString(),
-  //     no: index + 1,
-  //     name: user?.name || "No Name",
-  //     img: user?.img,
-  //     date: user?.joined || "N/A",
-  //     phone: user?.phone || "N/A",
-  //     email: user?.email || "N/A",
-  //     block: user?.block,
-  //     totalListings: user?.total_listing || 0,
-  //     activeListings: user?.active_listing || 0,
-  //     approvedListings: user?.active_listing || 0,
-  //     rejectedListings: user?.rejected_listing || 0,
-  //     soldListing: user?.sold_listing || 0,
-  //   })) || [];
-
-  const dataSource = [
+  const columns = [
     {
-      key: "1",
-      no: 1,
-      name: "John Doe",
-      img: "https://randomuser.me/api/portraits/men/1.jpg",
-      date: "2025-05-20",
-      phone: "+1 (555) 123-4567",
-      country: "Bangladesh",
-      subscription: "Free",
-      userRole: "Business Asset Seller",
-      email: "john.doe@example.com",
-      block: false,
-      totalListings: 15,
-      activeListings: 8,
-      approvedListings: 10,
-      rejectedListings: 2,
-      soldListing: 3,
+      title: "No",
+      key: "no",
+      render: (_, record, index) => index + 1,
     },
     {
-      key: "2",
-      no: 2,
-      name: "Jane Smith",
-      img: "https://randomuser.me/api/portraits/women/2.jpg",
-      date: "2025-04-15",
-      phone: "+44 7700 900123",
-      country: "United Kingdom",
-      subscription: "Premium",
-      userRole: "Franchise Buyer",
-      email: "jane.smith@example.co.uk",
-      block: false,
-      totalListings: 20,
-      activeListings: 12,
-      approvedListings: 18,
-      rejectedListings: 1,
-      soldListing: 5,
+      title: "Name",
+      key: "name",
+      render: (_, record, index) => (
+        <div className="flex items-center gap-3">
+          <img
+            src={
+              record.img || `https://avatar.iran.liara.run/public/${index + 1}`
+            }
+            className="w-10 h-10 object-cover rounded-full"
+            alt="User Avatar"
+          />
+          <div className="flex flex-col gap-[2px]">
+            <span className="leading-none">{record.name}</span>
+            <span className="leading-none">{record.email}</span>
+          </div>
+        </div>
+      ),
+    },
+    // { title: "Email", dataIndex: "email", key: "email" },
+    { title: "Contact Number", dataIndex: "mobile", key: "mobile" },
+    {
+      title: "User Role",
+      key: "userRole",
+      render: (_, record) => (
+        <Tag
+          className="!p-1 !w-full !flex !items-center !justify-center"
+          color="blue"
+        >
+          {record.role}
+        </Tag>
+      ),
+    },
+    { title: "Country", dataIndex: "country", key: "country" },
+    {
+      title: "Subscription",
+      key: "subscription",
+      render: (_, record) =>
+        record?.subscriptionPlan?.subscriptionPlanType || "Free Plan",
     },
     {
-      key: "3",
-      no: 3,
-      name: "Ahmed Khan",
-      img: "https://randomuser.me/api/portraits/men/3.jpg",
-      date: "2025-03-10",
-      phone: "+92 300 1234567",
-      country: "Pakistan",
-      subscription: "Free",
-      userRole: "Business Asset Buyer",
-      email: "ahmed.khan@example.pk",
-      block: true,
-      totalListings: 5,
-      activeListings: 2,
-      approvedListings: 3,
-      rejectedListings: 2,
-      soldListing: 1,
-    },
-    {
-      key: "4",
-      no: 4,
-      name: "Maria Garcia",
-      img: "https://randomuser.me/api/portraits/women/4.jpg",
-      date: "2025-06-05",
-      phone: "+34 600 123 456",
-      country: "Spain",
-      subscription: "Standard",
-      userRole: "Franchise Seller",
-      email: "maria.garcia@example.es",
-      block: false,
-      totalListings: 12,
-      activeListings: 6,
-      approvedListings: 9,
-      rejectedListings: 1,
-      soldListing: 4,
-    },
-    {
-      key: "5",
-      no: 5,
-      name: "David Lee",
-      img: "https://randomuser.me/api/portraits/men/5.jpg",
-      date: "2025-02-28",
-      phone: "+1 (213) 555-7890",
-      country: "United States",
-      subscription: "Premium",
-      userRole: "Business Broker",
-      email: "david.lee@example.com",
-      block: false,
-      totalListings: 30,
-      activeListings: 20,
-      approvedListings: 25,
-      rejectedListings: 3,
-      soldListing: 10,
-    },
-     {
-      key: "6",
-      no: 6,
-      name: "John Doe",
-      img: "https://randomuser.me/api/portraits/men/1.jpg",
-      date: "2025-05-20",
-      phone: "+1 (555) 123-4567",
-      country: "Bangladesh",
-      subscription: "Free",
-      userRole: "Business Asset Seller",
-      email: "john.doe@example.com",
-      block: false,
-      totalListings: 15,
-      activeListings: 8,
-      approvedListings: 10,
-      rejectedListings: 2,
-      soldListing: 3,
-    },
-    {
-      key: "7",
-      no: 7,
-      name: "Jane Smith",
-      img: "https://randomuser.me/api/portraits/women/2.jpg",
-      date: "2025-04-15",
-      phone: "+44 7700 900123",
-      country: "United Kingdom",
-      subscription: "Premium",
-      userRole: "Franchise Buyer",
-      email: "jane.smith@example.co.uk",
-      block: false,
-      totalListings: 20,
-      activeListings: 12,
-      approvedListings: 18,
-      rejectedListings: 1,
-      soldListing: 5,
-    },
-    {
-      key: "8",
-      no: 8,
-      name: "Ahmed Khan",
-      img: "https://randomuser.me/api/portraits/men/3.jpg",
-      date: "2025-03-10",
-      phone: "+92 300 1234567",
-      country: "Pakistan",
-      subscription: "Free",
-      userRole: "Business Asset Buyer",
-      email: "ahmed.khan@example.pk",
-      block: true,
-      totalListings: 5,
-      activeListings: 2,
-      approvedListings: 3,
-      rejectedListings: 2,
-      soldListing: 1,
-    },
-    {
-      key: "9",
-      no: 9,
-      name: "Maria Garcia",
-      img: "https://randomuser.me/api/portraits/women/4.jpg",
-      date: "2025-06-05",
-      phone: "+34 600 123 456",
-      country: "Spain",
-      subscription: "Standard",
-      userRole: "Franchise Seller",
-      email: "maria.garcia@example.es",
-      block: false,
-      totalListings: 12,
-      activeListings: 6,
-      approvedListings: 9,
-      rejectedListings: 1,
-      soldListing: 4,
-    },
-    {
-      key: "10",
-      no: 10,
-      name: "David Lee",
-      img: "https://randomuser.me/api/portraits/men/5.jpg",
-      date: "2025-02-28",
-      phone: "+1 (213) 555-7890",
-      country: "United States",
-      subscription: "Premium",
-      userRole: "Business Broker",
-      email: "david.lee@example.com",
-      block: false,
-      totalListings: 30,
-      activeListings: 20,
-      approvedListings: 25,
-      rejectedListings: 3,
-      soldListing: 10,
-    },
-     {
-      key: "11",
-      no: 11,
-      name: "John Doe",
-      img: "https://randomuser.me/api/portraits/men/1.jpg",
-      date: "2025-05-20",
-      phone: "+1 (555) 123-4567",
-      country: "Bangladesh",
-      subscription: "Free",
-      userRole: "Business Asset Seller",
-      email: "john.doe@example.com",
-      block: false,
-      totalListings: 15,
-      activeListings: 8,
-      approvedListings: 10,
-      rejectedListings: 2,
-      soldListing: 3,
-    },
-    {
-      key: "12",
-      no: 12,
-      name: "Jane Smith",
-      img: "https://randomuser.me/api/portraits/women/2.jpg",
-      date: "2025-04-15",
-      phone: "+44 7700 900123",
-      country: "United Kingdom",
-      subscription: "Premium",
-      userRole: "Franchise Buyer",
-      email: "jane.smith@example.co.uk",
-      block: false,
-      totalListings: 20,
-      activeListings: 12,
-      approvedListings: 18,
-      rejectedListings: 1,
-      soldListing: 5,
-    },
-    {
-      key: "13",
-      no: 13,
-      name: "Ahmed Khan",
-      img: "https://randomuser.me/api/portraits/men/3.jpg",
-      date: "2025-03-10",
-      phone: "+92 300 1234567",
-      country: "Pakistan",
-      subscription: "Free",
-      userRole: "Business Asset Buyer",
-      email: "ahmed.khan@example.pk",
-      block: true,
-      totalListings: 5,
-      activeListings: 2,
-      approvedListings: 3,
-      rejectedListings: 2,
-      soldListing: 1,
-    },
-    {
-      key: "14",
-      no: 14,
-      name: "Maria Garcia",
-      img: "https://randomuser.me/api/portraits/women/4.jpg",
-      date: "2025-06-05",
-      phone: "+34 600 123 456",
-      country: "Spain",
-      subscription: "Standard",
-      userRole: "Franchise Seller",
-      email: "maria.garcia@example.es",
-      block: false,
-      totalListings: 12,
-      activeListings: 6,
-      approvedListings: 9,
-      rejectedListings: 1,
-      soldListing: 4,
-    },
-    {
-      key: "15",
-      no: 15,
-      name: "David Lee",
-      img: "https://randomuser.me/api/portraits/men/5.jpg",
-      date: "2025-02-28",
-      phone: "+1 (213) 555-7890",
-      country: "United States",
-      subscription: "Premium",
-      userRole: "Business Broker",
-      email: "david.lee@example.com",
-      block: false,
-      totalListings: 30,
-      activeListings: 20,
-      approvedListings: 25,
-      rejectedListings: 3,
-      soldListing: 10,
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <div className="flex gap-2">
+          <button
+            onClick={() => showModal(record)}
+            className={`border rounded-lg p-1 ${
+              record?.isBlocked === true
+                ? "border-red-500 text-red-500 bg-red-100"
+                : "border-green-500 text-green-500 bg-green-100"
+            }`}
+          >
+            <MdBlockFlipped
+              className={`w-8 h-8 ${
+                record?.isBlocked === true
+                  ? "text-red-500"
+                  : "text-green-500"
+              }`}
+            />
+          </button>
+          <button
+            onClick={() => showModal2(record)}
+            className="border border-[#0091ff] rounded-lg p-1 bg-[#cce9ff] text-[#0091ff]"
+          >
+            <FaRegEye className="w-8 h-8 text-[#0091ff]" />
+          </button>
+        </div>
+      ),
     },
   ];
 
-   const columns = [
-     { title: "No", dataIndex: "no", key: "no" },
-     {
-       title: "Name",
-       key: "name",
-       render: (_, record) => (
-         <div className="flex items-center gap-3">
-           <img
-             src={record.img}
-             className="w-10 h-10 object-cover rounded-full"
-             alt="User Avatar"
-           />
-           <div className="flex flex-col gap-[2px]">
-             <span className="leading-none">{record.name}</span>
-             <span className="leading-none">{record.email}</span>
-           </div>
-         </div>
-       ),
-     },
-     { title: "Contact Number", dataIndex: "phone", key: "phone" },
-     {
-       title: "User Role",
-       key: "userRole",
-       render: (_, record) => (
-         <Tag
-           className="!p-1 !w-full !flex !items-center !justify-center"
-           color="blue"
-         >
-           {record.userRole}
-         </Tag>
-       ),
-     },
-     { title: "Country", dataIndex: "country", key: "country" },
-     { title: "Subscription ", dataIndex: "subscription", key: "subscription" },
- 
-     {
-       title: "Action",
-       key: "action",
-       render: (_, record) => (
-         <div className="flex gap-2">
-           <button
-             onClick={() => showModal(record)}
-             className={`border rounded-lg p-1 ${
-               record.block
-                 ? "border-red-500 text-red-500 bg-red-100"
-                 : "border-[#0091ff] text-[#0091ff] bg-[#cce9ff]"
-             }`}
-           >
-             <MdBlockFlipped
-               className={`w-8 h-8 ${
-                 record.block
-                   ? "border-red-500 text-red-500 bg-red-100"
-                   : "border-[#0091ff] text-[#0091ff] bg-[#cce9ff]"
-               }`}
-             />
-           </button>
-           <button
-             onClick={() => showModal2(record)}
-             className="border border-[#0091ff] rounded-lg p-1 bg-[#cce9ff] text-[#0091ff]"
-           >
-             <FaRegEye className="w-8 h-8 text-[#0091ff]" />
-           </button>
-         </div>
-       ),
-     },
-   ];
-
-  // if (isLoading) return <Loader />;
+  if (isLoading) return <Loader />;
 
   return (
     <ConfigProvider
@@ -439,7 +168,7 @@ const AllUsers = ({ search }) => {
       }}
     >
       <Table
-        dataSource={dataSource}
+        dataSource={users}
         columns={columns}
         // pagination={{
         //   pageSize: userData?.pagination?.itemPerPage,
@@ -450,7 +179,7 @@ const AllUsers = ({ search }) => {
         // }}
         pagination={{
           pageSize: 10,
-          total: dataSource.length,
+          total: users.length,
           current: 1,
           showSizeChanger: false,
           onChange: (page) => setPage(page),
@@ -461,11 +190,7 @@ const AllUsers = ({ search }) => {
       {/* Block Modal */}
       <Modal open={isModalOpen} centered onCancel={handleCancel} footer={null}>
         <div className="flex flex-col justify-center items-center py-10">
-          <img
-            src={img}
-            alt="Confirmation"
-            className="w-40 h-40 mb-5"
-          />
+          <img src={img} alt="Confirmation" className="w-40 h-40 mb-5" />
           <p className="text-3xl text-center text-gray-800">Warning!</p>
           <p className="text-xl text-center mt-5">
             Do you want to block this user?
@@ -478,13 +203,11 @@ const AllUsers = ({ search }) => {
               Cancel
             </button>
             <button
-              onClick={() => {
-                // handleBlock();
-                setIsModalOpen(false);
-              }}
-              className="bg-[#0091ff] !text-white font-semibold w-1/3 py-3 px-5 rounded-lg"
+              onClick={handleBlock}
+              disabled={isUpdating}
+              className="bg-[#0091ff] !text-white font-semibold w-1/3 py-3 px-5 rounded-lg disabled:opacity-50"
             >
-              Confirm
+              {isUpdating ? "Processing..." : "Confirm"}
             </button>
           </div>
         </div>

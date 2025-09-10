@@ -7,58 +7,58 @@ import BrandLogo from "../../Components/Shared/BrandLogo";
 import Logo from "../../assets/icons/logo.png";
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
 // import Swal from "sweetalert2";
-import { useLogInMutation } from "../../redux/api/authApi";
-// import { setUser } from "../../redux/Slice/authSlice";
+import { setUser } from "../../redux/Slice/authSlice";
 import { useDispatch } from "react-redux";
-
+import { useLogInMutation } from "../../redux/api/authApi";
+import Swal from "sweetalert2";
+//
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
-  // const dispatch = useDispatch();
-  // const [logIn] = useLogInMutation();
+  const dispatch = useDispatch();
+  const [logIn] = useLogInMutation();
 
   const handleSignIn = async (e) => {
     e.preventDefault();
-    navigate("/");
-    // if (!email || !password) {
-    //   Swal.fire({
-    //     icon: "error",
-    //     title: "Oops...",
-    //     text: !email ? "Email is required!" : "Password is required!",
-    //   });
-    //   return;
-    // }
-    // const loginData = { email, password };
 
-    // try {
-    //   const response = await logIn(loginData).unwrap();
-    //   if (response?.token) {
+    if (!email || !password) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: !email ? "Email is required!" : "Password is required!",
+      });
+      return;
+    }
+    const loginData = { email, password, role: "Admin" };
 
-    //     dispatch(
-    //       setUser({
-    //         user: response || {},
-    //         token: response?.token,
-    //       })
-    //     );
-    //     localStorage.setItem("token", response?.token);
-    //     Swal.fire({
-    //       icon: "success",
-    //       title: "Login successful!",
-    //       text: "You are now logged in.",
-    //     });
-    //     navigate("/");
-    //   }
-    // } catch (error) {
-    //   console.log(error);
-    //   Swal.fire({
-    //     icon: "error",
-    //     title: "Login Failed",
-    //     text: error?.data?.message || "Something went wrong!",
-    //   });
-    // }
+    try {
+      const response = await logIn(loginData).unwrap();
+      console.log("response from login", response?.data?.accessToken);
+      if (response?.data?.accessToken) {
+        dispatch(
+          setUser({
+            user: response || {},
+            token: response?.data?.accessToken,
+          })
+        );
+        Swal.fire({
+          icon: "success",
+          title: "Login successful!",
+          text: "You are now logged in.",
+        });
+        navigate("/");
+      }
+    } catch (error) {
+      console.log(error);
+      Swal.fire({
+        icon: "error",
+        title: "Login Failed",
+        text: error?.data?.message || "Something went wrong!",
+      });
+    }
   };
 
   return (

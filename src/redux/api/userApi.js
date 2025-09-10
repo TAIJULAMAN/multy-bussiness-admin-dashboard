@@ -4,7 +4,7 @@ export const userApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getAllUser: builder.query({
       query: (params) => ({
-        url: "auth/get-all",
+        url: "dashboard/get-all-user",
         method: "GET",
         params: {
           ...params,
@@ -12,25 +12,38 @@ export const userApi = baseApi.injectEndpoints({
       }),
       providesTags: ["user"],
     }),
-    updateUser: builder.mutation({
-      query: ({ id }) => ({
-        url: `/auth/block/${id}`,
-        method: "PATCH",
-      }),
-      invalidatesTags: ["user"],
-    }),
+
     getSingleUser: builder.query({
-      query: ({ user }) => ({
-        url: `product/admin-get-all`,
+      query: ({ userId }) => ({
+        url: "dashboard/users-business-statistics",
         method: "GET",
         params: {
-          user,
+          userId,
         },
       }),
       providesTags: ["user"],
     }),
 
+    updateUser: builder.mutation({
+      query: (userId) => {
+        // console.log("updateUser API - userId:", userId);
+        return {
+          url: `dashboard/block-user?userId=${userId}`,
+          method: "PATCH",
+        };
+      },
+      invalidatesTags: ["user"],
+    }),
   }),
 });
 
-export const { useGetAllUserQuery, useUpdateUserMutation, useGetSingleUserQuery } = userApi;
+export const { useGetAllUserQuery, useGetSingleUserQuery, useUpdateUserMutation } = userApi;
+
+
+// updateUser: builder.mutation({
+//     query: ({ id }) => ({
+//       url: `/auth/block/${id}`,
+//       method: "PATCH",
+//     }),
+//     invalidatesTags: ["user", "reports"],
+//   })
