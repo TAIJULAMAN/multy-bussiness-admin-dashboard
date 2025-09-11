@@ -4,7 +4,6 @@ import { FaTrashAlt } from "react-icons/fa";
 import { UploadOutlined } from "@ant-design/icons";
 import PageHeading from "../../Components/Shared/PageHeading";
 import Loader from "../../Components/Shared/Loaders/Loader";
-import Category_delete_modal from "../Categories/Category_delete_modal";
 import {
   useGet_all_formationQuery,
   useAdd_formationMutation,

@@ -18,11 +18,11 @@ import {
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import PageHeading from "../../Components/Shared/PageHeading";
-import Category_delete_modal from "./Category_delete_modal";
 import {
   useGetAllCategoryQuery,
   useCreateCategoryMutation,
   useUpdateCategoryMutation,
+  useDeleteCategoryMutation,
 } from "../../redux/api/categoryApi";
 import { getImageBaseUrl } from "../../config/envConfig";
 import img1 from "../../assets/cover.png";
@@ -51,6 +51,8 @@ export default function Categories() {
     useCreateCategoryMutation();
   const [updateCategory, { isLoading: isUpdating }] =
     useUpdateCategoryMutation();
+  const [deleteCategory, { isLoading: isDeleting }] =
+    useDeleteCategoryMutation();
   console.log("categoriesResponse from category", categoriesResponse);
 
   const categoriesData =
@@ -123,11 +125,8 @@ export default function Categories() {
 
   const handleUpdateCategory = async (values) => {
     try {
-      // Create FormData for file upload
       const formData = new FormData();
       formData.append("categoryName", values.categoryName.trim());
-
-      // Only append image if a new one is selected
       if (
         values.image &&
         values.image.fileList &&
@@ -138,8 +137,6 @@ export default function Categories() {
           values.image.fileList[0].originFileObj
         );
       }
-
-      // Call API - pass FormData directly
       const response = await updateCategory({
         categoryId: selectedCategory.id,
         data: formData,
@@ -179,6 +176,37 @@ export default function Categories() {
       categoryName: category?.categoryName,
     });
     setUpdateModalOpen(true);
+  };
+
+  const handleDeleteCategory = async () => {
+    try {
+      const response = await deleteCategory(category.id).unwrap();
+
+      if (response?.success) {
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: response.message || "Category deleted successfully!",
+        });
+        setCategory(null);
+        setDeleteModalOpen(false);
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: response?.message || "Failed to delete category",
+        });
+      }
+    } catch (error) {
+      console.error("Delete category error:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text:
+          error?.data?.message ||
+          "Failed to delete category. Please try again.",
+      });
+    }
   };
 
   const columns = [
@@ -531,13 +559,56 @@ export default function Categories() {
           setDeleteModalOpen(false);
         }}
       >
-        <Category_delete_modal
-          category={category}
-          onclose={() => {
-            setCategory(null);
-            setDeleteModalOpen(false);
-          }}
-        />
+        <div className="p-6">
+          {/* Header */}
+          <div className="text-center mb-6">
+            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+              <svg
+                className="h-6 w-6 text-red-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.314 16.5c-.77.833.192 2.5 1.732 2.5z"
+                />
+              </svg>
+            </div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              Delete Category
+            </h2>
+            <p className="text-gray-600">
+              Are you sure you want to delete{" "}
+              <strong>"{category?.categoryName}"</strong>? This action cannot be
+              undone and will also remove all its sub-categories.
+            </p>
+          </div>
+
+          {/* Buttons */}
+          <div className="flex justify-end gap-3">
+            <Button
+              onClick={() => {
+                setCategory(null);
+                setDeleteModalOpen(false);
+              }}
+              disabled={isDeleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="primary"
+              danger
+              onClick={handleDeleteCategory}
+              loading={isDeleting}
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
+            </Button>
+          </div>
+        </div>
       </Modal>
     </>
   );
