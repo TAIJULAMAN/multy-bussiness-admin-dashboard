@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Form, Input, Button, Select, InputNumber, Upload, message, Image, Space } from 'antd';
 import { SaveOutlined, ArrowLeftOutlined, UploadOutlined, PlusOutlined } from '@ant-design/icons';
-import { dataSource } from '../../data/Data';
+import { useUpdateListingMutation } from '../../redux/api/listingApi';
+import { getImageBaseUrl } from '../../config/envConfig';
+import Swal from 'sweetalert2';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -17,13 +19,19 @@ const getBase64 = (file) =>
 
 const EditListing = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [form] = Form.useForm();
-  const [loading, setLoading] = useState(false);
   const [fileList, setFileList] = useState([]);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState('');
   const [previewTitle, setPreviewTitle] = useState('');
-  const [currentImages, setCurrentImages] = useState(['/bus1.png']); // Default image
+  const [currentImages, setCurrentImages] = useState([]);
+  
+  // Get listing data from navigation state
+  const listingData = location.state?.listing;
+  
+  // Update listing mutation
+  const [updateListing, { isLoading }] = useUpdateListingMutation();
 
   // Handle image upload
   const beforeUpload = (file) => {
@@ -60,51 +68,74 @@ const EditListing = () => {
     </div>
   );
 
+  // Initialize form with listing data
   useEffect(() => {
-    // In a real app, you would fetch the listing data from an API
-    const foundListing = dataSource.find(item => item.key === '1'); 
-    if (foundListing) {
+    if (listingData) {
       form.setFieldsValue({
-        ...foundListing,
-        date: foundListing.date ? new Date(foundListing.date) : null,
+        name: listingData.title || '',
+        price: listingData.price || 0,
+        category: listingData.category || '',
+        businessRole: listingData.businessRole || '',
+        location: listingData.location || '',
+        description: listingData.description || ''
       });
-      // Set current images if available
-      if (foundListing.images && foundListing.images.length > 0) {
-        setCurrentImages(foundListing.images);
+      
+      // Set current images from listing data
+      if (listingData.images && listingData.images.length > 0) {
+        const imageUrls = listingData.images.map(img => 
+          typeof img === 'string' ? img : getImageBaseUrl(img)
+        );
+        setCurrentImages(imageUrls);
       }
     } else {
-      message.error('Listing not found');
+      message.error('No listing data found. Please select a listing to edit.');
       navigate('/listing-management');
     }
-  }, [form, navigate]);
+  }, [form, navigate, listingData]);
 
   const onFinish = async (values) => {
-    setLoading(true);
+    if (!listingData?._id) {
+      message.error('No listing ID found');
+      return;
+    }
+
     try {
-      // In a real app, you would upload the images to a server here
-      const formData = new FormData();
-      
-      // Add new files to form data
-      fileList.forEach(file => {
-        formData.append('images', file.originFileObj);
+      // Prepare update data
+      const updateData = {
+        title: values.name,
+        price: values.price,
+        category: values.category,
+        businessRole: values.businessRole,
+        location: values.location,
+        description: values.description,
+        images: currentImages // Keep existing images
+      };
+
+      // Call update mutation
+      await updateListing({
+        id: listingData._id,
+        data: updateData
+      }).unwrap();
+
+      // Show success message
+      Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: 'Listing updated successfully!',
+        timer: 2000,
+        showConfirmButton: false
       });
-      
-      // Add existing image URLs
-      currentImages.forEach(imageUrl => {
-        formData.append('existingImages', imageUrl);
-      });
-      
-      // Simulate API call
-      console.log('Updating listing with images:', values);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      message.success('Listing updated successfully');
+
+      // Navigate back to listings
       navigate('/listing-management');
     } catch (error) {
       console.error('Error updating listing:', error);
-      message.error('Failed to update listing');
-    } finally {
-      setLoading(false);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error!',
+        text: error?.data?.message || 'Failed to update listing. Please try again.',
+        confirmButtonColor: '#0091FF'
+      });
     }
   };
 
@@ -205,33 +236,16 @@ const EditListing = () => {
             {/* Left Column */}
             <div className="space-y-4">
               <Form.Item
-                label="Product Name"
-                name="productName"
+                label="Name"
+                name="name"
                 rules={[
                   {
                     required: true,
-                    message: 'Please input the product name!',
+                    message: 'Please input the listing name!',
                   },
                 ]}
               >
-                <Input size="large" placeholder="Enter product name" />
-              </Form.Item>
-
-              <Form.Item
-                label="Business Type"
-                name="category"
-                rules={[
-                  {
-                    required: true,
-                    message: 'Please select a category!',
-                  },
-                ]}
-              >
-                <Select size="large" placeholder="Select category">
-                  <Option value="Category 1">Business Type 1</Option>
-                  <Option value="Category 2">Business Type 2</Option>
-                  <Option value="Category 3">Business Type 3</Option>
-                </Select>
+                <Input size="large" placeholder="Enter listing name" />
               </Form.Item>
 
               <Form.Item
@@ -254,84 +268,50 @@ const EditListing = () => {
               </Form.Item>
 
               <Form.Item
-                label="Industry"
-                name="industry"
+                label="Category"
+                name="category"
                 rules={[
                   {
                     required: true,
-                    message: 'Please select an industry!',
+                    message: 'Please input the category!',
                   },
                 ]}
               >
-                <Select size="large" placeholder="Select industry">
-                  <Option value="Active">Industry 1</Option>
-                  <Option value="Inactive">Industry 2</Option>
-                  <Option value="Pending Approval">Industry 3</Option>
-                </Select>
-              </Form.Item>
-
-              <Form.Item
-                label="Business Location"
-                name="businessLocation"
-                rules={[
-                  {
-                    required: true,
-                    message: 'Please select a business location!',
-                  },
-                ]}
-              >
-                <Select size="large" placeholder="Select business location">
-                  <Option value="Active">Business Location 1</Option>
-                  <Option value="Inactive">Business Location 2</Option>
-                  <Option value="Pending Approval">Business Location 3</Option>
-                </Select>
+                <Input size="large" placeholder="Enter category" />
               </Form.Item>
             </div>
 
             {/* Right Column */}
             <div className="space-y-4">
               <Form.Item
-                label="Ownership Type"
-                name="ownershipType"
+                label="Business Role"
+                name="businessRole"
                 rules={[
                   {
                     required: true,
-                    message: 'Please input the ownership type!',
+                    message: 'Please select a business role!',
                   },
                 ]}
               >
-                <Input size="large" placeholder="Enter ownership type" />
-              </Form.Item>
-
-              <Form.Item
-                label="Reason for listing"
-                name="reasonForListing"
-                rules={[
-                  {
-                    required: true,
-                    message: 'Please input a reason for listing!',
-                  },
-                ]}
-              >
-                <Input size="large" placeholder="Enter reason for listing" />
-              </Form.Item>
-
-
-              <Form.Item
-                label="Condition"
-                name="condition"
-                rules={[
-                  {
-                    required: true,
-                    message: 'Please select the condition!',
-                  },
-                ]}
-              >
-                <Select size="large" placeholder="Select condition">
-                  <Option value="New">New</Option>
-                  <Option value="Used">Used</Option>
-                  <Option value="Refurbished">Refurbished</Option>
+                <Select size="large" placeholder="Select business role">
+                  <Option value="business">Business</Option>
+                  <Option value="franchise">Franchise</Option>
+                  <Option value="business-asset">Business Asset</Option>
+                  <Option value="business-idea">Business Idea</Option>
                 </Select>
+              </Form.Item>
+
+              <Form.Item
+                label="Location"
+                name="location"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please input the location!',
+                  },
+                ]}
+              >
+                <Input size="large" placeholder="Enter location" />
               </Form.Item>
             </div>
           </div>
@@ -364,12 +344,11 @@ const EditListing = () => {
             <Button 
               type="primary" 
               htmlType="submit" 
-             
-              loading={loading}
+              loading={isLoading}
               className="px-6"
               size="large"
             >
-              Save 
+              Save Changes
             </Button>
           </div>
         </Form>
