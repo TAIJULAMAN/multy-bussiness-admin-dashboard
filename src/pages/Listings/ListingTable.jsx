@@ -2,19 +2,28 @@ import React from "react";
 import { ConfigProvider, Modal, Table } from "antd";
 import { useState } from "react";
 import { FaRegEye } from "react-icons/fa";
-import { FaTrash } from "react-icons/fa";
+import { FiEdit } from "react-icons/fi";
 
-import { dataSource } from "../../data/Data";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useGetAllListingsQuery } from "../../redux/api/listingApi";
+import Loader from "../../Components/Shared/Loaders/Loader";
+import { getImageBaseUrl } from "../../config/envConfig";
 
-export default function ListingTable() {
+export default function ListingTable({ businessRole = "", status = "" }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedListing, setSelectedListing] = useState(null);
   const [page, setPage] = useState(1);
   const [selectedImage, setSelectedImage] = useState("/bus1.png");
   const navigate = useNavigate();
 
-  const thumbnails = ["/bus1.png", "/bus2.png", "/bus3.png", "/bus4.png"];
+  // Fetch listings data from API with filters
+  const { data: listingsData, isLoading } = useGetAllListingsQuery({
+    businessRole: businessRole || undefined,
+    status: status || undefined,
+    page,
+    limit: 10,
+  });
+  console.log("listingsData", listingsData);
 
   const showModal = (record) => {
     setSelectedListing(record);
@@ -23,6 +32,23 @@ export default function ListingTable() {
   const handleCancel = () => {
     setIsModalOpen(false);
   };
+
+  const dataSource = listingsData?.data?.map((listing, index) => ({
+    key: listing._id || index,
+    no: index + 1 + (page - 1) * 10,
+    userName: listing?.user?.name || "N/A",
+    email: listing?.user?.email || "N/A",
+    userImg: listing?.user?.image,
+    productName: listing?.title || "N/A",
+    catrgory: listing?.category || "N/A",
+    productImg: listing?.image,
+    price: listing?.price || 0,
+    date: listing?.createdAt
+      ? new Date(listing?.createdAt).toLocaleDateString()
+      : "N/A",
+    country: listing?.countryName || "N/A",
+    ...listing,
+  }));
 
   const columns = [
     {
@@ -36,8 +62,11 @@ export default function ListingTable() {
       render: (_, record) => (
         <div className="flex items-center gap-2">
           <img
-            // src={imageUrl(record?.userImg)}
-            src="https://avatar.iran.liara.run/public/20"
+            src={
+              record?.userImg
+                ? `${getImageBaseUrl()}/profile-image/${record?.userImg}`
+                : "https://avatar.iran.liara.run/public/23"
+            }
             className="w-10 h-10 object-cover rounded-full"
             alt="User Avatar"
           />
@@ -54,10 +83,13 @@ export default function ListingTable() {
       render: (_, record) => (
         <div className="flex items-center gap-3">
           <img
-            // src={imageUrl(record?.productImg)}
-            src="https://avatar.iran.liara.run/public/21"
+            src={
+              record?.productImg
+                ? `${getImageBaseUrl()}/business-image/${record?.productImg}`
+                : "https://avatar.iran.liara.run/public/21"
+            }
             className="w-10 h-10 object-cover rounded"
-            alt="Product Avatar"
+            alt="Product Image"
           />
           <div className="flex flex-col items-start justify-center">
             <span>{record?.productName}</span>
@@ -87,15 +119,33 @@ export default function ListingTable() {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <button
-          onClick={() => showModal(record)}
-          className="border border-[#0091ff] rounded-lg p-1 bg-[#cce9ff] text-[#0091ff]"
-        >
-          <FaRegEye className="w-8 h-8 text-[#0091ff]" />
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => showModal(record)}
+            className="border border-[#0091ff] rounded-lg p-1 bg-[#cce9ff] text-[#0091ff]"
+            title="View Details"
+          >
+            <FaRegEye className="w-8 h-8 text-[#0091ff]" />
+          </button>
+          <button
+            onClick={() =>
+              navigate("/edit-listing-management", {
+                state: { listing: record },
+              })
+            }
+            className="border border-green-500 rounded-lg p-1 bg-green-100 text-green-600"
+            title="Edit Listing"
+          >
+            <FiEdit className="w-8 h-8 text-green-600" />
+          </button>
+        </div>
       ),
     },
   ];
+
+  if (isLoading) {
+    return <Loader />;
+  }
 
   return (
     <ConfigProvider
@@ -123,17 +173,19 @@ export default function ListingTable() {
         columns={columns}
         pagination={{
           pageSize: 10,
-          total: dataSource.length,
-          current: 1,
+          total: listingsData?.total || dataSource?.length || 0,
+          current: page,
           showSizeChanger: false,
-          onChange: (page) => setPage(page),
+          onChange: (newPage) => setPage(newPage),
         }}
         scroll={{ x: "max-content" }}
       />
       <Modal
         open={isModalOpen}
         centered
-        onCancel={handleCancel}
+        onCancel={() => {
+          setIsModalOpen(false);
+        }}
         footer={null}
         width="800px"
         style={{ top: 20 }}
@@ -153,27 +205,6 @@ export default function ListingTable() {
                 alt="Trendy Urban Café"
                 className="w-full h-96 object-cover rounded-lg shadow-lg"
               />
-            </div>
-
-            {/* Thumbnail Gallery */}
-            <div className="flex gap-3 overflow-x-auto">
-              {thumbnails.map((thumb, index) => (
-                <button
-                  key={index}
-                  onClick={() => setSelectedImage(thumb)}
-                  className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
-                    selectedImage === thumb
-                      ? "border-blue-500 shadow-md"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
-                >
-                  <img
-                    src={thumb || "/placeholder.svg"}
-                    alt={`Café view ${index + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                </button>
-              ))}
             </div>
           </div>
 
@@ -351,16 +382,10 @@ export default function ListingTable() {
 
             {/* Action Buttons */}
             <div className="w-full pt-5 border-t border-gray-200 flex gap-2">
-              <button
-                onClick={() => navigate("/edit-listing-management")}
-                className="w-1/3 px-3 py-2 border border-[#0091ff] text-[#0091ff] text-sm"
-              >
-                Edit
-              </button>
-              <button className="w-1/3 px-3 py-2 border border-[#0091ff] bg-[#0091ff] !text-white text-sm">
+              <button className="w-full px-3 py-2 border border-[#0091ff] bg-[#0091ff] !text-white text-sm">
                 Mark as Approved
               </button>
-              <button className="w-1/3 px-3 py-2 border border-red-500 bg-red-500 !text-white text-sm">
+              <button className="w-full px-3 py-2 border border-red-500 bg-red-500 !text-white text-sm">
                 Mark as Rejected
               </button>
             </div>
