@@ -1,78 +1,100 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
-// import { useChangeAdminPasswordMutation, useGetAdminProfileQuery } from "../../redux/api/profileApi";
-// import Swal from "sweetalert2";
+import {
+  useChangeAdminPasswordMutation,
+  useGetUserProfileQuery,
+} from "../../redux/api/profileApi";
+import { useSelector } from "react-redux";
+import { decodeAuthToken } from "../../Utils/decode-access-token";
+import { message } from "antd";
 
 function ChangePassword() {
   const [showPassword, setShowPassword] = useState(false);
   const [formValues, setFormValues] = useState({
-    old_password: "",
-    password: "",
-    confirm_password: "",
+    email: "",
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
   });
-  // const { data: AdminProfileData } = useGetAdminProfileQuery()
-  // console.log("admin profile data", AdminProfileData)
-  // const [changeAdminPassword] = useChangeAdminPasswordMutation();
 
-//   const handleChange = (e) => {
-//     const { name, value } = e.target;
-//     setFormValues((prev) => ({
-//       ...prev,
-//       [name]: value,
-//     }));
-//   };
-  const handleSubmit = (e) => {
+  const token = useSelector((state) => state.auth.token);
+  const decodedToken = decodeAuthToken(token);
+  const { data: userProfileData } = useGetUserProfileQuery({
+    userId: decodedToken?.userId,
+  });
+  const [changeAdminPassword, { isLoading }] = useChangeAdminPasswordMutation();
+
+  useEffect(() => {
+    if (userProfileData?.data?.email) {
+      setFormValues((prev) => ({
+        ...prev,
+        email: userProfileData?.data?.email,
+      }));
+    }
+  }, [userProfileData]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormValues((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // const { old_password, password, confirm_password } = formValues;
+    const { email, currentPassword, newPassword, confirmPassword } = formValues;
 
-    // Password validation
-    // if (password !== confirm_password) {
-    //           Swal.fire({
-    //                     icon: "error",
-    //                     title: "Password Mismatch",
-    //                     text: "The passwords do not match. Please try again.",
-    //           });
-    //           return;
-    // }
+    // Validation
+    if (!currentPassword.trim()) {
+      message.error("Current password is required");
+      return;
+    }
 
-    // if (!AdminProfileData?.data?.email) {
-    //           Swal.fire({
-    //                     icon: "error",
-    //                     title: "Error",
-    //                     text: "User information is missing. Please log in again.",
-    //           });
-    //           return;
-    // }
+    if (!newPassword.trim()) {
+      message.error("New password is required");
+      return;
+    }
 
-    // Submit the password change request
+    if (newPassword.length < 6) {
+      message.error("New password must be at least 6 characters long");
+      return;
+    }
 
-    // changeAdminPassword({
-    //           old_password,
-    //           password,
-    //           confirm_password,
-    // })
-    //           .unwrap()
-    //           .then(() => {
-    //                     Swal.fire({
-    //                               icon: "success",
-    //                               title: "Password Updated",
-    //                               text: "Your password has been updated successfully.",
-    //                     });
-    //                     setFormValues({
-    //                               old_password: "",
-    //                               password: "",
-    //                               confirm_password: "",
-    //                     });
-    //           })
-    //           .catch((error) => {
-    //                     Swal.fire({
-    //                               icon: "error",
-    //                               title: "Error",
-    //                               text: error?.data?.message || "An error occurred. Please try again.",
-    //                     });
-    //           });
+    if (newPassword !== confirmPassword) {
+      message.error("New password and confirm password do not match");
+      return;
+    }
+
+    if (!email) {
+      message.error("Email is required. Please try refreshing the page.");
+      return;
+    }
+
+    try {
+      const response = await changeAdminPassword({
+        email,
+        currentPassword,
+        newPassword,
+        confirmPassword,
+      }).unwrap();
+
+      if (response?.success) {
+        message.success("Password updated successfully!");
+        setFormValues({
+          email: email, // Keep email
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+      } else {
+        message.error("Failed to update password");
+      }
+    } catch (error) {
+      console.error("Password change error:", error);
+      message.error(error?.data?.message || "Failed to update password");
+    }
   };
 
   return (
@@ -80,20 +102,23 @@ function ChangePassword() {
       <p className="text-gray-800 text-center font-bold text-2xl mb-5">
         Change Password
       </p>
-      <form className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div className="w-full">
-          <label htmlFor="password" className="text-xl text-gray-800 mb-2">
+          <label
+            htmlFor="currentPassword"
+            className="text-xl text-gray-800 mb-2"
+          >
             Current Password
           </label>
           <div className="w-full relative">
             <input
               type={showPassword ? "text" : "password"}
-              name="old_password"
+              name="currentPassword"
               placeholder="**********"
-              className="w-full border-2 border-[#6A6D76] rounded-md outline-none px-5 py-3 mt-5 placeholder:text-xl"
+              className="w-full border-2 border-[#6A6D76] rounded-md outline-none px-5 py-3 mt-5 placeholder:text-xl focus:border-[#0091FF]"
               required
-              value={formValues.old_password}
-              //   onChange={handleChange}
+              value={formValues.currentPassword}
+              onChange={handleChange}
             />
             <button
               type="button"
@@ -109,18 +134,18 @@ function ChangePassword() {
           </div>
         </div>
         <div className="w-full">
-          <label htmlFor="password" className="text-xl text-gray-800 mb-2">
+          <label htmlFor="newPassword" className="text-xl text-gray-800 mb-2">
             New Password
           </label>
           <div className="w-full relative">
             <input
               type={showPassword ? "text" : "password"}
-              name="password"
+              name="newPassword"
               placeholder="**********"
-              className="w-full border-2 border-[#6A6D76] rounded-md outline-none px-5 py-3 mt-5 placeholder:text-xl"
+              className="w-full border-2 border-[#6A6D76] rounded-md outline-none px-5 py-3 mt-5 placeholder:text-xl focus:border-[#0091FF]"
               required
-              value={formValues.password}
-              //   onChange={handleChange}
+              value={formValues.newPassword}
+              onChange={handleChange}
             />
             <button
               type="button"
@@ -136,18 +161,21 @@ function ChangePassword() {
           </div>
         </div>
         <div className="w-full">
-          <label htmlFor="password" className="text-xl text-[#0D0D0D] mb-2">
+          <label
+            htmlFor="confirmPassword"
+            className="text-xl text-[#0D0D0D] mb-2"
+          >
             Confirm New Password
           </label>
           <div className="w-full relative">
             <input
               type={showPassword ? "text" : "password"}
-              name="confirm_password"
+              name="confirmPassword"
               placeholder="**********"
-              className="w-full border-2 border-[#6A6D76] rounded-md outline-none px-5 py-3 mt-5 placeholder:text-xl"
+              className="w-full border-2 border-[#6A6D76] rounded-md outline-none px-5 py-3 mt-5 placeholder:text-xl focus:border-[#0091FF]"
               required
-              value={formValues.confirm_password}
-            //   onChange={handleChange}
+              value={formValues.confirmPassword}
+              onChange={handleChange}
             />
             <button
               type="button"
@@ -163,8 +191,12 @@ function ChangePassword() {
           </div>
         </div>
         <div className="text-center py-5 text-white">
-          <button className="bg-[#0091FF] text-white font-semibold w-full py-3 rounded-md">
-            Save Changes
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="bg-[#0091FF] text-white font-semibold w-full py-3 rounded-md hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoading ? "Changing Password..." : "Save Changes"}
           </button>
         </div>
       </form>
