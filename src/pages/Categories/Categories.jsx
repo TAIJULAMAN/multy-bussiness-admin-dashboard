@@ -19,7 +19,11 @@ import {
 import { useNavigate } from "react-router-dom";
 import PageHeading from "../../Components/Shared/PageHeading";
 import Category_delete_modal from "./Category_delete_modal";
-import { useGetAllCategoryQuery, useCreateCategoryMutation, useUpdateCategoryMutation } from "../../redux/api/categoryApi";
+import {
+  useGetAllCategoryQuery,
+  useCreateCategoryMutation,
+  useUpdateCategoryMutation,
+} from "../../redux/api/categoryApi";
 import { getImageBaseUrl } from "../../config/envConfig";
 import img1 from "../../assets/cover.png";
 import Swal from "sweetalert2";
@@ -31,6 +35,7 @@ export default function Categories() {
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [updateModalOpen, setUpdateModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  console.log("selectedCategory", selectedCategory);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [form] = Form.useForm();
@@ -42,8 +47,10 @@ export default function Categories() {
     error,
     refetch,
   } = useGetAllCategoryQuery();
-  const [createCategory, { isLoading: isCreating }] = useCreateCategoryMutation();
-  const [updateCategory, { isLoading: isUpdating }] = useUpdateCategoryMutation();
+  const [createCategory, { isLoading: isCreating }] =
+    useCreateCategoryMutation();
+  const [updateCategory, { isLoading: isUpdating }] =
+    useUpdateCategoryMutation();
   console.log("categoriesResponse from category", categoriesResponse);
 
   const categoriesData =
@@ -107,46 +114,35 @@ export default function Categories() {
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: error?.data?.message || "Failed to create category. Please try again.",
+        text:
+          error?.data?.message ||
+          "Failed to create category. Please try again.",
       });
     }
   };
-  
 
   const handleUpdateCategory = async (values) => {
     try {
-      // Validate required fields
-      if (!values.categoryName?.trim()) {
-        Swal.fire({
-          icon: "error",
-          title: "Validation Error",
-          text: "Category name is required!",
-        });
-        return;
-      }
-
-      if (!selectedCategory?.id) {
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "Category ID is missing. Please try again.",
-        });
-        return;
-      }
-
       // Create FormData for file upload
       const formData = new FormData();
       formData.append("categoryName", values.categoryName.trim());
-      
+
       // Only append image if a new one is selected
-      if (values.image && values.image.fileList && values.image.fileList.length > 0) {
-        formData.append("category-image", values.image.fileList[0].originFileObj);
+      if (
+        values.image &&
+        values.image.fileList &&
+        values.image.fileList.length > 0
+      ) {
+        formData.append(
+          "category-image",
+          values.image.fileList[0].originFileObj
+        );
       }
 
       // Call API - pass FormData directly
       const response = await updateCategory({
-        id: selectedCategory.id,
-        data: formData
+        categoryId: selectedCategory.id,
+        data: formData,
       }).unwrap();
 
       if (response?.success) {
@@ -158,7 +154,6 @@ export default function Categories() {
         setUpdateModalOpen(false);
         updateForm.resetFields();
         setSelectedCategory(null);
-        // Data will auto-refresh due to invalidatesTags
       } else {
         Swal.fire({
           icon: "error",
@@ -171,7 +166,9 @@ export default function Categories() {
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: error?.data?.message || "Failed to update category. Please try again.",
+        text:
+          error?.data?.message ||
+          "Failed to update category. Please try again.",
       });
     }
   };
@@ -179,7 +176,7 @@ export default function Categories() {
   const handleOpenUpdateModal = (category) => {
     setSelectedCategory(category);
     updateForm.setFieldsValue({
-      categoryName: category.categoryName,
+      categoryName: category?.categoryName,
     });
     setUpdateModalOpen(true);
   };
@@ -381,7 +378,7 @@ export default function Categories() {
                   return false;
                 }
                 // Check file type
-                const isImage = file.type.startsWith('image/');
+                const isImage = file.type.startsWith("image/");
                 if (!isImage) {
                   Swal.fire({
                     icon: "error",
@@ -407,9 +404,9 @@ export default function Categories() {
             >
               Cancel
             </Button>
-            <Button 
-              type="primary" 
-              htmlType="submit" 
+            <Button
+              type="primary"
+              htmlType="submit"
               className="bg-[#0091FF]"
               loading={isCreating}
               disabled={isCreating}
@@ -452,11 +449,37 @@ export default function Categories() {
             <Input placeholder="Enter category name" />
           </Form.Item>
 
-          <Form.Item name="image" label="Category Image (Optional)">
+          <Form.Item
+            name="image"
+            label="Category Image (Optional)"
+            valuePropName="file"
+          >
             <Upload
               listType="picture"
               maxCount={1}
-              beforeUpload={() => false}
+              beforeUpload={(file) => {
+                // Check file size (5MB limit)
+                const isLt5M = file.size / 1024 / 1024 < 5;
+                if (!isLt5M) {
+                  Swal.fire({
+                    icon: "error",
+                    title: "File too large",
+                    text: "Image must be smaller than 5MB!",
+                  });
+                  return false;
+                }
+                // Check file type
+                const isImage = file.type.startsWith("image/");
+                if (!isImage) {
+                  Swal.fire({
+                    icon: "error",
+                    title: "Invalid file type",
+                    text: "Please upload an image file!",
+                  });
+                  return false;
+                }
+                return false; // Prevent auto upload
+              }}
               accept="image/*"
             >
               <Button icon={<UploadOutlined />}>Upload New Image</Button>
@@ -486,8 +509,14 @@ export default function Categories() {
             >
               Cancel
             </Button>
-            <Button type="primary" htmlType="submit" className="bg-[#0091FF]">
-              Update Category
+            <Button
+              type="primary"
+              htmlType="submit"
+              className="bg-[#0091FF]"
+              loading={isUpdating}
+              disabled={isUpdating}
+            >
+              {isUpdating ? "Updating..." : "Update Category"}
             </Button>
           </div>
         </Form>
