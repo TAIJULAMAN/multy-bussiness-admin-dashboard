@@ -7,8 +7,12 @@ export const baseApi = createApi({
   reducerPath: "baseApi",
   baseQuery: fetchBaseQuery({
     baseUrl: getBaseUrl(),
-    headers: {
-      Authorization: localStorage.getItem("token"),
+    prepareHeaders: (headers, { getState }) => {
+      const token = getState().auth.token;
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+      }
+      return headers;
     },
   }),
   endpoints: () => ({}),
@@ -24,5 +28,7 @@ export const baseApi = createApi({
     "coupon",
     "earning",
     "subscriber",
+    "profile",
+    "category",
   ],
 });

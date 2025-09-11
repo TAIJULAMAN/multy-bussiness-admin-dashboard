@@ -1,13 +1,27 @@
-import { Modal, Table, Button, Image, Space, Pagination, Form, Input, Upload } from "antd";
+import {
+  Modal,
+  Table,
+  Button,
+  Image,
+  Space,
+  Pagination,
+  Form,
+  Input,
+  Upload,
+  Spin,
+} from "antd";
 import { useState } from "react";
-import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
-import { EyeOutlined, EditOutlined, DeleteOutlined, UploadOutlined } from "@ant-design/icons";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  UploadOutlined,
+} from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import PageHeading from "../../Components/Shared/PageHeading";
 import Category_delete_modal from "./Category_delete_modal";
+import { useGetAllCategoryQuery, useCreateCategoryMutation, useUpdateCategoryMutation } from "../../redux/api/categoryApi";
+import { getImageBaseUrl } from "../../config/envConfig";
 import img1 from "../../assets/cover.png";
-import img2 from "../../assets/cover1.png";
-import img3 from "../../assets/cover2.png";
 import Swal from "sweetalert2";
 
 export default function Categories() {
@@ -22,103 +36,142 @@ export default function Categories() {
   const [form] = Form.useForm();
   const [updateForm] = Form.useForm();
 
-  // Mock data based on the screenshot
-  const categoriesData = [
-    {
-      key: 1,
-      id: 1,
-      image: img1,
-      categoryName: "Restaurants & Cafes",
-      totalSubcategories: 8,
-    },
-    {
-      key: 2,
-      id: 2,
-      image: img2,
-      categoryName: "Retail & E-commerce",
-      totalSubcategories: 5,
-    },
-    {
-      key: 3,
-      id: 3,
-      image: img3,
-      categoryName: "Health & Fitness",
-      totalSubcategories: 3,
-    },
-    {
-      key: 4,
-      id: 4,
-      image: img1,
-      categoryName: "Health & Fitness",
-      totalSubcategories: 9,
-    },
-    {
-      key: 5,
-      id: 5,
-      image: img2,
-      categoryName: "Education & Training",
-      totalSubcategories: 1,
-    },
-    {
-      key: 6,
-      id: 6,
-      image: img3,
-      categoryName: "Automotive Services",
-      totalSubcategories: 7,
-    },
-    {
-      key: 7,
-      id: 7,
-      image: img1,
-      categoryName: "Real Estate",
-      totalSubcategories: 0,
-    },
-    {
-      key: 8,
-      id: 8,
-      image: img2,
-      categoryName: "Travel & Tourism",
-      totalSubcategories: 6,
-    },
-  ];
+  const {
+    data: categoriesResponse,
+    isLoading,
+    error,
+    refetch,
+  } = useGetAllCategoryQuery();
+  const [createCategory, { isLoading: isCreating }] = useCreateCategoryMutation();
+  const [updateCategory, { isLoading: isUpdating }] = useUpdateCategoryMutation();
+  console.log("categoriesResponse from category", categoriesResponse);
+
+  const categoriesData =
+    categoriesResponse?.data?.map((category, index) => ({
+      key: category._id || category.id || index + 1,
+      id: category._id || category.id,
+      image: category.categoryImage
+        ? `${getImageBaseUrl()}/category-image/${category.categoryImage}`
+        : img1,
+      categoryName: category.categoryName,
+      totalSubcategories: category.subCategoryCount || 0,
+    })) || [];
 
   const handleAddCategory = async (values) => {
     try {
-      // Mock API call - replace with actual API
-      console.log("Adding category:", values);
-      Swal.fire({
-        icon: "success",
-        title: "Success",
-        text: "Category added successfully!",
-      });
-      setAddModalOpen(false);
-      form.resetFields();
+      // Validate required fields
+      if (!values.categoryName?.trim()) {
+        Swal.fire({
+          icon: "error",
+          title: "Validation Error",
+          text: "Category name is required!",
+        });
+        return;
+      }
+
+      if (!values.image || values.image.fileList.length === 0) {
+        Swal.fire({
+          icon: "error",
+          title: "Validation Error",
+          text: "Category image is required!",
+        });
+        return;
+      }
+
+      // Create FormData for file upload
+      const formData = new FormData();
+      formData.append("categoryName", values.categoryName.trim());
+      formData.append("category-image", values.image.fileList[0].originFileObj);
+
+      // Call API
+      const response = await createCategory(formData).unwrap();
+
+      if (response?.success) {
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: response.message || "Category created successfully!",
+        });
+        setAddModalOpen(false);
+        form.resetFields();
+        // Data will auto-refresh due to invalidatesTags
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: response?.message || "Failed to create category",
+        });
+      }
     } catch (error) {
+      console.error("Create category error:", error);
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: "Failed to add category. Please try again.",
+        text: error?.data?.message || "Failed to create category. Please try again.",
       });
     }
   };
+  
 
   const handleUpdateCategory = async (values) => {
     try {
-      // Mock API call - replace with actual API
-      console.log("Updating category:", values);
-      Swal.fire({
-        icon: "success",
-        title: "Success",
-        text: "Category updated successfully!",
-      });
-      setUpdateModalOpen(false);
-      updateForm.resetFields();
-      setSelectedCategory(null);
+      // Validate required fields
+      if (!values.categoryName?.trim()) {
+        Swal.fire({
+          icon: "error",
+          title: "Validation Error",
+          text: "Category name is required!",
+        });
+        return;
+      }
+
+      if (!selectedCategory?.id) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Category ID is missing. Please try again.",
+        });
+        return;
+      }
+
+      // Create FormData for file upload
+      const formData = new FormData();
+      formData.append("categoryName", values.categoryName.trim());
+      
+      // Only append image if a new one is selected
+      if (values.image && values.image.fileList && values.image.fileList.length > 0) {
+        formData.append("category-image", values.image.fileList[0].originFileObj);
+      }
+
+      // Call API - pass FormData directly
+      const response = await updateCategory({
+        id: selectedCategory.id,
+        data: formData
+      }).unwrap();
+
+      if (response?.success) {
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: response.message || "Category updated successfully!",
+        });
+        setUpdateModalOpen(false);
+        updateForm.resetFields();
+        setSelectedCategory(null);
+        // Data will auto-refresh due to invalidatesTags
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: response?.message || "Failed to update category",
+        });
+      }
     } catch (error) {
+      console.error("Update category error:", error);
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: "Failed to update category. Please try again.",
+        text: error?.data?.message || "Failed to update category. Please try again.",
       });
     }
   };
@@ -175,10 +228,14 @@ export default function Categories() {
       width: 150,
       align: "center",
       render: (_, record) => (
-        <Button 
-          type="primary" 
+        <Button
+          type="primary"
           className="bg-blue-500"
-          onClick={() => navigate(`/subcategories?categoryId=${record.id}&categoryName=${record.categoryName}`)}
+          onClick={() =>
+            navigate(
+              `/subcategories?categoryId=${record.id}&categoryName=${record.categoryName}`
+            )
+          }
         >
           View
         </Button>
@@ -218,8 +275,8 @@ export default function Categories() {
       <div className="flex justify-between items-center mb-5">
         <PageHeading title="Categories Management" />
         <div className="text-white">
-          <Button 
-            type="primary" 
+          <Button
+            type="primary"
             size="large"
             className="bg-[#0091FF] border-[#0091FF] hover:bg-[#0077CC] hover:border-[#0077CC]"
             onClick={() => setAddModalOpen(true)}
@@ -230,30 +287,46 @@ export default function Categories() {
       </div>
 
       <div className="bg-white rounded-lg shadow-sm">
-        <Table
-          columns={columns}
-          dataSource={categoriesData}
-          pagination={false}
-          scroll={{ x: 800 }}
-          className="custom-table"
-        />
-        
-        <div className="flex justify-center py-5">
-          <Pagination
-            current={currentPage}
-            pageSize={pageSize}
-            total={categoriesData.length}
-            showSizeChanger
-            showQuickJumper
-            showTotal={(total, range) =>
-              `${range[0]}-${range[1]} of ${total} items`
-            }
-            onChange={(page, size) => {
-              setCurrentPage(page);
-              setPageSize(size);
-            }}
-          />
-        </div>
+        {error ? (
+          <div className="p-8 text-center">
+            <p className="text-red-500 mb-4">Failed to load categories</p>
+            <Button onClick={refetch} type="primary" className="bg-[#0091FF]">
+              Retry
+            </Button>
+          </div>
+        ) : (
+          <>
+            <Spin spinning={isLoading}>
+              <Table
+                columns={columns}
+                dataSource={categoriesData}
+                pagination={false}
+                scroll={{ x: 800 }}
+                className="custom-table"
+                locale={{
+                  emptyText: isLoading ? "Loading..." : "No categories found",
+                }}
+              />
+            </Spin>
+
+            <div className="flex justify-center py-5">
+              <Pagination
+                current={currentPage}
+                pageSize={pageSize}
+                total={categoriesData.length}
+                showSizeChanger
+                showQuickJumper
+                showTotal={(total, range) =>
+                  `${range[0]}-${range[1]} of ${total} items`
+                }
+                onChange={(page, size) => {
+                  setCurrentPage(page);
+                  setPageSize(size);
+                }}
+              />
+            </div>
+          </>
+        )}
       </div>
 
       {/* Add Category Modal */}
@@ -278,7 +351,10 @@ export default function Categories() {
             label="Category Name"
             rules={[
               { required: true, message: "Please enter category name" },
-              { max: 100, message: "Category name cannot exceed 100 characters" },
+              {
+                max: 100,
+                message: "Category name cannot exceed 100 characters",
+              },
             ]}
           >
             <Input placeholder="Enter category name" />
@@ -288,11 +364,34 @@ export default function Categories() {
             name="image"
             label="Category Image"
             rules={[{ required: true, message: "Please upload an image" }]}
+            valuePropName="file"
           >
             <Upload
               listType="picture"
               maxCount={1}
-              beforeUpload={() => false}
+              beforeUpload={(file) => {
+                // Check file size (5MB limit)
+                const isLt5M = file.size / 1024 / 1024 < 5;
+                if (!isLt5M) {
+                  Swal.fire({
+                    icon: "error",
+                    title: "File too large",
+                    text: "Image must be smaller than 5MB!",
+                  });
+                  return false;
+                }
+                // Check file type
+                const isImage = file.type.startsWith('image/');
+                if (!isImage) {
+                  Swal.fire({
+                    icon: "error",
+                    title: "Invalid file type",
+                    text: "Please upload an image file!",
+                  });
+                  return false;
+                }
+                return false; // Prevent auto upload
+              }}
               accept="image/*"
             >
               <Button icon={<UploadOutlined />}>Upload Image</Button>
@@ -308,12 +407,14 @@ export default function Categories() {
             >
               Cancel
             </Button>
-            <Button
-              type="primary"
-              htmlType="submit"
+            <Button 
+              type="primary" 
+              htmlType="submit" 
               className="bg-[#0091FF]"
+              loading={isCreating}
+              disabled={isCreating}
             >
-              Add Category
+              {isCreating ? "Creating..." : "Add Category"}
             </Button>
           </div>
         </Form>
@@ -342,16 +443,16 @@ export default function Categories() {
             label="Category Name"
             rules={[
               { required: true, message: "Please enter category name" },
-              { max: 100, message: "Category name cannot exceed 100 characters" },
+              {
+                max: 100,
+                message: "Category name cannot exceed 100 characters",
+              },
             ]}
           >
             <Input placeholder="Enter category name" />
           </Form.Item>
 
-          <Form.Item
-            name="image"
-            label="Category Image (Optional)"
-          >
+          <Form.Item name="image" label="Category Image (Optional)">
             <Upload
               listType="picture"
               maxCount={1}
@@ -385,11 +486,7 @@ export default function Categories() {
             >
               Cancel
             </Button>
-            <Button
-              type="primary"
-              htmlType="submit"
-              className="bg-[#0091FF]"
-            >
+            <Button type="primary" htmlType="submit" className="bg-[#0091FF]">
               Update Category
             </Button>
           </div>

@@ -194,9 +194,6 @@ export default function Formation() {
                   }
                   alt={formation.title}
                   className="w-full h-[200px] object-cover rounded-lg bg-gray-100"
-                  onError={(e) => {
-                    e.target.src = "/placeholder-image.jpg";
-                  }}
                 />
                 <div>
                   <h3 className="font-medium text-gray-800 mb-2">

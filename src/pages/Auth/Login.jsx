@@ -36,11 +36,12 @@ const Login = () => {
 
     try {
       const response = await logIn(loginData).unwrap();
+      console.log("response", response);
       console.log("response from login", response?.data?.accessToken);
       if (response?.data?.accessToken) {
         dispatch(
           setUser({
-            user: response || {},
+            user: response?.data?.user || {},
             token: response?.data?.accessToken,
           })
         );

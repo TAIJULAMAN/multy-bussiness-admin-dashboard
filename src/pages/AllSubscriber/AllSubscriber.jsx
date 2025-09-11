@@ -4,7 +4,7 @@ import { useGetAllSubscriberQuery } from "../../redux/api/allSubscriberApi";
 import Loader from "../../Components/Shared/Loaders/Loader";
 
 export default function AllSubscriber() {
-  const { data: subscriberData, isLoading, error } = useGetAllSubscriberQuery();
+  const { data: subscriberData, isLoading } = useGetAllSubscriberQuery();
   console.log("subscriberData", subscriberData);
 
   // Map API data to table format
@@ -12,60 +12,24 @@ export default function AllSubscriber() {
     subscriberData?.data?.map((subscriber, index) => ({
       key: subscriber._id || index.toString(),
       no: index + 1,
-      name: subscriber.name || "No Name",
       email: subscriber.email || "No Email",
-      role: subscriber.role || "User",
-      status: subscriber.status || "Active",
     })) || [];
   const columns = [
     {
       title: "No",
       dataIndex: "no",
       key: "no",
-      align: "center",
-      width: 80,
     },
-    {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
-    },
+
     {
       title: "Email",
       dataIndex: "email",
       key: "email",
     },
-    {
-      title: "Role",
-      dataIndex: "role",
-      key: "role",
-      align: "center",
-    },
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      align: "center",
-    },
   ];
 
   if (isLoading) {
     return <Loader />;
-  }
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center p-10">
-        <div className="text-center">
-          <h3 className="text-lg font-semibold text-red-600 mb-2">
-            Error Loading Subscribers
-          </h3>
-          <p className="text-gray-600">
-            {error?.data?.message || "Failed to load subscriber data"}
-          </p>
-        </div>
-      </div>
-    );
   }
 
   return (
