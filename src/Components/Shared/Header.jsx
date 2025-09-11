@@ -10,7 +10,9 @@ import {
   useGetAllNotificationQuery,
   useDeleteNotificationMutation,
 } from "../../redux/api/notificationApi";
+import { useGetUserProfileQuery } from "../../redux/api/profileApi";
 import { useSelector } from "react-redux";
+import { getImageBaseUrl } from "../../config/envConfig";
 
 function Header() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -18,15 +20,17 @@ function Header() {
   const [isOpen, setIsOpen] = useState(true);
 
   const token = useSelector((state) => state.auth.token);
-  console.log(token);
+  // console.log(token);
   const decodedToken = decodeAuthToken(token);
-  console.log("decodedToken", decodedToken);
+  // console.log("decodedToken", decodedToken);
 
-  // const { data: profileData } = useGetProfileQuery({ _id: decodedToken?.id });
+  const { data: profileData } = useGetUserProfileQuery({
+    _id: decodedToken?.id,
+  });
   // console.log("profileData from header", profileData);
 
   const { data: notificationsData } = useGetAllNotificationQuery();
-  console.log("notificationsData", notificationsData);
+  // console.log("notificationsData", notificationsData);
 
   const [deleteNotification] = useDeleteNotificationMutation();
 
@@ -78,14 +82,22 @@ function Header() {
         {/* Profile */}
         <Link to="/profile" className="flex items-center gap-2">
           <img
-            src="https://avatar.iran.liara.run/public/26"
-            className="w-8 md:w-12 h-8 md:h-12 object-cover rounded-full"
+            src={
+              profileData?.data?.image
+                ? `${getImageBaseUrl()}/profile-image/${
+                    profileData?.data?.image
+                  }`
+                : "https://avatar.iran.liara.run/public/23"
+            }
+            className="w-10 h-10 object-cover rounded-full"
             alt="User Avatar"
           />
           <div className="hidden md:flex flex-col items-start">
-            <h3 className="text-gray-800 text-sm">Shah Aman</h3>
+            <h3 className="text-gray-800 text-sm">
+              {profileData?.data?.name || "Admin Person"}
+            </h3>
             <p className="text-xs px-2 py-1 bg-[#cce9ff] text-[#0091FF] rounded">
-              Admin
+              {profileData?.data?.role || "Admin"}
             </p>
           </div>
         </Link>

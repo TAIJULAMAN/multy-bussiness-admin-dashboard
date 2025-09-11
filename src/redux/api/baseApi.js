@@ -32,5 +32,6 @@ export const baseApi = createApi({
     "category",
     "listings",
     "notification",
+    "NDA",
   ],
 });

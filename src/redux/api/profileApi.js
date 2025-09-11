@@ -25,6 +25,14 @@ const profileApi = baseApi.injectEndpoints({
         body: data,
       }),
     }),
+    getUserDetails: builder.query({
+      query: (params) => ({
+        url: "user/user-detail",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["profile"],
+    }),
   }),
 });
 
@@ -32,4 +40,5 @@ export const {
   useUpdateProfileMutation,
   useChangeAdminPasswordMutation,
   useGetUserProfileQuery,
+  useGetUserDetailsQuery,
 } = profileApi;
