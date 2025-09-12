@@ -30,5 +30,8 @@ export const baseApi = createApi({
     "subscriber",
     "profile",
     "category",
+    "listings",
+    "notification",
+    "NDA",
   ],
 });

@@ -18,8 +18,12 @@ import {
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import PageHeading from "../../Components/Shared/PageHeading";
-import Category_delete_modal from "./Category_delete_modal";
-import { useGetAllCategoryQuery, useCreateCategoryMutation, useUpdateCategoryMutation } from "../../redux/api/categoryApi";
+import {
+  useGetAllCategoryQuery,
+  useCreateCategoryMutation,
+  useUpdateCategoryMutation,
+  useDeleteCategoryMutation,
+} from "../../redux/api/categoryApi";
 import { getImageBaseUrl } from "../../config/envConfig";
 import img1 from "../../assets/cover.png";
 import Swal from "sweetalert2";
@@ -31,6 +35,7 @@ export default function Categories() {
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [updateModalOpen, setUpdateModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  console.log("selectedCategory", selectedCategory);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [form] = Form.useForm();
@@ -42,8 +47,12 @@ export default function Categories() {
     error,
     refetch,
   } = useGetAllCategoryQuery();
-  const [createCategory, { isLoading: isCreating }] = useCreateCategoryMutation();
-  const [updateCategory, { isLoading: isUpdating }] = useUpdateCategoryMutation();
+  const [createCategory, { isLoading: isCreating }] =
+    useCreateCategoryMutation();
+  const [updateCategory, { isLoading: isUpdating }] =
+    useUpdateCategoryMutation();
+  const [deleteCategory, { isLoading: isDeleting }] =
+    useDeleteCategoryMutation();
   console.log("categoriesResponse from category", categoriesResponse);
 
   const categoriesData =
@@ -107,46 +116,30 @@ export default function Categories() {
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: error?.data?.message || "Failed to create category. Please try again.",
+        text:
+          error?.data?.message ||
+          "Failed to create category. Please try again.",
       });
     }
   };
-  
 
   const handleUpdateCategory = async (values) => {
     try {
-      // Validate required fields
-      if (!values.categoryName?.trim()) {
-        Swal.fire({
-          icon: "error",
-          title: "Validation Error",
-          text: "Category name is required!",
-        });
-        return;
-      }
-
-      if (!selectedCategory?.id) {
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "Category ID is missing. Please try again.",
-        });
-        return;
-      }
-
-      // Create FormData for file upload
       const formData = new FormData();
       formData.append("categoryName", values.categoryName.trim());
-      
-      // Only append image if a new one is selected
-      if (values.image && values.image.fileList && values.image.fileList.length > 0) {
-        formData.append("category-image", values.image.fileList[0].originFileObj);
+      if (
+        values.image &&
+        values.image.fileList &&
+        values.image.fileList.length > 0
+      ) {
+        formData.append(
+          "category-image",
+          values.image.fileList[0].originFileObj
+        );
       }
-
-      // Call API - pass FormData directly
       const response = await updateCategory({
-        id: selectedCategory.id,
-        data: formData
+        categoryId: selectedCategory.id,
+        data: formData,
       }).unwrap();
 
       if (response?.success) {
@@ -158,7 +151,6 @@ export default function Categories() {
         setUpdateModalOpen(false);
         updateForm.resetFields();
         setSelectedCategory(null);
-        // Data will auto-refresh due to invalidatesTags
       } else {
         Swal.fire({
           icon: "error",
@@ -171,7 +163,9 @@ export default function Categories() {
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: error?.data?.message || "Failed to update category. Please try again.",
+        text:
+          error?.data?.message ||
+          "Failed to update category. Please try again.",
       });
     }
   };
@@ -179,9 +173,40 @@ export default function Categories() {
   const handleOpenUpdateModal = (category) => {
     setSelectedCategory(category);
     updateForm.setFieldsValue({
-      categoryName: category.categoryName,
+      categoryName: category?.categoryName,
     });
     setUpdateModalOpen(true);
+  };
+
+  const handleDeleteCategory = async () => {
+    try {
+      const response = await deleteCategory(category.id).unwrap();
+
+      if (response?.success) {
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: response.message || "Category deleted successfully!",
+        });
+        setCategory(null);
+        setDeleteModalOpen(false);
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: response?.message || "Failed to delete category",
+        });
+      }
+    } catch (error) {
+      console.error("Delete category error:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text:
+          error?.data?.message ||
+          "Failed to delete category. Please try again.",
+      });
+    }
   };
 
   const columns = [
@@ -381,7 +406,7 @@ export default function Categories() {
                   return false;
                 }
                 // Check file type
-                const isImage = file.type.startsWith('image/');
+                const isImage = file.type.startsWith("image/");
                 if (!isImage) {
                   Swal.fire({
                     icon: "error",
@@ -407,9 +432,9 @@ export default function Categories() {
             >
               Cancel
             </Button>
-            <Button 
-              type="primary" 
-              htmlType="submit" 
+            <Button
+              type="primary"
+              htmlType="submit"
               className="bg-[#0091FF]"
               loading={isCreating}
               disabled={isCreating}
@@ -452,11 +477,37 @@ export default function Categories() {
             <Input placeholder="Enter category name" />
           </Form.Item>
 
-          <Form.Item name="image" label="Category Image (Optional)">
+          <Form.Item
+            name="image"
+            label="Category Image (Optional)"
+            valuePropName="file"
+          >
             <Upload
               listType="picture"
               maxCount={1}
-              beforeUpload={() => false}
+              beforeUpload={(file) => {
+                // Check file size (5MB limit)
+                const isLt5M = file.size / 1024 / 1024 < 5;
+                if (!isLt5M) {
+                  Swal.fire({
+                    icon: "error",
+                    title: "File too large",
+                    text: "Image must be smaller than 5MB!",
+                  });
+                  return false;
+                }
+                // Check file type
+                const isImage = file.type.startsWith("image/");
+                if (!isImage) {
+                  Swal.fire({
+                    icon: "error",
+                    title: "Invalid file type",
+                    text: "Please upload an image file!",
+                  });
+                  return false;
+                }
+                return false; // Prevent auto upload
+              }}
               accept="image/*"
             >
               <Button icon={<UploadOutlined />}>Upload New Image</Button>
@@ -486,8 +537,14 @@ export default function Categories() {
             >
               Cancel
             </Button>
-            <Button type="primary" htmlType="submit" className="bg-[#0091FF]">
-              Update Category
+            <Button
+              type="primary"
+              htmlType="submit"
+              className="bg-[#0091FF]"
+              loading={isUpdating}
+              disabled={isUpdating}
+            >
+              {isUpdating ? "Updating..." : "Update Category"}
             </Button>
           </div>
         </Form>
@@ -502,13 +559,56 @@ export default function Categories() {
           setDeleteModalOpen(false);
         }}
       >
-        <Category_delete_modal
-          category={category}
-          onclose={() => {
-            setCategory(null);
-            setDeleteModalOpen(false);
-          }}
-        />
+        <div className="p-6">
+          {/* Header */}
+          <div className="text-center mb-6">
+            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+              <svg
+                className="h-6 w-6 text-red-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.314 16.5c-.77.833.192 2.5 1.732 2.5z"
+                />
+              </svg>
+            </div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              Delete Category
+            </h2>
+            <p className="text-gray-600">
+              Are you sure you want to delete{" "}
+              <strong>"{category?.categoryName}"</strong>? This action cannot be
+              undone and will also remove all its sub-categories.
+            </p>
+          </div>
+
+          {/* Buttons */}
+          <div className="flex justify-end gap-3">
+            <Button
+              onClick={() => {
+                setCategory(null);
+                setDeleteModalOpen(false);
+              }}
+              disabled={isDeleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="primary"
+              danger
+              onClick={handleDeleteCategory}
+              loading={isDeleting}
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
+            </Button>
+          </div>
+        </div>
       </Modal>
     </>
   );

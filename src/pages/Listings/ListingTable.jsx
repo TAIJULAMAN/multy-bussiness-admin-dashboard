@@ -2,27 +2,124 @@ import React from "react";
 import { ConfigProvider, Modal, Table } from "antd";
 import { useState } from "react";
 import { FaRegEye } from "react-icons/fa";
-import { FaTrash } from "react-icons/fa";
+import { FiEdit } from "react-icons/fi";
 
-import { dataSource } from "../../data/Data";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useGetAllListingsQuery, useUpdateListingMutation } from "../../redux/api/listingApi";
+import Loader from "../../Components/Shared/Loaders/Loader";
+import { getImageBaseUrl } from "../../config/envConfig";
+import Swal from "sweetalert2";
 
-export default function ListingTable() {
+export default function ListingTable({ businessRole = "", status = "" }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedListing, setSelectedListing] = useState(null);
+  console.log("selectedListing", selectedListing);
   const [page, setPage] = useState(1);
   const [selectedImage, setSelectedImage] = useState("/bus1.png");
   const navigate = useNavigate();
 
-  const thumbnails = ["/bus1.png", "/bus2.png", "/bus3.png", "/bus4.png"];
+  // Fetch listings data from API with filters
+  const { data: listingsData, isLoading } = useGetAllListingsQuery({
+    businessRole: businessRole || undefined,
+    status: status || undefined,
+    page,
+    limit: 10,
+  });
+  // console.log("listingsData", listingsData);
+
+  // Update listing mutation
+  const [updateListing, { isLoading: isUpdating }] = useUpdateListingMutation();
 
   const showModal = (record) => {
     setSelectedListing(record);
     setIsModalOpen(true);
   };
-  const handleCancel = () => {
-    setIsModalOpen(false);
+
+  // Handle approve listing
+  const handleApprove = async () => {
+    if (!selectedListing) return;
+    
+    try {
+      await updateListing({
+        _id: selectedListing._id,
+        data: { status: "approved" }
+      }).unwrap();
+      
+      Swal.fire({
+        icon: "success",
+        title: "Approved!",
+        text: "Listing has been approved successfully!",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      
+      setIsModalOpen(false);
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Failed to approve listing. Please try again.",
+      });
+    }
   };
+
+  // Handle reject listing
+  const handleReject = async () => {
+    if (!selectedListing) return;
+    
+    Swal.fire({
+      title: "Are you sure?",
+      text: `You are about to reject "${selectedListing.title}" listing. This action can be reversed later.`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, reject it!",
+      cancelButtonText: "Cancel",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await updateListing({
+            _id: selectedListing._id,
+            data: { status: "rejected" }
+          }).unwrap();
+          
+          Swal.fire({
+            icon: "success",
+            title: "Rejected!",
+            text: "Listing has been rejected successfully!",
+            timer: 2000,
+            showConfirmButton: false,
+          });
+          
+          setIsModalOpen(false);
+        } catch (error) {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Failed to reject listing. Please try again.",
+          });
+        }
+      }
+    });
+  };
+
+  const dataSource = listingsData?.data?.map((listing, index) => ({
+    key: listing._id || index,
+    no: index + 1 + (page - 1) * 10,
+    userName: listing?.user?.name || "N/A",
+    email: listing?.user?.email || "N/A",
+    userImg: listing?.user?.image,
+    productName: listing?.title || "N/A",
+    catrgory: listing?.category || "N/A",
+    productImg: listing?.image,
+    price: listing?.price || 0,
+    date: listing?.createdAt
+      ? new Date(listing?.createdAt).toLocaleDateString()
+      : "N/A",
+    country: listing?.countryName || "N/A",
+    ...listing,
+  }));
 
   const columns = [
     {
@@ -36,8 +133,11 @@ export default function ListingTable() {
       render: (_, record) => (
         <div className="flex items-center gap-2">
           <img
-            // src={imageUrl(record?.userImg)}
-            src="https://avatar.iran.liara.run/public/20"
+            src={
+              record?.userImg
+                ? `${getImageBaseUrl()}/profile-image/${record?.userImg}`
+                : "https://avatar.iran.liara.run/public/23"
+            }
             className="w-10 h-10 object-cover rounded-full"
             alt="User Avatar"
           />
@@ -54,10 +154,13 @@ export default function ListingTable() {
       render: (_, record) => (
         <div className="flex items-center gap-3">
           <img
-            // src={imageUrl(record?.productImg)}
-            src="https://avatar.iran.liara.run/public/21"
+            src={
+              record?.productImg
+                ? `${getImageBaseUrl()}/business-image/${record?.productImg}`
+                : "https://avatar.iran.liara.run/public/21"
+            }
             className="w-10 h-10 object-cover rounded"
-            alt="Product Avatar"
+            alt="Product Image"
           />
           <div className="flex flex-col items-start justify-center">
             <span>{record?.productName}</span>
@@ -87,15 +190,33 @@ export default function ListingTable() {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <button
-          onClick={() => showModal(record)}
-          className="border border-[#0091ff] rounded-lg p-1 bg-[#cce9ff] text-[#0091ff]"
-        >
-          <FaRegEye className="w-8 h-8 text-[#0091ff]" />
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => showModal(record)}
+            className="border border-[#0091ff] rounded-lg p-1 bg-[#cce9ff] text-[#0091ff]"
+            title="View Details"
+          >
+            <FaRegEye className="w-8 h-8 text-[#0091ff]" />
+          </button>
+          <button
+            onClick={() =>
+              navigate("/edit-listing-management", {
+                state: { listing: record },
+              })
+            }
+            className="border border-green-500 rounded-lg p-1 bg-green-100 text-green-600"
+            title="Edit Listing"
+          >
+            <FiEdit className="w-8 h-8 text-green-600" />
+          </button>
+        </div>
       ),
     },
   ];
+
+  if (isLoading) {
+    return <Loader />;
+  }
 
   return (
     <ConfigProvider
@@ -123,17 +244,19 @@ export default function ListingTable() {
         columns={columns}
         pagination={{
           pageSize: 10,
-          total: dataSource.length,
-          current: 1,
+          total: listingsData?.total || dataSource?.length || 0,
+          current: page,
           showSizeChanger: false,
-          onChange: (page) => setPage(page),
+          onChange: (newPage) => setPage(newPage),
         }}
         scroll={{ x: "max-content" }}
       />
       <Modal
         open={isModalOpen}
         centered
-        onCancel={handleCancel}
+        onCancel={() => {
+          setIsModalOpen(false);
+        }}
         footer={null}
         width="800px"
         style={{ top: 20 }}
@@ -149,31 +272,16 @@ export default function ListingTable() {
             {/* Main Image */}
             <div className="mb-4">
               <img
-                src={selectedImage || "/placeholder.svg"}
-                alt="Trendy Urban Café"
+                src={
+                  selectedListing?.image
+                    ? `${getImageBaseUrl()}/business-image/${
+                        selectedListing.image
+                      }`
+                    : "https://avatar.iran.liara.run/public/21"
+                }
+                alt={selectedListing?.title || "Business Listing"}
                 className="w-full h-96 object-cover rounded-lg shadow-lg"
               />
-            </div>
-
-            {/* Thumbnail Gallery */}
-            <div className="flex gap-3 overflow-x-auto">
-              {thumbnails.map((thumb, index) => (
-                <button
-                  key={index}
-                  onClick={() => setSelectedImage(thumb)}
-                  className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
-                    selectedImage === thumb
-                      ? "border-blue-500 shadow-md"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
-                >
-                  <img
-                    src={thumb || "/placeholder.svg"}
-                    alt={`Café view ${index + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                </button>
-              ))}
             </div>
           </div>
 
@@ -182,11 +290,10 @@ export default function ListingTable() {
             {/* Title and Price */}
             <div>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                Trendy Urban Café in Dhaka City
+                {selectedListing?.title || "Business Listing"}
               </h1>
               <div className="flex items-center gap-2 text-2xl font-semibold text-gray-800">
-                {/* <FaTag className="text-green-600" /> */}
-                <span>Price: $75,000 USD</span>
+                <span>Price: ${selectedListing?.price || 0} USD</span>
               </div>
             </div>
 
@@ -197,50 +304,54 @@ export default function ListingTable() {
               </h2>
 
               <div className="space-y-4">
-                {/* Business Type */}
+                {/* Business Role */}
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    {/* <FaBuilding className="text-gray-600" /> */}
                     <span className="font-medium text-gray-700">
-                      Business Type
+                      Business Role
                     </span>
                   </div>
                   <span className="inline-block bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full">
-                    Franchise Resale
+                    {selectedListing?.businessRole || "N/A"}
                   </span>
                 </div>
 
-                {/* Industry */}
+                {/* Category */}
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    {/* <FaMapMarkerAlt className="text-gray-600" /> */}
-                    <span className="font-medium text-gray-700">Industry</span>
+                    <span className="font-medium text-gray-700">Category</span>
                   </div>
                   <span className="text-gray-600">
-                    Food & Beverage – Café & Coffee Shop
+                    {selectedListing?.category || "N/A"}
                   </span>
                 </div>
 
-                {/* Ownership Type */}
+                {/* Status */}
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    {/* <FaUser className="text-gray-600" /> */}
-                    <span className="font-medium text-gray-700">
-                      Ownership Type
-                    </span>
+                    <span className="font-medium text-gray-700">Status</span>
                   </div>
-                  <span className="text-gray-600">Sole Proprietorship</span>
+                  <span
+                    className={`inline-block text-sm font-medium px-3 py-1 rounded-full ${
+                      selectedListing?.status === "approved"
+                        ? "bg-green-100 text-green-800"
+                        : selectedListing?.status === "rejected"
+                        ? "bg-red-100 text-red-800"
+                        : "bg-yellow-100 text-yellow-800"
+                    }`}
+                  >
+                    {selectedListing?.status || "Pending"}
+                  </span>
                 </div>
 
-                {/* Reason for Selling */}
+                {/* User Information */}
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    {/* <FaInfoCircle className="text-gray-600" /> */}
-                    <span className="font-medium text-gray-700">
-                      Reason for Selling
-                    </span>
+                    <span className="font-medium text-gray-700">Listed By</span>
                   </div>
-                  <span className="text-gray-600">Owner relocating abroad</span>
+                  <span className="text-gray-600">
+                    {selectedListing?.user?.name || "N/A"}
+                  </span>
                 </div>
 
                 {/* Location */}
@@ -250,118 +361,75 @@ export default function ListingTable() {
                     <span className="font-medium text-gray-700">Location</span>
                   </div>
                   <span className="text-gray-600">
-                    Banani, Dhaka, Bangladesh
+                    {selectedListing?.country || "N/A"}
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Product Description */}
+            {/* Business Description */}
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                Product Description
+                Business Description
               </h3>
               <div className="space-y-3 text-gray-700">
                 <p>
-                  Located in the heart of Banani, this cozy, fully-operational
-                  urban café is a favorite among young professionals, students,
-                  and tourists. The business boasts a strong brand identity,
-                  stylish interior, and a loyal customer base.
-                </p>
-                <p>
-                  The café is known for its handcrafted coffee, fresh bakery
-                  items, and comfortable ambiance perfect for casual meetings
-                  and co-working.
+                  {selectedListing?.description ||
+                    "No description available for this business listing."}
                 </p>
               </div>
             </div>
 
-            {/* Assets Included */}
+            {/* Additional Information */}
+            {selectedListing?.additionalInfo && (
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                  Additional Information
+                </h3>
+                <div className="space-y-3 text-gray-700">
+                  <p>{selectedListing.additionalInfo}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Contact Information */}
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                Assets Included
+                Contact Information
               </h3>
-              <ul className="space-y-2 text-gray-700">
-                <li className="flex items-start gap-2">
-                  <span className="text-green-600 mt-1">•</span>
-                  <span>Licensed franchise brand rights (transferable)</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-600 mt-1">•</span>
-                  <span>Complete café setup (~1,200 sq. ft.)</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-600 mt-1">•</span>
-                  <span>Professional coffee & kitchen equipment</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-600 mt-1">•</span>
-                  <span>POS system</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-600 mt-1">•</span>
-                  <span>Decor and interior furnishings</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-600 mt-1">•</span>
-                  <span>10k+ social media followers</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-600 mt-1">•</span>
-                  <span>Staff and supplier contacts</span>
-                </li>
-              </ul>
-            </div>
-
-            {/* Financial Summary */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                Financial Summary (Approximate)
-              </h3>
-
               <div className="space-y-3">
-                <div className="">
-                  <span className="text-gray-700">Monthly Revenue:</span>
-                  <span className="font-semibold">$4,500</span>
-                </div>
-                <div className="">
-                  <span className="text-gray-700">Monthly Expenses:</span>
-                  <span className="font-semibold">$2,000</span>
-                </div>
-                <div className="">
-                  <span className="text-gray-700">Net Profit:</span>
-                  <span className="font-semibold">$2,500</span>
-                </div>
-                <div className="">
-                  <span className="text-gray-700">Inventory Value:</span>
-                  <span className="font-semibold">$2,000</span>
-                </div>
-                <div className="">
-                  <span className="text-gray-700">Lease Terms:</span>
-                  <span className="text-gray-600 text-sm">
-                    3 years remaining, renewable
+                <div className="flex justify-between">
+                  <span className="text-gray-700">Email:</span>
+                  <span className="font-semibold">
+                    {selectedListing?.user?.email || "N/A"}
                   </span>
                 </div>
-                <div className="">
-                  <span className="text-gray-700">Royalty Fee:</span>
-                  <span className="text-gray-600">5% of monthly revenue</span>
+                <div className="flex justify-between">
+                  <span className="text-gray-700">Posted Date:</span>
+                  <span className="text-gray-600">
+                    {selectedListing?.createdAt
+                      ? new Date(selectedListing.createdAt).toLocaleDateString()
+                      : "N/A"}
+                  </span>
                 </div>
               </div>
             </div>
 
             {/* Action Buttons */}
             <div className="w-full pt-5 border-t border-gray-200 flex gap-2">
-              <button
-                onClick={() => navigate("/edit-listing-management")}
-                className="w-1/3 px-3 py-2 border border-[#0091ff] text-[#0091ff] text-sm"
+              <button 
+                onClick={handleApprove}
+                disabled={isUpdating}
+                className="w-full px-3 py-2 border border-[#0091ff] bg-[#0091ff] !text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Edit
+                {isUpdating ? "Processing..." : "Mark as Approved"}
               </button>
-              <button className="w-1/3 px-3 py-2 border border-[#0091ff] bg-[#0091ff] !text-white text-sm">
-                Mark as Approved
-              </button>
-              <button className="w-1/3 px-3 py-2 border border-red-500 bg-red-500 !text-white text-sm">
-                Mark as Rejected
+              <button 
+                onClick={handleReject}
+                disabled={isUpdating}
+                className="w-full px-3 py-2 border border-red-500 bg-red-500 !text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isUpdating ? "Processing..." : "Mark as Rejected"}
               </button>
             </div>
           </div>

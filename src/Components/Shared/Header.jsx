@@ -4,73 +4,59 @@ import logo from "../../assets/icons/logo.png";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import { Modal } from "antd";
 import { RxCross2 } from "react-icons/rx";
-// import { useDeleteNotificationMutation, useGetAllNotificationQuery } from "../../redux/api/notificationApi";
-import { imageUrl } from "../../Utils/server";
 import { decodeAuthToken } from "../../Utils/decode-access-token";
-// import { useGetProfileQuery } from "../../redux/api/profileApi";
 import toast from "react-hot-toast";
-
-const notificationsData = [
-  {
-    id: "1",
-    type: "user_joined",
-    title: "New User Joined",
-    description: "Emily Johnson has joined the platform.",
-    date: "2025-04-24",
-    time: "09:20 AM",
-    avatar: "https://avatar.iran.liara.run/public/11",
-  },
-  {
-    id: "2",
-    type: "listing_request",
-    title: "New Listing Request",
-    description:
-      'Michael Brown submitted a new listing: "Downtown Event Space"',
-    date: "2024-12-14",
-    time: "08:00 AM",
-    avatar: "https://avatar.iran.liara.run/public/12",
-  },
-  {
-    id: "3",
-    type: "listing_request",
-    title: "New Listing Request",
-    description: 'Anna Lee submitted a new listing: "Cozy Book Café"',
-    date: "2024-12-14",
-    time: "08:00 AM",
-    avatar: "https://avatar.iran.liara.run/public/13",
-  },
-];
+import {
+  useGetAllNotificationQuery,
+  useDeleteNotificationMutation,
+} from "../../redux/api/notificationApi";
+import { useGetUserProfileQuery } from "../../redux/api/profileApi";
+import { useSelector } from "react-redux";
+import { getImageBaseUrl } from "../../config/envConfig";
 
 function Header() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [notifications, setNotifications] = useState(notificationsData);
+  const [notifications, setNotifications] = useState([]);
   const [isOpen, setIsOpen] = useState(true);
 
-  const token = localStorage.getItem("token");
+  const token = useSelector((state) => state.auth.token);
   // console.log(token);
   const decodedToken = decodeAuthToken(token);
-  // console.log(decodedToken);
-  // const { data: profileData } = useGetProfileQuery({ _id: decodedToken?.id });
+  // console.log("decodedToken", decodedToken);
+
+  const { data: profileData } = useGetUserProfileQuery({
+    _id: decodedToken?.id,
+  });
   // console.log("profileData from header", profileData);
 
-  // const { data: notificationsData } = useGetAllNotificationQuery();
-  // console.log("notificationsData", notificationsData?.data?.length);
+  const { data: notificationsData } = useGetAllNotificationQuery();
+  // console.log("notificationsData", notificationsData);
 
-  // const [deleteNotification] = useDeleteNotificationMutation();
+  const [deleteNotification] = useDeleteNotificationMutation();
 
-  const showModal = () => setIsModalOpen(true);
-  const handleCancel = () => setIsModalOpen(false);
+  const handleDismiss = async (notificationId) => {
+    console.log("handleDismiss called with:", notificationId);
+    console.log("decodedToken:", decodedToken);
+    console.log("role:", decodedToken?.role || "Admin");
 
-  const handleDismiss = async (id) => {
-    // try {
-    //   const result = await deleteNotification(id).unwrap();
-    //   if (result) {
-    //     toast.success('Notification deleted successfully');
-    //   }
-    // } catch (error) {
-    //   console.error('Error deleting notification:', error);
-    //   toast.error('Failed to delete notification');
-    // }
+    try {
+      const params = {
+        notificationId,
+        role: decodedToken?.role || "Admin",
+      };
+      console.log("Sending delete request with params:", params);
+
+      const result = await deleteNotification(params).unwrap();
+      console.log("Delete result:", result);
+
+      if (result) {
+        toast.success("Notification deleted successfully");
+      }
+    } catch (error) {
+      console.error("Error deleting notification:", error);
+      console.error("Error details:", error?.data || error?.message);
+      toast.error("Failed to delete notification");
+    }
   };
 
   if (!isOpen) return null;
@@ -82,28 +68,36 @@ function Header() {
       <div className="flex items-center gap-5">
         {/* Notifications */}
         <button
-          onClick={showModal}
+          onClick={() => setIsModalOpen(true)}
           className="relative bg-[#cce9ff] p-[15px] rounded-full transition"
         >
           <IoIosNotificationsOutline size={22} />
-          {/* {notificationsData?.length > 0 && ( */}
-          <span className="absolute top-1 right-1 bg-[#0091FF] text-xs text-white px-1 rounded-full">
-            10
-          </span>
-          {/* )} */}
+          {notificationsData?.data?.length > 0 && (
+            <span className="absolute top-1 right-1 bg-[#0091FF] text-xs text-white px-1 rounded-full">
+              {notificationsData?.data?.length}
+            </span>
+          )}
         </button>
 
         {/* Profile */}
         <Link to="/profile" className="flex items-center gap-2">
           <img
-            src="https://avatar.iran.liara.run/public/26"
-            className="w-8 md:w-12 h-8 md:h-12 object-cover rounded-full"
+            src={
+              profileData?.data?.image
+                ? `${getImageBaseUrl()}/profile-image/${
+                    profileData?.data?.image
+                  }`
+                : "https://avatar.iran.liara.run/public/23"
+            }
+            className="w-10 h-10 object-cover rounded-full"
             alt="User Avatar"
           />
           <div className="hidden md:flex flex-col items-start">
-            <h3 className="text-gray-800 text-sm">Shah Aman</h3>
+            <h3 className="text-gray-800 text-sm">
+              {profileData?.data?.name || "Admin Person"}
+            </h3>
             <p className="text-xs px-2 py-1 bg-[#cce9ff] text-[#0091FF] rounded">
-              Admin
+              {profileData?.data?.role || "Admin"}
             </p>
           </div>
         </Link>
@@ -113,39 +107,43 @@ function Header() {
       <Modal
         open={isModalOpen}
         centered
-        onCancel={handleCancel}
+        onCancel={() => setIsModalOpen(false)}
         footer={null}
         title="Notifications"
       >
         <div className="py-4 max-h-[70vh] overflow-y-auto">
-          {notificationsData?.length > 0 ? (
-            notificationsData?.map((notification) => (
+          {notificationsData?.data?.length > 0 ? (
+            notificationsData?.data?.map((notification) => (
               <div
-                key={notification?.id}
+                key={notification?._id}
                 className="relative p-3 bg-white border rounded-lg mb-3"
               >
                 <button
-                  onClick={() => handleDismiss(notification?.id)}
+                  onClick={() => handleDismiss(notification?._id)}
                   className="absolute top-2 right-2 p-1 rounded-full hover:bg-gray-100 transition-colors"
                   aria-label="Dismiss notification"
                 >
                   <RxCross2 className="w-4 h-4 text-gray-400 hover:text-red-500" />
                 </button>
                 <div className="flex gap-3">
-                  <img
-                    src={notification?.avatar}
-                    alt={notification?.title}
-                    className="w-12 h-12 object-cover"
-                  />
                   <div className="flex-1">
                     <h3 className="font-semibold text-gray-900">
                       {notification?.title}
                     </h3>
                     <p className="text-sm text-gray-700">
-                      {notification?.description}
+                      {notification?.message}
                     </p>
                     <p className="text-xs text-gray-500 mt-1">
-                      {notification?.date} {notification?.time}
+                      {new Date(notification?.createdAt).toLocaleDateString(
+                        "en-US",
+                        {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        }
+                      )}
                     </p>
                   </div>
                 </div>

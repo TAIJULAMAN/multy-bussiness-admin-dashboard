@@ -4,7 +4,6 @@ import { FaTrashAlt } from "react-icons/fa";
 import { UploadOutlined } from "@ant-design/icons";
 import PageHeading from "../../Components/Shared/PageHeading";
 import Loader from "../../Components/Shared/Loaders/Loader";
-import Category_delete_modal from "../Categories/Category_delete_modal";
 import {
   useGet_all_formationQuery,
   useAdd_formationMutation,
@@ -25,7 +24,7 @@ export default function Formation() {
     useAdd_formationMutation();
   const [updateFormation, { isLoading: isUpdating }] =
     useUpdate_formationMutation();
-  const [deleteFormation] = useDelete_formationMutation();
+  const [deleteFormation, { isLoading: isDeleting }] = useDelete_formationMutation();
   const [form] = Form.useForm();
   const [updateForm] = Form.useForm();
   const [selectedFormation, setSelectedFormation] = useState(null);
@@ -133,28 +132,35 @@ export default function Formation() {
   const handleDeleteFormation = async (formation) => {
     Swal.fire({
       title: "Are you sure?",
-      text: "You are about to delete this formation",
+      text: `You are about to delete "${formation.title}" formation. This action cannot be undone!`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#d33",
       cancelButtonColor: "#3085d6",
       confirmButtonText: "Yes, delete it!",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
+      cancelButtonText: "Cancel",
+      showLoaderOnConfirm: true,
+      preConfirm: async () => {
         try {
           await deleteFormation({ formatId: formation._id }).unwrap();
-          Swal.fire({
-            icon: "success",
-            title: "Deleted!",
-            text: "Formation has been deleted successfully!",
-          });
+          return true;
         } catch (error) {
-          Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: "Failed to delete formation. Please try again.",
-          });
+          Swal.showValidationMessage(
+            `Delete failed: ${error?.data?.message || "Please try again"}`
+          );
+          return false;
         }
+      },
+      allowOutsideClick: () => !Swal.isLoading(),
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          icon: "success",
+          title: "Deleted!",
+          text: "Formation has been deleted successfully!",
+          timer: 2000,
+          showConfirmButton: false,
+        });
       }
     });
   };
@@ -405,13 +411,7 @@ export default function Formation() {
             setDeleteModalOpen(false);
           }}
         >
-          <Category_delete_modal
-            category={category}
-            onclose={() => {
-              setCategory(null);
-              setDeleteModalOpen(false);
-            }}
-          />
+         
         </Modal>
       </div>
     </>

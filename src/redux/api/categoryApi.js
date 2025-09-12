@@ -18,17 +18,19 @@ const categoryApi = baseApi.injectEndpoints({
       invalidatesTags: ["category"],
     }),
     updateCategory: builder.mutation({
-      query: ({ id, data }) => ({
-        url: `category/update-category/categoryId=${id}`,
+      query: ({ categoryId, data }) => ({
+        url: `category/update-category`,
         method: "PATCH",
+        params: { categoryId },
         body: data,
       }),
       invalidatesTags: ["category"],
     }),
     deleteCategory: builder.mutation({
-      query: (id) => ({
-        url: `delete-category/${id}`,
+      query: (categoryId) => ({
+        url: `category/delete-category`,
         method: "DELETE",
+        params: { categoryId },
       }),
       invalidatesTags: ["category"],
     }),

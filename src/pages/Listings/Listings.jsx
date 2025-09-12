@@ -5,55 +5,61 @@ import ListingTable from "./ListingTable";
 const ListingsTabs = () => {
   const [activeTab, setActiveTab] = useState("allListings");
 
+  const tabs = [
+    { key: "allListings", label: "ALL Listings" },
+    { key: "listingsUnderApproval", label: "Listings Under Approval" },
+    { key: "Seller", label: "Business Listings" },
+    { key: "Asset Seller", label: "Franchise Listings" },
+    { key: "Francise Seller", label: "Business Asset Listings" },
+    { key: "Business Idea Lister", label: "Business Idea Lister" },
+  ];
+
   const renderContent = () => {
     switch (activeTab) {
       case "allListings":
         return (
           <div className="p-4">
-            <ListingTable />
+            <ListingTable businessRole="" />
           </div>
         );
       case "listingsUnderApproval":
         return (
           <div className="p-4">
-            <ListingTable />
+            <ListingTable businessRole="not-approved" />
           </div>
         );
-      case "businessListings":
+      case "Seller":
         return (
           <div className="p-4">
-            <ListingTable />
+            <ListingTable businessRole="Seller" />
           </div>
         );
-      case "franchiseListings":
+      case "Asset Seller":
         return (
           <div className="p-4">
-            <ListingTable />
+            <ListingTable businessRole="Asset Seller" />
           </div>
         );
-      case "businessAssetListings":
+      case "Francise Seller":
         return (
           <div className="p-4">
-            <ListingTable />
+            <ListingTable businessRole="Francise Seller" />
           </div>
         );
-      case "businessIdeaListings":
+      case "Business Idea Lister":
         return (
           <div className="p-4">
-            <ListingTable />
+            <ListingTable businessRole="Business Idea Lister" />
           </div>
         );
       default:
-        return null;
+        return (
+          <div className="p-4">
+            <ListingTable businessRole="" />
+          </div>
+        );
     }
   };
-
-  const tabStyle = (tabKey) =>
-    `px-4 py-2 rounded-t-md font-semibold transition-all duration-200 ${
-      activeTab === tabKey
-        ? "bg-[#0091ff] !text-white border border-[#0091ff] !border-b-0"
-        : "text-[#0091ff] hover:bg-[#0091ff]"
-    }`;
 
   return (
     <div>
@@ -61,47 +67,26 @@ const ListingsTabs = () => {
         <PageHeading title="Listings Management" />
       </div>
 
-      {/* Tab  */}
-      <div className="border-b-2 border-[#0091ff] flex space-x-2 gap-2">
-        <button
-          onClick={() => setActiveTab("allListings")}
-          className={tabStyle("allListings")}
-        >
-          ALL Listings
-        </button>
-        <button
-          onClick={() => setActiveTab("listingsUnderApproval")}
-          className={tabStyle("listingsUnderApproval")}
-        >
-          Listings Under Approval
-        </button>
-        <button
-          onClick={() => setActiveTab("businessListings")}
-          className={tabStyle("businessListings")}
-        >
-          business Listings
-        </button>
-        <button
-          onClick={() => setActiveTab("franchiseListings")}
-          className={tabStyle("franchiseListings")}
-        >
-          Franchise Listings
-        </button>
-        <button
-          onClick={() => setActiveTab("businessAssetListings")}
-          className={tabStyle("businessAssetListings")}
-        >
-          Business Asset Listings
-        </button>
-        <button
-          onClick={() => setActiveTab("businessIdeaListings")}
-          className={tabStyle("businessIdeaListings")}
-        >
-          Business Idea Listings
-        </button>
+      {/* Tab Navigation */}
+      <div className="mb-5 border border-[#0091FF]">
+        <div className="flex flex-wrap gap-2 bg-white">
+          {tabs.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={`px-10 py-2 text-sm font-medium transition-colors ${
+                activeTab === tab.key
+                  ? "bg-[#0091FF] text-white"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* content */}
+      {/* Content */}
       {renderContent()}
     </div>
   );
