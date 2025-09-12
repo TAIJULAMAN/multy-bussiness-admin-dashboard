@@ -81,7 +81,13 @@ function NDATable({ data = [] }) {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <Link to="/document">
+        <Link 
+          to="/document" 
+          state={{ 
+            ndaData: record,
+            pdfUrl: record.nda 
+          }}
+        >
           <button className="border border-[#0091ff] rounded-lg p-1 bg-[#cce9ff] text-[#0091ff]">
             <FaRegEye className="w-8 h-8 text-[#0091ff]" />
           </button>
