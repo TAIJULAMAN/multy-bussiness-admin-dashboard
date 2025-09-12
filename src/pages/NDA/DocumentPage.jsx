@@ -93,35 +93,6 @@ export default function DocumentPage() {
 
         {/* Document Content */}
         <div className="p-8 space-y-6">
-          {/* User Info */}
-          {ndaData && (
-            <div className="bg-gray-50 p-4 rounded-lg mb-6">
-              <h2 className="text-lg font-bold text-gray-900 mb-3">
-                NDA Information
-              </h2>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <strong>Name:</strong> {ndaData.userName}
-                </div>
-                <div>
-                  <strong>Email:</strong> {ndaData.email}
-                </div>
-                <div>
-                  <strong>Role:</strong> {ndaData.userRole}
-                </div>
-                <div>
-                  <strong>Date:</strong> {ndaData.date}
-                </div>
-                <div>
-                  <strong>Contact:</strong> {ndaData.contactNumber}
-                </div>
-                <div>
-                  <strong>Passport:</strong> {ndaData.passportNumber}
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* PDF Viewer */}
           {(pdfUrl && pdfUrl !== "N/A") || ndaData?.nda ? (
             <div className="w-full">
@@ -132,30 +103,6 @@ export default function DocumentPage() {
               <div className="bg-white border rounded-lg shadow-sm overflow-hidden">
                 <div className="p-6">
                   <div className="border rounded-lg overflow-hidden bg-white">
-                    {numPages && (
-                      <div className="bg-gray-50 px-4 py-3 border-b flex justify-between items-center">
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={goToPrevPage}
-                            disabled={pageNumber <= 1}
-                            className="px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 disabled:opacity-50 text-sm"
-                          >
-                            ← Previous
-                          </button>
-                          <span className="text-sm text-gray-600">
-                            Page {pageNumber} of {numPages}
-                          </span>
-                          <button
-                            onClick={goToNextPage}
-                            disabled={pageNumber >= numPages}
-                            className="px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 disabled:opacity-50 text-sm"
-                          >
-                            Next →
-                          </button>
-                        </div>
-                      </div>
-                    )}
-
                     <div className="flex justify-center bg-gray-100 p-4">
                       {!error ? (
                         <Document
@@ -172,32 +119,6 @@ export default function DocumentPage() {
                         </Document>
                       ) : (
                         <div className="w-full">
-                          <div className="bg-red-50 border border-red-200 rounded-lg p-6 mb-4">
-                            <h4 className="font-medium text-red-900 mb-2">
-                              PDF Loading Failed
-                            </h4>
-                            <p className="text-sm text-red-700 mb-4">
-                              The PDF viewer couldn't load the document. Try the
-                              options below:
-                            </p>
-                            <div className="flex flex-wrap gap-3">
-                              <a
-                                href={pdfFileUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
-                              >
-                                📄 Open in New Tab
-                              </a>
-                              <a
-                                href={pdfFileUrl}
-                                download
-                                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm"
-                              >
-                                📥 Download PDF
-                              </a>
-                            </div>
-                          </div>
                           <iframe
                             src={pdfFileUrl}
                             width="100%"
@@ -210,42 +131,6 @@ export default function DocumentPage() {
                     </div>
                   </div>
                 </div>
-              </div>
-
-              {/* Extracted Text */}
-              <div className="mt-8 bg-gray-50 p-6 rounded-lg border">
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                  📄 Extracted Text Content
-                </h3>
-
-                {textLoading && (
-                  <div className="flex items-center justify-center py-8">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-                    <span className="ml-2 text-gray-600">
-                      Extracting text from PDF...
-                    </span>
-                  </div>
-                )}
-
-                {textError && (
-                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                    <p className="text-red-700 text-sm">⚠️ {textError}</p>
-                  </div>
-                )}
-
-                {!textLoading && !textError && pdfText && (
-                  <div className="bg-white border rounded-lg p-4 max-h-96 overflow-y-auto">
-                    <pre className="text-sm text-gray-700 whitespace-pre-wrap font-mono">
-                      {pdfText}
-                    </pre>
-                  </div>
-                )}
-
-                {!textLoading && !textError && !pdfText && (
-                  <p className="text-gray-500 text-sm italic">
-                    No text content extracted yet.
-                  </p>
-                )}
               </div>
             </div>
           ) : (
