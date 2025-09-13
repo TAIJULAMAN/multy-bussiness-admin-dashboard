@@ -5,7 +5,10 @@ import { FaRegEye } from "react-icons/fa";
 import { FiEdit } from "react-icons/fi";
 
 import { useNavigate } from "react-router-dom";
-import { useGetAllListingsQuery, useUpdateListingMutation } from "../../redux/api/listingApi";
+import {
+  useGetAllListingsQuery,
+  useUpdateListingMutation,
+} from "../../redux/api/listingApi";
 import Loader from "../../Components/Shared/Loaders/Loader";
 import { getImageBaseUrl } from "../../config/envConfig";
 import Swal from "sweetalert2";
@@ -38,13 +41,13 @@ export default function ListingTable({ businessRole = "", status = "" }) {
   // Handle approve listing
   const handleApprove = async () => {
     if (!selectedListing) return;
-    
+    console.log(selectedListing._id);
     try {
       await updateListing({
-        _id: selectedListing._id,
-        data: { status: "approved" }
+        businessId: selectedListing._id,
+        // data: { status: "approved" }
       }).unwrap();
-      
+
       Swal.fire({
         icon: "success",
         title: "Approved!",
@@ -52,7 +55,7 @@ export default function ListingTable({ businessRole = "", status = "" }) {
         timer: 2000,
         showConfirmButton: false,
       });
-      
+
       setIsModalOpen(false);
     } catch (error) {
       Swal.fire({
@@ -66,7 +69,7 @@ export default function ListingTable({ businessRole = "", status = "" }) {
   // Handle reject listing
   const handleReject = async () => {
     if (!selectedListing) return;
-    
+
     Swal.fire({
       title: "Are you sure?",
       text: `You are about to reject "${selectedListing.title}" listing. This action can be reversed later.`,
@@ -81,9 +84,9 @@ export default function ListingTable({ businessRole = "", status = "" }) {
         try {
           await updateListing({
             _id: selectedListing._id,
-            data: { status: "rejected" }
+            data: { status: "rejected" },
           }).unwrap();
-          
+
           Swal.fire({
             icon: "success",
             title: "Rejected!",
@@ -91,7 +94,7 @@ export default function ListingTable({ businessRole = "", status = "" }) {
             timer: 2000,
             showConfirmButton: false,
           });
-          
+
           setIsModalOpen(false);
         } catch (error) {
           Swal.fire({
@@ -333,14 +336,14 @@ export default function ListingTable({ businessRole = "", status = "" }) {
                   </div>
                   <span
                     className={`inline-block text-sm font-medium px-3 py-1 rounded-full ${
-                      selectedListing?.status === "approved"
+                      selectedListing?.isApproved === true
                         ? "bg-green-100 text-green-800"
-                        : selectedListing?.status === "rejected"
-                        ? "bg-red-100 text-red-800"
                         : "bg-yellow-100 text-yellow-800"
                     }`}
                   >
-                    {selectedListing?.status || "Pending"}
+                    {selectedListing?.isApproved === true
+                      ? "Approved"
+                      : "Pending"}
                   </span>
                 </div>
 
@@ -417,19 +420,21 @@ export default function ListingTable({ businessRole = "", status = "" }) {
 
             {/* Action Buttons */}
             <div className="w-full pt-5 border-t border-gray-200 flex gap-2">
-              <button 
+              <button
                 onClick={handleApprove}
                 disabled={isUpdating}
-                className="w-full px-3 py-2 border border-[#0091ff] bg-[#0091ff] !text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                className={`w-full px-3 py-2 border text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed
+    ${
+      selectedListing?.isApproved === true
+        ? "bg-red-500 border-red-500 hover:bg-red-600 text-white"
+        : "bg-blue-500 border-blue-500 hover:bg-blue-600 text-white"
+    }`}
               >
-                {isUpdating ? "Processing..." : "Mark as Approved"}
-              </button>
-              <button 
-                onClick={handleReject}
-                disabled={isUpdating}
-                className="w-full px-3 py-2 border border-red-500 bg-red-500 !text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isUpdating ? "Processing..." : "Mark as Rejected"}
+                {isUpdating
+                  ? "Processing..."
+                  : selectedListing?.isApproved === true
+                  ? "Mark as Rejected"
+                  : "Mark as Approve"}
               </button>
             </div>
           </div>

@@ -11,13 +11,13 @@ const listingApi = baseApi.injectEndpoints({
       providesTags: ["listings"],
     }),
     updateListing: builder.mutation({
-      query: ({ businessId, data }) => {
+      query: ({ businessId}) => {
         // console.log("Updating FAQ:", { _id, data });
         return {
-          url: `business/update-business`,
+          url: `dashboard/approve-business`,
           method: "PATCH",
           params: { businessId },
-          body: data,
+        
         };
       },
       invalidatesTags: ["listings"],
