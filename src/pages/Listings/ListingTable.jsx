@@ -28,7 +28,7 @@ export default function ListingTable({ businessRole = "", status = "" }) {
     page,
     limit: 10,
   });
-  // console.log("listingsData", listingsData);
+  console.log("listingsData from list page", listingsData);
 
   // Update listing mutation
   const [updateListing, { isLoading: isUpdating }] = useUpdateListingMutation();
@@ -43,15 +43,17 @@ export default function ListingTable({ businessRole = "", status = "" }) {
     if (!selectedListing) return;
     console.log(selectedListing._id);
     try {
+      const wasApproved = selectedListing?.isApproved === true;
       await updateListing({
         businessId: selectedListing._id,
-        // data: { status: "approved" }
       }).unwrap();
 
       Swal.fire({
         icon: "success",
-        title: "Approved!",
-        text: "Listing has been approved successfully!",
+        title: wasApproved ? "Rejected!" : "Approved!",
+        text: wasApproved
+          ? "Listing has been rejected successfully!"
+          : "Listing has been approved successfully!",
         timer: 2000,
         showConfirmButton: false,
       });

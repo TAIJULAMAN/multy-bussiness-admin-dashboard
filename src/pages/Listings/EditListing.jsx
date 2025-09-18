@@ -1,10 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Form, Input, Button, Select, InputNumber, Upload, message, Image, Space } from 'antd';
-import { SaveOutlined, ArrowLeftOutlined, UploadOutlined, PlusOutlined } from '@ant-design/icons';
-import { useUpdateListingMutation } from '../../redux/api/listingApi';
-import { getImageBaseUrl } from '../../config/envConfig';
-import Swal from 'sweetalert2';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import {
+  Form,
+  Input,
+  Button,
+  Select,
+  InputNumber,
+  Upload,
+  message,
+  Image,
+  Space,
+} from "antd";
+import {
+  SaveOutlined,
+  ArrowLeftOutlined,
+  UploadOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
+import { useUpdateListingDetailsMutation } from "../../redux/api/listingApi";
+import { getImageBaseUrl } from "../../config/envConfig";
+import Swal from "sweetalert2";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -23,26 +38,27 @@ const EditListing = () => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
   const [previewOpen, setPreviewOpen] = useState(false);
-  const [previewImage, setPreviewImage] = useState('');
-  const [previewTitle, setPreviewTitle] = useState('');
+  const [previewImage, setPreviewImage] = useState("");
+  const [previewTitle, setPreviewTitle] = useState("");
   const [currentImages, setCurrentImages] = useState([]);
-  
+
   // Get listing data from navigation state
   const listingData = location.state?.listing;
-  
-  // Update listing mutation
-  const [updateListing, { isLoading }] = useUpdateListingMutation();
+
+  // Update listing details mutation
+  const [updateListingDetails, { isLoading }] =
+    useUpdateListingDetailsMutation();
 
   // Handle image upload
   const beforeUpload = (file) => {
-    const isImage = file.type.startsWith('image/');
+    const isImage = file.type.startsWith("image/");
     if (!isImage) {
-      message.error('You can only upload image files!');
+      message.error("You can only upload image files!");
       return Upload.LIST_IGNORE;
     }
     const isLt2M = file.size / 1024 / 1024 < 2;
     if (!isLt2M) {
-      message.error('Image must be smaller than 2MB!');
+      message.error("Image must be smaller than 2MB!");
       return Upload.LIST_IGNORE;
     }
     return isImage && isLt2M;
@@ -58,7 +74,9 @@ const EditListing = () => {
     }
     setPreviewImage(file.url || file.preview);
     setPreviewOpen(true);
-    setPreviewTitle(file.name || file.url.substring(file.url.lastIndexOf('/') + 1));
+    setPreviewTitle(
+      file.name || file.url.substring(file.url.lastIndexOf("/") + 1)
+    );
   };
 
   const uploadButton = (
@@ -72,30 +90,30 @@ const EditListing = () => {
   useEffect(() => {
     if (listingData) {
       form.setFieldsValue({
-        name: listingData.title || '',
+        name: listingData.title || "",
         price: listingData.price || 0,
-        category: listingData.category || '',
-        businessRole: listingData.businessRole || '',
-        location: listingData.location || '',
-        description: listingData.description || ''
+        category: listingData.category || "",
+        businessRole: listingData.businessRole || "",
+        location: listingData.location || "",
+        description: listingData.description || "",
       });
-      
+
       // Set current images from listing data
       if (listingData.images && listingData.images.length > 0) {
-        const imageUrls = listingData.images.map(img => 
-          typeof img === 'string' ? img : getImageBaseUrl(img)
+        const imageUrls = listingData.images.map((img) =>
+          typeof img === "string" ? img : getImageBaseUrl(img)
         );
         setCurrentImages(imageUrls);
       }
     } else {
-      message.error('No listing data found. Please select a listing to edit.');
-      navigate('/listing-management');
+      message.error("No listing data found. Please select a listing to edit.");
+      navigate("/listing-management");
     }
   }, [form, navigate, listingData]);
 
   const onFinish = async (values) => {
     if (!listingData?._id) {
-      message.error('No listing ID found');
+      message.error("No listing ID found");
       return;
     }
 
@@ -108,33 +126,35 @@ const EditListing = () => {
         businessRole: values.businessRole,
         location: values.location,
         description: values.description,
-        images: currentImages // Keep existing images
+        images: currentImages, // Keep existing images
       };
 
       // Call update mutation
-      await updateListing({
-        id: listingData._id,
-        data: updateData
+      await updateListingDetails({
+        businessId: listingData._id,
+        user: listingData?.user?._id,
+        data: updateData,
       }).unwrap();
 
       // Show success message
       Swal.fire({
-        icon: 'success',
-        title: 'Success!',
-        text: 'Listing updated successfully!',
+        icon: "success",
+        title: "Success!",
+        text: "Listing updated successfully!",
         timer: 2000,
-        showConfirmButton: false
+        showConfirmButton: false,
       });
 
       // Navigate back to listings
-      navigate('/listing-management');
+      navigate("/listing-management");
     } catch (error) {
-      console.error('Error updating listing:', error);
+      console.error("Error updating listing:", error);
       Swal.fire({
-        icon: 'error',
-        title: 'Error!',
-        text: error?.data?.message || 'Failed to update listing. Please try again.',
-        confirmButtonColor: '#0091FF'
+        icon: "error",
+        title: "Error!",
+        text:
+          error?.data?.message || "Failed to update listing. Please try again.",
+        confirmButtonColor: "#0091FF",
       });
     }
   };
@@ -150,9 +170,9 @@ const EditListing = () => {
       <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-sm p-6">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-semibold text-gray-900">Edit Listing</h1>
-          <Button 
-            type="text" 
-            icon={<ArrowLeftOutlined />} 
+          <Button
+            type="text"
+            icon={<ArrowLeftOutlined />}
             onClick={() => navigate(-1)}
           >
             Back
@@ -169,7 +189,9 @@ const EditListing = () => {
         >
           {/* Current Images Section */}
           <div className="mb-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Current Images</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-4">
+              Current Images
+            </h3>
             <div className="flex flex-wrap gap-4 mb-4">
               {currentImages.map((image, index) => (
                 <div key={`current-${index}`} className="relative group">
@@ -200,7 +222,9 @@ const EditListing = () => {
 
           {/* Image Upload Section */}
           <div className="mb-8">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Upload New Images</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-4">
+              Upload New Images
+            </h3>
             <Upload
               action="https://www.mocky.io/v2/5cc8019d300000980a055e76" // Replace with your upload endpoint
               listType="picture-card"
@@ -222,7 +246,7 @@ const EditListing = () => {
           {previewImage && (
             <Image
               width={200}
-              style={{ display: 'none' }}
+              style={{ display: "none" }}
               src={previewImage}
               preview={{
                 visible: previewOpen,
@@ -241,7 +265,7 @@ const EditListing = () => {
                 rules={[
                   {
                     required: true,
-                    message: 'Please input the listing name!',
+                    message: "Please input the listing name!",
                   },
                 ]}
               >
@@ -254,16 +278,18 @@ const EditListing = () => {
                 rules={[
                   {
                     required: true,
-                    message: 'Please input the price!',
+                    message: "Please input the price!",
                   },
                 ]}
               >
-                <InputNumber 
-                  size="large" 
+                <InputNumber
+                  size="large"
                   className="w-full"
                   min={0}
-                  formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                  parser={value => value.replace(/\$\s?|(,*)/g, '')}
+                  formatter={(value) =>
+                    `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  }
+                  parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
                 />
               </Form.Item>
 
@@ -273,7 +299,7 @@ const EditListing = () => {
                 rules={[
                   {
                     required: true,
-                    message: 'Please input the category!',
+                    message: "Please input the category!",
                   },
                 ]}
               >
@@ -289,7 +315,7 @@ const EditListing = () => {
                 rules={[
                   {
                     required: true,
-                    message: 'Please select a business role!',
+                    message: "Please select a business role!",
                   },
                 ]}
               >
@@ -307,7 +333,7 @@ const EditListing = () => {
                 rules={[
                   {
                     required: true,
-                    message: 'Please input the location!',
+                    message: "Please input the location!",
                   },
                 ]}
               >
@@ -322,7 +348,7 @@ const EditListing = () => {
             rules={[
               {
                 required: true,
-                message: 'Please input the description!',
+                message: "Please input the description!",
               },
             ]}
           >
@@ -334,16 +360,12 @@ const EditListing = () => {
           </Form.Item>
 
           <div className="flex justify-end space-x-4 pt-4 border-t border-gray-200 gap-5">
-            <Button 
-              onClick={() => navigate(-1)}
-              className="px-6"
-              size="large"
-            >
+            <Button onClick={() => navigate(-1)} className="px-6" size="large">
               Cancel
             </Button>
-            <Button 
-              type="primary" 
-              htmlType="submit" 
+            <Button
+              type="primary"
+              htmlType="submit"
               loading={isLoading}
               className="px-6"
               size="large"

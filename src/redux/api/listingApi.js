@@ -11,37 +11,33 @@ const listingApi = baseApi.injectEndpoints({
       providesTags: ["listings"],
     }),
     updateListing: builder.mutation({
-      query: ({ businessId}) => {
+      query: ({ businessId }) => {
         // console.log("Updating FAQ:", { _id, data });
         return {
           url: `dashboard/approve-business`,
           method: "PATCH",
           params: { businessId },
-        
         };
       },
+      invalidatesTags: ["listings"],
+    }),
+    // Update listing details (title, price, category, etc.)
+    updateListingDetails: builder.mutation({
+      query: ({ businessId, user, data }) => ({
+        url: "business/update-business",
+        method: "PATCH",
+        params: { businessId, user },
+        body: data,
+      }),
       invalidatesTags: ["listings"],
     }),
   }),
 });
 
-export const { useGetAllListingsQuery, useUpdateListingMutation } = listingApi;
+export const {
+  useGetAllListingsQuery,
+  useUpdateListingMutation,
+  useUpdateListingDetailsMutation,
+} = listingApi;
 
 export default listingApi;
-
-// deleteFaq: builder.mutation({
-//     query: ({ _id }) => ({
-//       url: `faq/delete-faq`,
-//       method: "DELETE",
-//       params: { faqId: _id },
-//     }),
-//     invalidatesTags: ["faq"],
-//   }),
-//   createFaq: builder.mutation({
-//     query: (data) => ({
-//       url: "faq/create-faq",
-//       method: "POST",
-//       body: data,
-//     }),
-//     invalidatesTags: ["faq"],
-//   }),
