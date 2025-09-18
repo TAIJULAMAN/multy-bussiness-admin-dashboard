@@ -1,5 +1,5 @@
 import { ConfigProvider, Modal, Table, Tag } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AiOutlineMail, AiOutlinePhone } from "react-icons/ai";
 import { FaRegEye } from "react-icons/fa";
 import { MdBlockFlipped } from "react-icons/md";
@@ -12,6 +12,7 @@ import {
   useUpdateUserMutation,
 } from "../../redux/api/userApi";
 import Loader from "../../Components/Shared/Loaders/Loader";
+import { useDebounced } from "../../Utils/hook";
 
 const AllUsers = ({ search }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -19,10 +20,14 @@ const AllUsers = ({ search }) => {
   const [isModalOpen2, setIsModalOpen2] = useState(false);
   const [activeTab, setActiveTab] = useState("User Statics");
   const [selectedUser, setSelectedUser] = useState(null);
+  const debouncedSearch = useDebounced({ searchTerm: search || "", delay: 400 });
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch]);
 
   const { data: usersData, isLoading } = useGetAllUserQuery({
     page,
-    search,
+    searchText: debouncedSearch,
   });
 
   const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
@@ -161,12 +166,8 @@ const AllUsers = ({ search }) => {
           pageSize: metaLimit,
           total: metaTotal,
           current: metaPage,
-          showSizeChanger: false,
           onChange: (newPage) => setPage(newPage),
         }}
-        // rowKey={(record) =>
-        //   record?._id || record?.id || record?.email || record?.name
-        // }
         scroll={{ x: "max-content" }}
       />
 
