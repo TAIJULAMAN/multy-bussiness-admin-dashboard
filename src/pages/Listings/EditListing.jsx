@@ -4,25 +4,30 @@ import {
   Form,
   Input,
   Button,
-  Select,
   InputNumber,
   Upload,
   message,
   Image,
   Space,
 } from "antd";
-import {
-  SaveOutlined,
-  ArrowLeftOutlined,
-  UploadOutlined,
-  PlusOutlined,
-} from "@ant-design/icons";
+import { ArrowLeftOutlined, PlusOutlined } from "@ant-design/icons";
 import { useUpdateListingDetailsMutation } from "../../redux/api/listingApi";
 import { getImageBaseUrl } from "../../config/envConfig";
 import Swal from "sweetalert2";
 
-const { Option } = Select;
 const { TextArea } = Input;
+
+// helper to get filename from url
+const extractFileName = (path) => {
+  if (!path) return null;
+  try {
+    const url = typeof path === "string" ? path : "";
+    const idx = url.lastIndexOf("/");
+    return idx >= 0 ? url.substring(idx + 1) : url;
+  } catch (e) {
+    return path;
+  }
+};
 
 const getBase64 = (file) =>
   new Promise((resolve, reject) => {
@@ -44,6 +49,7 @@ const EditListing = () => {
 
   // Get listing data from navigation state
   const listingData = location.state?.listing;
+  console.log("listingData from edit list", listingData);
 
   // Update listing details mutation
   const [updateListingDetails, { isLoading }] =
@@ -90,11 +96,20 @@ const EditListing = () => {
   useEffect(() => {
     if (listingData) {
       form.setFieldsValue({
-        name: listingData.title || "",
-        price: listingData.price || 0,
+        title: listingData?.title || "",
         category: listingData.category || "",
-        businessRole: listingData.businessRole || "",
-        location: listingData.location || "",
+        subCategory: listingData.subCategory || "",
+        businessType: listingData.businessType || "",
+        ownerShipType: listingData?.ownerShipType
+        || "No OwnerShip Type",
+        askingPrice: listingData.askingPrice || 0,
+        price: listingData.price || 0,
+        country: listingData.country || "",
+        countryName: listingData.countryName || "",
+        state: listingData.state || "",
+        city: listingData.city || "",
+        reason: listingData.reason || "",
+        business_image: listingData.data?.image || "",
         description: listingData.description || "",
       });
 
@@ -104,6 +119,10 @@ const EditListing = () => {
           typeof img === "string" ? img : getImageBaseUrl(img)
         );
         setCurrentImages(imageUrls);
+      } else if (listingData.image || listingData.business_image) {
+        // fallback to single image field
+        const singleUrl = listingData.image || listingData.business_image;
+        setCurrentImages([singleUrl]);
       }
     } else {
       message.error("No listing data found. Please select a listing to edit.");
@@ -119,14 +138,23 @@ const EditListing = () => {
 
     try {
       // Prepare update data
+      const businessImageFromUI = extractFileName(currentImages?.[0]);
       const updateData = {
-        title: values.name,
-        price: values.price,
+        title: values.title,
         category: values.category,
-        businessRole: values.businessRole,
-        location: values.location,
+        country: values.country,
+        business_image:
+          businessImageFromUI || extractFileName(values.business_image),
+        reason: values.reason,
+        subCategory: values.subCategory,
+        state: values.state,
+        city: values.city,
+        countryName: values.countryName,
+        askingPrice: values.askingPrice,
+        price: values.price,
+        ownerShipType: values.ownerShipType,
+        businessType: values.businessType,
         description: values.description,
-        images: currentImages, // Keep existing images
       };
 
       // Call update mutation
@@ -260,12 +288,12 @@ const EditListing = () => {
             {/* Left Column */}
             <div className="space-y-4">
               <Form.Item
-                label="Name"
-                name="name"
+                label="Title"
+                name="title"
                 rules={[
                   {
                     required: true,
-                    message: "Please input the listing name!",
+                    message: "Please input the listing title!",
                   },
                 ]}
               >
@@ -305,39 +333,52 @@ const EditListing = () => {
               >
                 <Input size="large" placeholder="Enter category" />
               </Form.Item>
+
+              <Form.Item label="Sub Category" name="subCategory">
+                <Input size="large" placeholder="Enter sub category" />
+              </Form.Item>
+
+              <Form.Item label="Business Type" name="businessType">
+                <Input size="large" placeholder="Enter business type" />
+              </Form.Item>
             </div>
 
             {/* Right Column */}
             <div className="space-y-4">
-              <Form.Item
-                label="Business Role"
-                name="businessRole"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please select a business role!",
-                  },
-                ]}
-              >
-                <Select size="large" placeholder="Select business role">
-                  <Option value="business">Business</Option>
-                  <Option value="franchise">Franchise</Option>
-                  <Option value="business-asset">Business Asset</Option>
-                  <Option value="business-idea">Business Idea</Option>
-                </Select>
+              <Form.Item label="Ownership Type" name="ownerShipType">
+                <Input size="large" placeholder="Enter ownership type" />
               </Form.Item>
 
-              <Form.Item
-                label="Location"
-                name="location"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input the location!",
-                  },
-                ]}
-              >
-                <Input size="large" placeholder="Enter location" />
+              <Form.Item label="Asking Price ($)" name="askingPrice">
+                <InputNumber
+                  size="large"
+                  className="w-full"
+                  min={0}
+                  formatter={(value) =>
+                    `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  }
+                  parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+                />
+              </Form.Item>
+
+              <Form.Item label="Country" name="country">
+                <Input size="large" placeholder="Enter country code" />
+              </Form.Item>
+
+              <Form.Item label="Country Name" name="countryName">
+                <Input size="large" placeholder="Enter country name" />
+              </Form.Item>
+
+              <Form.Item label="State" name="state">
+                <Input size="large" placeholder="Enter state" />
+              </Form.Item>
+
+              <Form.Item label="City" name="city">
+                <Input size="large" placeholder="Enter city" />
+              </Form.Item>
+
+              <Form.Item label="Reason" name="reason">
+                <Input size="large" placeholder="Enter selling reason" />
               </Form.Item>
             </div>
           </div>

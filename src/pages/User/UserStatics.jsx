@@ -6,7 +6,7 @@ const UserStats = ({ selectedUser }) => {
   const { data: singleUserData } = useGetSingleUserQuery({
     userId: selectedUser?._id,
   });
-  console.log("singleUserData of user stat", singleUserData);
+  // console.log("singleUserData of user stat", singleUserData);
   return (
     <div className="grid grid-cols-2">
       <div className="pb-6 pr-6 text-center border-b border-r">
