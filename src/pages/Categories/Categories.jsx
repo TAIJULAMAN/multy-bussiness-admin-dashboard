@@ -47,6 +47,7 @@ export default function Categories() {
     error,
     refetch,
   } = useGetAllCategoryQuery();
+  console.log("categoriesResponse from category", categoriesResponse);
   const [createCategory, { isLoading: isCreating }] =
     useCreateCategoryMutation();
   const [updateCategory, { isLoading: isUpdating }] =
@@ -64,6 +65,7 @@ export default function Categories() {
         : img1,
       categoryName: category.categoryName,
       totalSubcategories: category.subCategoryCount || 0,
+      subCategories: category.subCategories || [],
     })) || [];
 
   const handleAddCategory = async (values) => {
@@ -241,11 +243,13 @@ export default function Categories() {
     },
     {
       title: "Total Subcategories",
-      dataIndex: "totalSubcategories",
-      key: "totalSubcategories",
+      dataIndex: "subCategories",
+      key: "subCategories",
       width: 150,
       align: "center",
-      render: (count) => <span className="font-semibold">{count}</span>,
+      render: (subCategories) => (
+        <span className="font-semibold">{Array.isArray(subCategories) ? subCategories.length : 0}</span>
+      ),
     },
     {
       title: "View Subcategories",

@@ -2,7 +2,7 @@ import React from "react";
 import { useGetSingleUserQuery } from "../../redux/api/userApi";
 
 const UserStats = ({ selectedUser }) => {
-  // console.log("selected user from user stat", selectedUser);
+  console.log("selected user from user stat", selectedUser);
   const { data: singleUserData } = useGetSingleUserQuery({
     userId: selectedUser?._id,
   });
