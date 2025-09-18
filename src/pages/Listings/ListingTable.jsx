@@ -18,7 +18,6 @@ export default function ListingTable({ businessRole = "", status = "" }) {
   const [selectedListing, setSelectedListing] = useState(null);
   console.log("selectedListing", selectedListing);
   const [page, setPage] = useState(1);
-  const [selectedImage, setSelectedImage] = useState("/bus1.png");
   const navigate = useNavigate();
 
   // Fetch listings data from API with filters
@@ -28,7 +27,7 @@ export default function ListingTable({ businessRole = "", status = "" }) {
     page,
     limit: 10,
   });
-  console.log("listingsData from list page", listingsData);
+  // console.log("listingsData from list page", listingsData);
 
   // Update listing mutation
   const [updateListing, { isLoading: isUpdating }] = useUpdateListingMutation();

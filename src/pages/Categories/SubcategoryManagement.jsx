@@ -1,6 +1,6 @@
 import { Modal, Table, Button, Space, Pagination, Form, Input, message } from "antd";
 import { useState, useEffect } from "react";
-import { EditOutlined, DeleteOutlined, ArrowLeftOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import PageHeading from "../../Components/Shared/PageHeading";
 
