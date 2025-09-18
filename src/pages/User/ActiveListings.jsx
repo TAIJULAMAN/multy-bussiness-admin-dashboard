@@ -3,17 +3,18 @@ import React, { useState } from "react";
 import { FaRegEye } from "react-icons/fa";
 import img from "../../assets/product.png";
 import { useGetSingleUserQuery } from "../../redux/api/userApi";
-// import { useGetSingleUserQuery } from '../../redux/api/userApi';
 // import { imageUrl } from '../../Utils/server';
 
 const ActiveListings = ({ setIsModalOpen2, selectedUser }) => {
+    console.log("selectedUser from active listing", selectedUser);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   console.log("selectedItem", selectedItem);
-  const { data: singleUser, isLoading } = useGetSingleUserQuery({
-    user: selectedUser?.key,
-  });
-  console.log("singleUser", singleUser?.data?.approvedBusiness);
+  const { data: singleUser, isLoading } = useGetSingleUserQuery(
+    { userId: selectedUser?._id },
+    { skip: !selectedUser?._id }
+  );
+  console.log("singleUser of active list table", singleUser);
 
   const showModal = (record) => {
     setSelectedItem(record);
@@ -29,32 +30,40 @@ const ActiveListings = ({ setIsModalOpen2, selectedUser }) => {
   const dataSource = singleUser?.data?.approvedBusiness?.map((item, index) => ({
             key: index + 1,
             no: index + 1,
-            name: item?.name || "No Name",
-            price: item?.price || "N/A",
-            category_name: item?.category_name || "N/A",
-            img: item?.img || "N/A",
-            condition: item?.condition || "N/A",
-            description: item?.description || "N/A",
+            name: item?.title || "No Name",
+            askingPrice: item?.askingPrice || "N/A",
+            date: item?.createdAt || "N/A",
+            category_name: item?.category || "N/A",
             status: item?.status || "N/A",
-            user: item?.user_name || "N/A",
-            user_id: item?.user_id || "N/A",
+            user: item?.userData?.name || "N/A",
+            user_id: item?.userData?._id || "N/A",
+            role: item?.userData?.role || "N/A",
+            country: item?.country || "N/A",
 
   }));
 
   const columns = [
     { title: "No", dataIndex: "no", key: "no" },
     { title: "Name", dataIndex: "name", key: "name" },
-    { title: "Contact Number", dataIndex: "phone", key: "phone" },
+    { title: "Asking Price", dataIndex: "askingPrice", key: "askingPrice" },
+    {
+      title: "Date",
+      dataIndex: "date",
+      key: "date",
+      render: (value) =>
+        value ? new Date(value).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: '2-digit' }) : "N/A",
+    },
+    { title: "Category", dataIndex: "category_name", key: "category_name" },
     {
       title: "User Role",
-      dataIndex: "userRole",
+      dataIndex: "role",
       render: (_, record) => (
-        <Tag color="blue">{record?.userRole || "No Role"}</Tag>
+        <Tag color="blue">{record?.role || "No Role"}</Tag>
       ),
     },
     { title: "Country", dataIndex: "country", key: "country" },
 
-    { title: "Category", dataIndex: "category_name", key: "category_name" },
+   
     {
       title: "Action",
       key: "action",
