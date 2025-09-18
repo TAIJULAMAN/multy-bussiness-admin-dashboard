@@ -28,7 +28,7 @@ export default function ListingTable({ businessRole = "", status = "" }) {
     page,
     limit: 10,
   });
-  // console.log("listingsData", listingsData);
+  console.log("listingsData from list page", listingsData);
 
   // Update listing mutation
   const [updateListing, { isLoading: isUpdating }] = useUpdateListingMutation();
@@ -38,20 +38,25 @@ export default function ListingTable({ businessRole = "", status = "" }) {
     setIsModalOpen(true);
   };
 
-  // Handle approve listing
   const handleApprove = async () => {
     if (!selectedListing) return;
     console.log(selectedListing._id);
     try {
+      const wasApproved = selectedListing?.isApproved === true;
       await updateListing({
         businessId: selectedListing._id,
-        // data: { status: "approved" }
       }).unwrap();
 
       Swal.fire({
         icon: "success",
-        title: "Approved!",
-        text: "Listing has been approved successfully!",
+        title: wasApproved ? "Rejected!" : "Approved!",
+        text: wasApproved
+          ? `Listing "${
+              selectedListing?.title || ""
+            }" has been rejected successfully!`
+          : `Listing "${
+              selectedListing?.title || ""
+            }" has been approved successfully!`,
         timer: 2000,
         showConfirmButton: false,
       });
@@ -66,47 +71,6 @@ export default function ListingTable({ businessRole = "", status = "" }) {
     }
   };
 
-  // Handle reject listing
-  const handleReject = async () => {
-    if (!selectedListing) return;
-
-    Swal.fire({
-      title: "Are you sure?",
-      text: `You are about to reject "${selectedListing.title}" listing. This action can be reversed later.`,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, reject it!",
-      cancelButtonText: "Cancel",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          await updateListing({
-            _id: selectedListing._id,
-            data: { status: "rejected" },
-          }).unwrap();
-
-          Swal.fire({
-            icon: "success",
-            title: "Rejected!",
-            text: "Listing has been rejected successfully!",
-            timer: 2000,
-            showConfirmButton: false,
-          });
-
-          setIsModalOpen(false);
-        } catch (error) {
-          Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: "Failed to reject listing. Please try again.",
-          });
-        }
-      }
-    });
-  };
-
   const dataSource = listingsData?.data?.map((listing, index) => ({
     key: listing._id || index,
     no: index + 1 + (page - 1) * 10,
@@ -116,11 +80,22 @@ export default function ListingTable({ businessRole = "", status = "" }) {
     productName: listing?.title || "N/A",
     catrgory: listing?.category || "N/A",
     productImg: listing?.image,
-    price: listing?.price || 0,
+    price: listing?.price || "N/A",
     date: listing?.createdAt
       ? new Date(listing?.createdAt).toLocaleDateString()
       : "N/A",
-    country: listing?.countryName || "N/A",
+    title: listing?.title,
+    category: listing?.category || "N/A",
+    subCategory: listing?.subCategory || "N/A",
+    businessType: listing?.businessType || "N/A",
+    ownerShipType: listing?.ownerShipType || "N/A",
+    askingPrice: listing?.askingPrice || "N/A",
+    countryName: listing?.countryName || "N/A",
+    state: listing?.state || "N/A",
+    city: listing?.city || "N/A",
+    reason: listing?.reason || "N/A",
+    description: listing?.description || "N/A",
+    isApproved: listing?.isApproved || "N/A",
     ...listing,
   }));
 
@@ -186,8 +161,8 @@ export default function ListingTable({ businessRole = "", status = "" }) {
     },
     {
       title: "business location",
-      dataIndex: "country",
-      key: "country",
+      dataIndex: "countryName",
+      key: "countryName",
     },
     {
       title: "Action",
@@ -276,7 +251,11 @@ export default function ListingTable({ businessRole = "", status = "" }) {
             <div className="mb-4">
               <img
                 src={
-                  selectedListing?.image
+                  selectedListing?.business_image
+                    ? `${getImageBaseUrl()}/business-image/${
+                        selectedListing.business_image
+                      }`
+                    : selectedListing?.image
                     ? `${getImageBaseUrl()}/business-image/${
                         selectedListing.image
                       }`

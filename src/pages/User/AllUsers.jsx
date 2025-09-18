@@ -1,5 +1,5 @@
 import { ConfigProvider, Modal, Table, Tag } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AiOutlineMail, AiOutlinePhone } from "react-icons/ai";
 import { FaRegEye } from "react-icons/fa";
 import { MdBlockFlipped } from "react-icons/md";
@@ -12,9 +12,7 @@ import {
   useUpdateUserMutation,
 } from "../../redux/api/userApi";
 import Loader from "../../Components/Shared/Loaders/Loader";
-
-// import { imageUrl } from "../../Utils/server";
-// import Loader from "../../Components/Shared/Loaders/Loader";
+import { useDebounced } from "../../Utils/hook";
 
 const AllUsers = ({ search }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -22,13 +20,21 @@ const AllUsers = ({ search }) => {
   const [isModalOpen2, setIsModalOpen2] = useState(false);
   const [activeTab, setActiveTab] = useState("User Statics");
   const [selectedUser, setSelectedUser] = useState(null);
-  console.log("selectedUser of user page", selectedUser?._id);
+  const debouncedSearch = useDebounced({ searchTerm: search || "", delay: 400 });
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch]);
 
-  const { data: usersData, isLoading, refetch } = useGetAllUserQuery();
-  // console.log("usersData", usersData);
-  const users = usersData?.data;
-  // const { data: userData, isLoading } = useGetAllUserQuery({ search, page });
+  const { data: usersData, isLoading } = useGetAllUserQuery({
+    page,
+    searchText: debouncedSearch,
+  });
+
   const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
+  const users = usersData?.data;
+  const metaPage = usersData?.meta?.page || page || 1;
+  const metaLimit = usersData?.meta?.limit || 10;
+  const metaTotal = usersData?.meta?.total || users?.length || 0;
 
   const showModal = (user) => {
     setSelectedUser(user);
@@ -40,23 +46,11 @@ const AllUsers = ({ search }) => {
     setIsModalOpen2(true);
   };
 
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleCancel2 = () => {
-    setIsModalOpen2(false);
-  };
-
-  const userId = selectedUser?._id;
   const handleBlock = async () => {
-    if (userId) {
+    if (selectedUser?._id) {
       try {
-        console.log("handleBlock - selectedUser._id:", selectedUser._id);
-        await updateUser(userId).unwrap();
-        await refetch(); // Refetch the user list to get updated data
+        await updateUser(selectedUser?._id).unwrap();
         setIsModalOpen(false);
-        console.log("User updated successfully");
       } catch (error) {
         console.error("Failed to update user:", error);
       }
@@ -67,7 +61,7 @@ const AllUsers = ({ search }) => {
     {
       title: "No",
       key: "no",
-      render: (_, record, index) => index + 1,
+      render: (_, __, index) => (metaPage - 1) * metaLimit + (index + 1),
     },
     {
       title: "Name",
@@ -124,9 +118,7 @@ const AllUsers = ({ search }) => {
           >
             <MdBlockFlipped
               className={`w-8 h-8 ${
-                record?.isBlocked === true
-                  ? "text-red-500"
-                  : "text-green-500"
+                record?.isBlocked === true ? "text-red-500" : "text-green-500"
               }`}
             />
           </button>
@@ -170,25 +162,24 @@ const AllUsers = ({ search }) => {
       <Table
         dataSource={users}
         columns={columns}
-        // pagination={{
-        //   pageSize: userData?.pagination?.itemPerPage,
-        //   total: userData?.pagination?.totalItems,
-        //   current: userData?.pagination?.currentPage,
-        //   showSizeChanger: false,
-        //   onChange: (page) => setPage(page),
-        // }}
         pagination={{
-          pageSize: 10,
-          total: users.length,
-          current: 1,
-          showSizeChanger: false,
-          onChange: (page) => setPage(page),
+          pageSize: metaLimit,
+          total: metaTotal,
+          current: metaPage,
+          onChange: (newPage) => setPage(newPage),
         }}
         scroll={{ x: "max-content" }}
       />
 
       {/* Block Modal */}
-      <Modal open={isModalOpen} centered onCancel={handleCancel} footer={null}>
+      <Modal
+        open={isModalOpen}
+        centered
+        onCancel={() => {
+          setIsModalOpen(false);
+        }}
+        footer={null}
+      >
         <div className="flex flex-col justify-center items-center py-10">
           <img src={img} alt="Confirmation" className="w-40 h-40 mb-5" />
           <p className="text-3xl text-center text-gray-800">Warning!</p>
@@ -197,7 +188,9 @@ const AllUsers = ({ search }) => {
           </p>
           <div className="text-center py-5 w-full flex justify-center gap-4">
             <button
-              onClick={handleCancel}
+              onClick={() => {
+                setIsModalOpen(false);
+              }}
               className="border-2 border-[#14803c] text-gray-800 font-semibold w-1/3 py-3 px-5 rounded-lg"
             >
               Cancel
@@ -217,7 +210,9 @@ const AllUsers = ({ search }) => {
       <Modal
         open={isModalOpen2}
         centered
-        onCancel={handleCancel2}
+        onCancel={() => {
+          setIsModalOpen2(false);
+        }}
         footer={null}
       >
         <div className="w-full max-w-md p-5 relative mx-auto">
