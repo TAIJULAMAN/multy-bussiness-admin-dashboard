@@ -28,6 +28,7 @@ export const baseApi = createApi({
     "coupon",
     "earning",
     "subscriber",
+    "subscription",
     "profile",
     "category",
     "listings",

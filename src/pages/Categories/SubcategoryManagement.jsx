@@ -1,15 +1,21 @@
-import { Modal, Table, Button, Space, Pagination, Form, Input, message } from "antd";
+import {
+  Modal,
+  Table,
+  Button,
+  Space,
+  Pagination,
+  Form,
+  Input,
+  message,
+} from "antd";
 import { useState, useEffect } from "react";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import PageHeading from "../../Components/Shared/PageHeading";
+import { skipToken } from "@reduxjs/toolkit/query";
+import { useGetAllSubCategoryQuery, useCreateSubCategoryMutation, useUpdateSubCategoryMutation, useDeleteSubCategoryMutation } from "../../redux/api/subCatagoryApi";
 
 export default function SubcategoryManagement() {
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const categoryId = searchParams.get('categoryId');
-  const categoryName = searchParams.get('categoryName');
-  
   const [selectedSubcategory, setSelectedSubcategory] = useState(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -18,63 +24,57 @@ export default function SubcategoryManagement() {
   const [pageSize, setPageSize] = useState(10);
   const [subcategories, setSubcategories] = useState([]);
   const [loading, setLoading] = useState(false);
-  
+
   const [addForm] = Form.useForm();
   const [editForm] = Form.useForm();
 
-  // Initialize subcategories data
+  const [searchParams] = useSearchParams();
+  const categoryId = searchParams.get("categoryId");
+
+  const {
+    data: subcategoriesData,
+    isLoading: isSubLoading,
+    isError: isSubError,
+  } = useGetAllSubCategoryQuery(categoryId ? { categoryId } : skipToken);
+  console.log(subcategoriesData);
+
+  // Update mutation
+  const [updateSubCategory, { isLoading: isUpdating }] = useUpdateSubCategoryMutation();
+  // Create mutation
+  const [createSubCategory, { isLoading: isCreating }] = useCreateSubCategoryMutation();
+  // Delete mutation
+  const [deleteSubCategory, { isLoading: isDeleting }] = useDeleteSubCategoryMutation();
+
   useEffect(() => {
-    const initialData = [
-      {
-        key: 1,
-        id: 1,
-        subcategoryName: "Fast Food",
-        listingsCount: 25,
-      },
-      {
-        key: 2,
-        id: 2,
-        subcategoryName: "Fine Dining",
-        listingsCount: 12,
-      },
-      {
-        key: 3,
-        id: 3,
-        subcategoryName: "Coffee Shops",
-        listingsCount: 18,
-      },
-      {
-        key: 4,
-        id: 4,
-        subcategoryName: "Bakeries",
-        listingsCount: 8,
-      },
-      {
-        key: 5,
-        id: 5,
-        subcategoryName: "Food Trucks",
-        listingsCount: 15,
-      },
-    ];
-    setSubcategories(initialData);
-  }, []);
+    if (!subcategoriesData) return;
+    const list = subcategoriesData?.data ?? subcategoriesData ?? [];
+    const rows = list.map((item, idx) => ({
+      key: idx + 1,
+      id: item._id || item.id || `${idx}`,
+      subcategoryName: item.subcategoryName || item.name || "Untitled",
+      listingsCount: item?.businessCount ?? 0,
+    }));
+    setSubcategories(rows);
+  }, [subcategoriesData]);
 
   // Handle Add Subcategory
   const handleAddSubcategory = async (values) => {
+    if (!categoryId) {
+      message.error("Missing categoryId");
+      return;
+    }
     setLoading(true);
     try {
-      const newSubcategory = {
-        key: subcategories.length + 1,
-        id: subcategories.length + 1,
-        subcategoryName: values.subcategoryName,
-        listingsCount: 0,
-      };
-      setSubcategories([...subcategories, newSubcategory]);
+      await createSubCategory({
+        name: values.subcategoryName,
+        categoryId,
+      }).unwrap();
+
       setAddModalOpen(false);
       addForm.resetFields();
-      message.success('Subcategory added successfully!');
+      message.success("Subcategory added successfully!");
     } catch (error) {
-      message.error('Failed to add subcategory');
+      message.error("Failed to add subcategory");
     } finally {
       setLoading(false);
     }
@@ -82,20 +82,23 @@ export default function SubcategoryManagement() {
 
   // Handle Edit Subcategory
   const handleEditSubcategory = async (values) => {
+    if (!selectedSubcategory?.id) {
+      message.error("No subcategory selected");
+      return;
+    }
     setLoading(true);
     try {
-      const updatedSubcategories = subcategories.map(sub => 
-        sub.id === selectedSubcategory.id 
-          ? { ...sub, subcategoryName: values.subcategoryName }
-          : sub
-      );
-      setSubcategories(updatedSubcategories);
+      await updateSubCategory({
+        subCategoryId: selectedSubcategory.id,
+        data: { name: values.subcategoryName },
+      }).unwrap();
+      // Close modal and reset form; list will refetch due to cache invalidation
       setEditModalOpen(false);
       editForm.resetFields();
       setSelectedSubcategory(null);
-      message.success('Subcategory updated successfully!');
+      message.success("Subcategory updated successfully!");
     } catch (error) {
-      message.error('Failed to update subcategory');
+      message.error("Failed to update subcategory");
     } finally {
       setLoading(false);
     }
@@ -103,15 +106,18 @@ export default function SubcategoryManagement() {
 
   // Handle Delete Subcategory
   const handleDeleteSubcategory = async () => {
+    if (!selectedSubcategory?.id) {
+      message.error("No subcategory selected");
+      return;
+    }
     setLoading(true);
     try {
-      const updatedSubcategories = subcategories.filter(sub => sub.id !== selectedSubcategory.id);
-      setSubcategories(updatedSubcategories);
+      await deleteSubCategory({ subCategoryId: selectedSubcategory.id }).unwrap();
       setDeleteModalOpen(false);
       setSelectedSubcategory(null);
-      message.success('Subcategory deleted successfully!');
+      message.success("Subcategory deleted successfully!");
     } catch (error) {
-      message.error('Failed to delete subcategory');
+      message.error("Failed to delete subcategory");
     } finally {
       setLoading(false);
     }
@@ -121,7 +127,7 @@ export default function SubcategoryManagement() {
   const openEditModal = (record) => {
     setSelectedSubcategory(record);
     editForm.setFieldsValue({
-      subcategoryName: record.subcategoryName
+      subcategoryName: record.subcategoryName,
     });
     setEditModalOpen(true);
   };
@@ -134,7 +140,7 @@ export default function SubcategoryManagement() {
 
   const columns = [
     {
-      title: "Sl",
+      title: "No",
       dataIndex: "key",
       key: "sl",
       width: 60,
@@ -184,7 +190,7 @@ export default function SubcategoryManagement() {
   return (
     <>
       <div className="flex justify-between items-center mb-5">
-        <PageHeading title={`${categoryName || 'Category'} - Subcategories Management`} />
+        <PageHeading title="Subcategories Management" />
         <div className="text-white">
           <Button
             type="primary"
@@ -204,8 +210,11 @@ export default function SubcategoryManagement() {
           pagination={false}
           scroll={{ x: 800 }}
           className="custom-table"
-          loading={loading}
+          loading={loading || isSubLoading || isUpdating || isCreating || isDeleting}
         />
+        {isSubError && (
+          <div className="text-red-500 px-4 py-2">Failed to load subcategories.</div>
+        )}
 
         <div className="flex justify-center py-5">
           <Pagination
@@ -246,19 +255,22 @@ export default function SubcategoryManagement() {
             label="Subcategory Name"
             name="subcategoryName"
             rules={[
-              { required: true, message: 'Please enter subcategory name' },
-              { min: 2, message: 'Subcategory name must be at least 2 characters' },
-              { max: 50, message: 'Subcategory name cannot exceed 50 characters' }
+              { required: true, message: "Please enter subcategory name" },
+              {
+                min: 2,
+                message: "Subcategory name must be at least 2 characters",
+              },
+              {
+                max: 50,
+                message: "Subcategory name cannot exceed 50 characters",
+              },
             ]}
           >
-            <Input 
-              placeholder="Enter subcategory name"
-              size="large"
-            />
+            <Input placeholder="Enter subcategory name" size="large" />
           </Form.Item>
-          
+
           <div className="flex justify-end gap-2 mt-6">
-            <Button 
+            <Button
               onClick={() => {
                 setAddModalOpen(false);
                 addForm.resetFields();
@@ -267,8 +279,8 @@ export default function SubcategoryManagement() {
             >
               Cancel
             </Button>
-            <Button 
-              type="primary" 
+            <Button
+              type="primary"
               htmlType="submit"
               loading={loading}
               size="large"
@@ -302,19 +314,22 @@ export default function SubcategoryManagement() {
             label="Subcategory Name"
             name="subcategoryName"
             rules={[
-              { required: true, message: 'Please enter subcategory name' },
-              { min: 2, message: 'Subcategory name must be at least 2 characters' },
-              { max: 50, message: 'Subcategory name cannot exceed 50 characters' }
+              { required: true, message: "Please enter subcategory name" },
+              {
+                min: 2,
+                message: "Subcategory name must be at least 2 characters",
+              },
+              {
+                max: 50,
+                message: "Subcategory name cannot exceed 50 characters",
+              },
             ]}
           >
-            <Input 
-              placeholder="Enter subcategory name"
-              size="large"
-            />
+            <Input placeholder="Enter subcategory name" size="large" />
           </Form.Item>
-          
+
           <div className="flex justify-end gap-2 mt-6">
-            <Button 
+            <Button
               onClick={() => {
                 setEditModalOpen(false);
                 editForm.resetFields();
@@ -324,8 +339,8 @@ export default function SubcategoryManagement() {
             >
               Cancel
             </Button>
-            <Button 
-              type="primary" 
+            <Button
+              type="primary"
               htmlType="submit"
               loading={loading}
               size="large"
@@ -353,13 +368,14 @@ export default function SubcategoryManagement() {
             <DeleteOutlined className="text-red-500 text-4xl mb-2" />
             <p className="text-lg font-medium mb-2">Are you sure?</p>
             <p className="text-gray-600">
-              Do you want to delete the subcategory "{selectedSubcategory?.subcategoryName}"? 
-              This action cannot be undone.
+              Do you want to delete the subcategory "
+              {selectedSubcategory?.subcategoryName}"? This action cannot be
+              undone.
             </p>
           </div>
-          
+
           <div className="flex justify-center gap-3 mt-6">
-            <Button 
+            <Button
               onClick={() => {
                 setDeleteModalOpen(false);
                 setSelectedSubcategory(null);
@@ -368,8 +384,8 @@ export default function SubcategoryManagement() {
             >
               Cancel
             </Button>
-            <Button 
-              type="primary" 
+            <Button
+              type="primary"
               danger
               onClick={handleDeleteSubcategory}
               loading={loading}

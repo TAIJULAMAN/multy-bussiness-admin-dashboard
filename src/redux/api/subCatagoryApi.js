@@ -3,39 +3,44 @@ import { baseApi } from "./baseApi";
 const subCategoryApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getAllSubCategory: builder.query({
-      query: () => ({
-        url: "category/get-all-category",
+      query: ({ categoryId }) => ({
+        url: "category/get-all-subcategory",
         method: "GET",
+        params: { categoryId },
       }),
       providesTags: ["category"],
+    }),
+    createSubCategory: builder.mutation({
+      query: (data) => ({
+        url: "category/create-sub-category",
+        method: "POST",
+        body: data, // expects { name, categoryId }
+      }),
+      invalidatesTags: ["category"],
+    }),
+    updateSubCategory: builder.mutation({
+      query: ({ subCategoryId, data }) => ({
+        url: "category/update-sub-category",
+        method: "PATCH",
+        params: { subCategoryId },
+        body: data,
+      }),
+      invalidatesTags: ["category"],
+    }),
+    deleteSubCategory: builder.mutation({
+      query: ({ subCategoryId }) => ({
+        url: "category/delete-sub-category",
+        method: "DELETE",
+        params: { subCategoryId },
+      }),
+      invalidatesTags: ["category"],
     }),
   }),
 });
 
-export const { useGetAllSubCategoryQuery } = subCategoryApi;
-
-// createCategory: builder.mutation({
-//     query: (data) => ({
-//       url: "category/create-category",
-//       method: "POST",
-//       body: data,
-//     }),
-//     invalidatesTags: ["category"],
-//   }),
-//   updateCategory: builder.mutation({
-//     query: ({ categoryId, data }) => ({
-//       url: `category/update-category`,
-//       method: "PATCH",
-//       params: { categoryId },
-//       body: data,
-//     }),
-//     invalidatesTags: ["category"],
-//   }),
-//   deleteCategory: builder.mutation({
-//     query: (categoryId) => ({
-//       url: `category/delete-category`,
-//       method: "DELETE",
-//       params: { categoryId },
-//     }),
-//     invalidatesTags: ["category"],
-//   }),
+export const {
+  useGetAllSubCategoryQuery,
+  useCreateSubCategoryMutation,
+  useUpdateSubCategoryMutation,
+  useDeleteSubCategoryMutation,
+} = subCategoryApi;
