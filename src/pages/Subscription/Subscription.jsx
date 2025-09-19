@@ -219,20 +219,15 @@ export default function Subscription({ role }) {
     const sub = plans[selectedPlan];
     const featurePayload = tempFeatures.map((f) => (typeof f === "string" ? f : f.text));
     updateSubscriptionPlan({
-      subscriptionId: sub.subscriptionId || sub.id,
+      subscriptionId: sub.id,
       role,
       data: { features: featurePayload },
     })
       .unwrap()
-      .then((res) => {
-        // Prefer server response
-        const serverFeaturesRaw = res?.data?.features;
-        const normalized = Array.isArray(serverFeaturesRaw)
-          ? serverFeaturesRaw.map((t, i) => ({ id: i + 1, text: typeof t === "string" ? t : String(t) }))
-          : tempFeatures;
+      .then(() => {
         setPlans((prev) => ({
           ...prev,
-          [selectedPlan]: { ...prev[selectedPlan], features: normalized },
+          [selectedPlan]: { ...prev[selectedPlan], features: [...tempFeatures] },
         }));
         setIsFeatureModalOpen(false);
         toast.success("Features updated");

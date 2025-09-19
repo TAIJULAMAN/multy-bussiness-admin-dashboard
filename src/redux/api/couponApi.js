@@ -3,9 +3,10 @@ import { baseApi } from "./baseApi";
 const couponApis = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     get_all_coupon: builder.query({
-      query: () => ({
+      query: ({ page }) => ({
         url: "coupon/get-all-coupon",
         method: "GET",
+        params: { page },
       }),
       providesTags: ["coupon"],
     }),

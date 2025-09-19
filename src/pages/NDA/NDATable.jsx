@@ -9,11 +9,8 @@ function NDATable({ data = [], ndaData }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedNDA, setSelectedNDA] = useState(null);
 
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
 
-  // Transform NDA data for table display
+
   const dataSource =
     data?.map((nda, index) => ({
       key: nda?._id || index,
@@ -27,6 +24,7 @@ function NDATable({ data = [], ndaData }) {
       date: new Date(nda?.createdAt).toLocaleDateString() || "N/A",
       ...nda,
     })) || [];
+    
   const columns = [
     {
       title: "No",
@@ -128,7 +126,9 @@ function NDATable({ data = [], ndaData }) {
       <Modal
         open={isModalOpen}
         centered
-        onCancel={handleCancel}
+        onCancel={() => {
+          setIsModalOpen(false);
+        }}
         footer={null}
         title="NDA Details"
       >
