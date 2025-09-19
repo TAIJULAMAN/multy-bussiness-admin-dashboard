@@ -54,7 +54,6 @@ export default function Categories() {
     useUpdateCategoryMutation();
   const [deleteCategory, { isLoading: isDeleting }] =
     useDeleteCategoryMutation();
-  console.log("categoriesResponse from category", categoriesResponse);
 
   const categoriesData =
     categoriesResponse?.data?.map((category, index) => ({
@@ -65,7 +64,6 @@ export default function Categories() {
         : img1,
       categoryName: category.categoryName,
       totalSubcategories: category.subCategoryCount || 0,
-      subCategories: category.subCategories || [],
     })) || [];
 
   const handleAddCategory = async (values) => {
@@ -243,13 +241,9 @@ export default function Categories() {
     },
     {
       title: "Total Subcategories",
-      dataIndex: "subCategories",
-      key: "subCategories",
+      dataIndex: "totalSubcategories",
+      key: "totalSubcategories",
       width: 150,
-      align: "center",
-      render: (subCategories) => (
-        <span className="font-semibold">{Array.isArray(subCategories) ? subCategories.length : 0}</span>
-      ),
     },
     {
       title: "View Subcategories",
@@ -260,11 +254,7 @@ export default function Categories() {
         <Button
           type="primary"
           className="bg-blue-500"
-          onClick={() =>
-            navigate(
-              `/subcategories?categoryId=${record.id}&categoryName=${record.categoryName}`
-            )
-          }
+          onClick={() => navigate(`/subcategories?categoryId=${record.id}`)}
         >
           View
         </Button>
