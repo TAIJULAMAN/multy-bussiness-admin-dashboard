@@ -2,18 +2,25 @@ import React from "react";
 import { ConfigProvider, Table } from "antd";
 import { useGetAllSubscriberQuery } from "../../redux/api/allSubscriberApi";
 import Loader from "../../Components/Shared/Loaders/Loader";
+import { useState } from "react";
 
 export default function AllSubscriber() {
-  const { data: subscriberData, isLoading } = useGetAllSubscriberQuery();
-  console.log("subscriberData", subscriberData);
+  const [page, setPage] = useState(1);
+  const { data: subscriberData, isLoading } = useGetAllSubscriberQuery({
+    page,
+  });
 
-  // Map API data to table format
   const dataSource =
     subscriberData?.data?.map((subscriber, index) => ({
       key: subscriber._id || index.toString(),
       no: index + 1,
       email: subscriber.email || "No Email",
     })) || [];
+
+  const metaPage = subscriberData?.meta?.page || page || 1;
+  const metaLimit = subscriberData?.meta?.limit || 10;
+  const metaTotal = subscriberData?.meta?.total || dataSource?.length || 0;
+
   const columns = [
     {
       title: "No",
@@ -40,12 +47,12 @@ export default function AllSubscriber() {
             activeBorderColor: "#14803c",
           },
           Pagination: {
-            colorPrimary: "#14803c",
-            colorPrimaryHover: "#14803c",
-            itemActiveBg: "#14803c",
+            colorPrimary: "#0091ff",
+            colorPrimaryHover: "#0091ff",
+            itemActiveBg: "#0091ff",
             itemActiveColor: "#ffffff",
-            colorBgTextHover: "#14803c",
-            colorText: "#14803c",
+            colorBgTextHover: "#0091ff",
+            colorText: "#0091ff",
           },
           Table: {
             headerBg: "#0091ff",
@@ -60,11 +67,10 @@ export default function AllSubscriber() {
         dataSource={dataSource}
         columns={columns}
         pagination={{
-          pageSize: 10,
-          showSizeChanger: true,
-          showQuickJumper: true,
-          showTotal: (total, range) =>
-            `${range[0]}-${range[1]} of ${total} subscribers`,
+          pageSize: metaLimit,
+          total: metaTotal,
+          current: metaPage,
+          onChange: (newPage) => setPage(newPage),
         }}
         scroll={{ x: "max-content" }}
       />
