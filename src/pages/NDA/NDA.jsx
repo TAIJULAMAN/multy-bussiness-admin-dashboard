@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import PageHeading from "../../Components/Shared/PageHeading";
 import NDATable from "./NDATable";
 import { useGetAllNDAQuery } from "../../redux/api/NDAApi";
+import Loader from "../../Components/Shared/Loaders/Loader";
 
 const NDA = () => {
   const [activeTab, setActiveTab] = useState("sellerNDA");
+  const [page, setPage] = useState(1);
 
-
-  const { data: ndaData, isLoading } = useGetAllNDAQuery();
-  console.log("NDA Data:", ndaData);
+  const { data: ndaData, isLoading } = useGetAllNDAQuery({ page });
 
   const getFilteredNDAData = () => {
     if (!ndaData?.data) return [];
@@ -39,7 +39,7 @@ const NDA = () => {
     const filteredData = getFilteredNDAData();
     return (
       <div className="p-4">
-        <NDATable data={filteredData} />
+        <NDATable data={filteredData} ndaData={ndaData} page={page} setPage={setPage} />
       </div>
     );
   };
@@ -50,6 +50,8 @@ const NDA = () => {
         ? "bg-[#0091ff] !text-white border border-[#0091ff] !border-b-0"
         : "text-[#0091ff] hover:bg-[#0091ff]"
     }`;
+
+  if (isLoading) return <Loader />;
 
   return (
     <div>

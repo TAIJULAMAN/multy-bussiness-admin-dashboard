@@ -3,9 +3,10 @@ import { baseApi } from "./baseApi";
 const ndaApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getAllNDA: builder.query({
-      query: () => ({
+      query: ({ page }) => ({
         url: "agreement/get-all-agreement",
         method: "GET",
+        params: { page },
       }),
       providesTags: ["NDA"],
     }),

@@ -34,10 +34,12 @@ function Coupon() {
   const [editingRecord, setEditingRecord] = useState(null);
   const { Option } = Select;
 
-  const { data, isLoading } = useGet_all_couponQuery();
+  const { data, isLoading } = useGet_all_couponQuery({ page });
   const [addCoupon, { isLoading: isAddingCoupon }] = useAdd_couponMutation();
-  const [updateCoupon, { isLoading: isUpdatingCoupon }] = useUpdate_couponMutation();
-  const [deleteCoupon, { isLoading: isDeletingCoupon }] = useDelete_couponMutation();
+  const [updateCoupon, { isLoading: isUpdatingCoupon }] =
+    useUpdate_couponMutation();
+  const [deleteCoupon, { isLoading: isDeletingCoupon }] =
+    useDelete_couponMutation();
 
   const dataSource =
     data?.data?.map((coupon, index) => ({
@@ -224,6 +226,10 @@ function Coupon() {
     return <Loader />;
   }
 
+  const metaPage = data?.meta?.page || page || 1;
+  const metaLimit = data?.meta?.limit || 10;
+  const metaTotal = data?.meta?.total || data?.length || 0;
+
   return (
     <div className="p-5">
       <div className="flex items-center justify-between mb-5">
@@ -262,11 +268,10 @@ function Coupon() {
           loading={isLoading}
           scroll={{ x: "max-content" }}
           pagination={{
-            pageSize: 10,
-            total: dataSource?.length,
-            current: page,
-            showSizeChanger: false,
-            onChange: (page) => setPage(page),
+            pageSize: metaLimit,
+            total: metaTotal,
+            current: metaPage,
+            onChange: (newPage) => setPage(newPage),
           }}
         />
       </ConfigProvider>
@@ -396,7 +401,7 @@ function Coupon() {
             className="bg-[#0091FF] !text-white rounded  py-3 w-1/2 disabled:opacity-50"
             disabled={isAddingCoupon || isUpdatingCoupon}
           >
-            {(isAddingCoupon || isUpdatingCoupon) ? (
+            {isAddingCoupon || isUpdatingCoupon ? (
               <div className="flex items-center justify-center gap-2">
                 <Spin size="small" />
                 {editingRecord ? "Updating..." : "Adding..."}

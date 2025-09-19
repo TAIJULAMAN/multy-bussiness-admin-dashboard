@@ -2,11 +2,14 @@ import React from "react";
 import { ConfigProvider, Table } from "antd";
 import Loader from "../../Components/Shared/Loaders/Loader";
 import { useGetEarningQuery } from "../../redux/api/earningApi";
+import { useState } from "react";
 
 const TransactionTable = () => {
+  const [page, setPage] = useState(1);
   const currentYear = new Date().getFullYear();
   const { data: earningData, isLoading } = useGetEarningQuery({
     year: currentYear,
+    page,
   });
 
   const dataSource = earningData?.data?.allPayment
@@ -70,6 +73,10 @@ const TransactionTable = () => {
     return <Loader />;
   }
 
+  const metaPage = earningData?.meta?.page || page || 1;
+  const metaLimit = earningData?.meta?.limit || 10;
+  const metaTotal = earningData?.meta?.total || dataSource?.length || 0;
+
   return (
     <>
       <ConfigProvider
@@ -77,6 +84,14 @@ const TransactionTable = () => {
           components: {
             InputNumber: {
               activeBorderColor: "#14803c",
+            },
+            Pagination: {
+              colorPrimary: "#0091ff",
+              colorPrimaryHover: "#0091ff",
+              itemActiveBg: "#0091ff",
+              itemActiveColor: "#ffffff",
+              colorBgTextHover: "#0091ff",
+              colorText: "#0091ff",
             },
             Table: {
               headerBg: "#0091FF",
@@ -90,7 +105,12 @@ const TransactionTable = () => {
         <Table
           dataSource={dataSource}
           columns={columns}
-          pagination={false}
+          pagination={{
+            pageSize: metaLimit,
+            total: metaTotal,
+            current: metaPage,
+            onChange: (newPage) => setPage(newPage),
+          }}
           scroll={{ x: "max-content" }}
         />
       </ConfigProvider>

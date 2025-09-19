@@ -3,25 +3,28 @@ import {
   Table,
   Button,
   Space,
-  Pagination,
   Form,
   Input,
   message,
+  ConfigProvider,
 } from "antd";
 import { useState, useEffect } from "react";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useSearchParams } from "react-router-dom";
 import PageHeading from "../../Components/Shared/PageHeading";
-import { skipToken } from "@reduxjs/toolkit/query";
-import { useGetAllSubCategoryQuery, useCreateSubCategoryMutation, useUpdateSubCategoryMutation, useDeleteSubCategoryMutation } from "../../redux/api/subCatagoryApi";
+import {
+  useGetAllSubCategoryQuery,
+  useCreateSubCategoryMutation,
+  useUpdateSubCategoryMutation,
+  useDeleteSubCategoryMutation,
+} from "../../redux/api/subCatagoryApi";
 
 export default function SubcategoryManagement() {
   const [selectedSubcategory, setSelectedSubcategory] = useState(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [page, setPage] = useState(1);
   const [subcategories, setSubcategories] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -31,19 +34,20 @@ export default function SubcategoryManagement() {
   const [searchParams] = useSearchParams();
   const categoryId = searchParams.get("categoryId");
 
-  const {
-    data: subcategoriesData,
-    isLoading: isSubLoading,
-    isError: isSubError,
-  } = useGetAllSubCategoryQuery(categoryId ? { categoryId } : skipToken);
-  console.log(subcategoriesData);
+  const { data: subcategoriesData, isLoading } = useGetAllSubCategoryQuery({
+    categoryId,
+    page,
+  });
 
   // Update mutation
-  const [updateSubCategory, { isLoading: isUpdating }] = useUpdateSubCategoryMutation();
+  const [updateSubCategory, { isLoading: isUpdating }] =
+    useUpdateSubCategoryMutation();
   // Create mutation
-  const [createSubCategory, { isLoading: isCreating }] = useCreateSubCategoryMutation();
+  const [createSubCategory, { isLoading: isCreating }] =
+    useCreateSubCategoryMutation();
   // Delete mutation
-  const [deleteSubCategory, { isLoading: isDeleting }] = useDeleteSubCategoryMutation();
+  const [deleteSubCategory, { isLoading: isDeleting }] =
+    useDeleteSubCategoryMutation();
 
   useEffect(() => {
     if (!subcategoriesData) return;
@@ -56,6 +60,16 @@ export default function SubcategoryManagement() {
     }));
     setSubcategories(rows);
   }, [subcategoriesData]);
+
+  // Use mapped rows so columns (subcategoryName, listingsCount) align
+  const dataSource = Array.isArray(subcategories)
+    ? subcategories
+    : [];
+
+  // Reset pagination to first page when category changes
+  useEffect(() => {
+    setPage(1);
+  }, [categoryId]);
 
   // Handle Add Subcategory
   const handleAddSubcategory = async (values) => {
@@ -112,7 +126,9 @@ export default function SubcategoryManagement() {
     }
     setLoading(true);
     try {
-      await deleteSubCategory({ subCategoryId: selectedSubcategory.id }).unwrap();
+      await deleteSubCategory({
+        subCategoryId: selectedSubcategory.id,
+      }).unwrap();
       setDeleteModalOpen(false);
       setSelectedSubcategory(null);
       message.success("Subcategory deleted successfully!");
@@ -144,7 +160,8 @@ export default function SubcategoryManagement() {
       dataIndex: "key",
       key: "sl",
       width: 60,
-      render: (text, record, index) => (currentPage - 1) * pageSize + index + 1,
+      // Use a safe fallback for metaLimit
+      render: (text, record, index) => (page - 1) * (subcategoriesData?.meta?.limit || 10) + index + 1,
     },
     {
       title: "Subcategory Name",
@@ -187,6 +204,11 @@ export default function SubcategoryManagement() {
     },
   ];
 
+  // Safe defaults for pagination
+  const metaPage = subcategoriesData?.meta?.page;
+  const metaLimit = subcategoriesData?.meta?.limit;
+  const metaTotal = subcategoriesData?.meta?.total;
+
   return (
     <>
       <div className="flex justify-between items-center mb-5">
@@ -202,200 +224,206 @@ export default function SubcategoryManagement() {
           </Button>
         </div>
       </div>
-
-      <div className="bg-white rounded-lg shadow-sm">
+      <ConfigProvider
+        theme={{
+          components: {
+            InputNumber: {
+              activeBorderColor: "#14803c",
+            },
+            Pagination: {
+              colorPrimary: "#0091ff",
+              colorPrimaryHover: "#0091ff",
+              itemActiveBg: "#0091ff",
+              itemActiveColor: "#ffffff",
+              colorBgTextHover: "#0091ff",
+              colorText: "#0091ff",
+            },
+            Table: {
+              headerBg: "#0091ff",
+              headerColor: "rgb(255,255,255)",
+              cellFontSize: 16,
+              headerSplitColor: "#0091ff",
+            },
+          },
+        }}
+      >
         <Table
+          dataSource={dataSource}
           columns={columns}
-          dataSource={subcategories}
-          pagination={false}
-          scroll={{ x: 800 }}
-          className="custom-table"
-          loading={loading || isSubLoading || isUpdating || isCreating || isDeleting}
+          rowKey={(row) => row._id || row.id || row.key}
+          pagination={{
+            pageSize: metaLimit,
+            total: metaTotal,
+            current: metaPage,
+            onChange: (newPage) => setPage(newPage),
+          }}
+          scroll={{ x: "max-content" }}
+          loading={isLoading || loading || isUpdating || isCreating || isDeleting}
         />
-        {isSubError && (
-          <div className="text-red-500 px-4 py-2">Failed to load subcategories.</div>
-        )}
 
-        <div className="flex justify-center py-5">
-          <Pagination
-            current={currentPage}
-            pageSize={pageSize}
-            total={subcategories.length}
-            showSizeChanger
-            showQuickJumper
-            showTotal={(total, range) =>
-              `${range[0]}-${range[1]} of ${total} items`
-            }
-            onChange={(page, size) => {
-              setCurrentPage(page);
-              setPageSize(size);
-            }}
-          />
-        </div>
-      </div>
-
-      {/* Add Subcategory Modal */}
-      <Modal
-        title="Add New Subcategory"
-        open={addModalOpen}
-        onCancel={() => {
-          setAddModalOpen(false);
-          addForm.resetFields();
-        }}
-        footer={null}
-        width={500}
-      >
-        <Form
-          form={addForm}
-          layout="vertical"
-          onFinish={handleAddSubcategory}
-          className="mt-4"
+        {/* Add Subcategory Modal */}
+        <Modal
+          title="Add New Subcategory"
+          open={addModalOpen}
+          onCancel={() => {
+            setAddModalOpen(false);
+            addForm.resetFields();
+          }}
+          footer={null}
+          width={500}
         >
-          <Form.Item
-            label="Subcategory Name"
-            name="subcategoryName"
-            rules={[
-              { required: true, message: "Please enter subcategory name" },
-              {
-                min: 2,
-                message: "Subcategory name must be at least 2 characters",
-              },
-              {
-                max: 50,
-                message: "Subcategory name cannot exceed 50 characters",
-              },
-            ]}
+          <Form
+            form={addForm}
+            layout="vertical"
+            onFinish={handleAddSubcategory}
+            className="mt-4"
           >
-            <Input placeholder="Enter subcategory name" size="large" />
-          </Form.Item>
-
-          <div className="flex justify-end gap-2 mt-6">
-            <Button
-              onClick={() => {
-                setAddModalOpen(false);
-                addForm.resetFields();
-              }}
-              size="large"
+            <Form.Item
+              label="Subcategory Name"
+              name="subcategoryName"
+              rules={[
+                { required: true, message: "Please enter subcategory name" },
+                {
+                  min: 2,
+                  message: "Subcategory name must be at least 2 characters",
+                },
+                {
+                  max: 50,
+                  message: "Subcategory name cannot exceed 50 characters",
+                },
+              ]}
             >
-              Cancel
-            </Button>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={loading}
-              size="large"
-              className="bg-[#0091FF] border-[#0091FF] hover:bg-[#0077CC] hover:border-[#0077CC]"
-            >
-              Add Subcategory
-            </Button>
-          </div>
-        </Form>
-      </Modal>
+              <Input placeholder="Enter subcategory name" size="large" />
+            </Form.Item>
 
-      {/* Edit Subcategory Modal */}
-      <Modal
-        title="Edit Subcategory"
-        open={editModalOpen}
-        onCancel={() => {
-          setEditModalOpen(false);
-          editForm.resetFields();
-          setSelectedSubcategory(null);
-        }}
-        footer={null}
-        width={500}
-      >
-        <Form
-          form={editForm}
-          layout="vertical"
-          onFinish={handleEditSubcategory}
-          className="mt-4"
+            <div className="flex justify-end gap-2 mt-6">
+              <Button
+                onClick={() => {
+                  setAddModalOpen(false);
+                  addForm.resetFields();
+                }}
+                size="large"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={loading}
+                size="large"
+                className="bg-[#0091FF] border-[#0091FF] hover:bg-[#0077CC] hover:border-[#0077CC]"
+              >
+                Add Subcategory
+              </Button>
+            </div>
+          </Form>
+        </Modal>
+
+        {/* Edit Subcategory Modal */}
+        <Modal
+          title="Edit Subcategory"
+          open={editModalOpen}
+          onCancel={() => {
+            setEditModalOpen(false);
+            editForm.resetFields();
+            setSelectedSubcategory(null);
+          }}
+          footer={null}
+          width={500}
         >
-          <Form.Item
-            label="Subcategory Name"
-            name="subcategoryName"
-            rules={[
-              { required: true, message: "Please enter subcategory name" },
-              {
-                min: 2,
-                message: "Subcategory name must be at least 2 characters",
-              },
-              {
-                max: 50,
-                message: "Subcategory name cannot exceed 50 characters",
-              },
-            ]}
+          <Form
+            form={editForm}
+            layout="vertical"
+            onFinish={handleEditSubcategory}
+            className="mt-4"
           >
-            <Input placeholder="Enter subcategory name" size="large" />
-          </Form.Item>
+            <Form.Item
+              label="Subcategory Name"
+              name="subcategoryName"
+              rules={[
+                { required: true, message: "Please enter subcategory name" },
+                {
+                  min: 2,
+                  message: "Subcategory name must be at least 2 characters",
+                },
+                {
+                  max: 50,
+                  message: "Subcategory name cannot exceed 50 characters",
+                },
+              ]}
+            >
+              <Input placeholder="Enter subcategory name" size="large" />
+            </Form.Item>
 
-          <div className="flex justify-end gap-2 mt-6">
-            <Button
-              onClick={() => {
-                setEditModalOpen(false);
-                editForm.resetFields();
-                setSelectedSubcategory(null);
-              }}
-              size="large"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={loading}
-              size="large"
-              className="bg-[#0091FF] border-[#0091FF] hover:bg-[#0077CC] hover:border-[#0077CC]"
-            >
-              Update Subcategory
-            </Button>
-          </div>
-        </Form>
-      </Modal>
+            <div className="flex justify-end gap-2 mt-6">
+              <Button
+                onClick={() => {
+                  setEditModalOpen(false);
+                  editForm.resetFields();
+                  setSelectedSubcategory(null);
+                }}
+                size="large"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={loading}
+                size="large"
+                className="bg-[#0091FF] border-[#0091FF] hover:bg-[#0077CC] hover:border-[#0077CC]"
+              >
+                Update Subcategory
+              </Button>
+            </div>
+          </Form>
+        </Modal>
 
-      {/* Delete Confirmation Modal */}
-      <Modal
-        title="Delete Subcategory"
-        open={deleteModalOpen}
-        onCancel={() => {
-          setDeleteModalOpen(false);
-          setSelectedSubcategory(null);
-        }}
-        footer={null}
-        width={400}
-      >
-        <div className="text-center py-4">
-          <div className="mb-4">
-            <DeleteOutlined className="text-red-500 text-4xl mb-2" />
-            <p className="text-lg font-medium mb-2">Are you sure?</p>
-            <p className="text-gray-600">
-              Do you want to delete the subcategory "
-              {selectedSubcategory?.subcategoryName}"? This action cannot be
-              undone.
-            </p>
-          </div>
+        {/* Delete Confirmation Modal */}
+        <Modal
+          title="Delete Subcategory"
+          open={deleteModalOpen}
+          onCancel={() => {
+            setDeleteModalOpen(false);
+            setSelectedSubcategory(null);
+          }}
+          footer={null}
+          width={400}
+        >
+          <div className="text-center py-4">
+            <div className="mb-4">
+              <DeleteOutlined className="text-red-500 text-4xl mb-2" />
+              <p className="text-lg font-medium mb-2">Are you sure?</p>
+              <p className="text-gray-600">
+                Do you want to delete the subcategory "
+                {selectedSubcategory?.subcategoryName}"? This action cannot be
+                undone.
+              </p>
+            </div>
 
-          <div className="flex justify-center gap-3 mt-6">
-            <Button
-              onClick={() => {
-                setDeleteModalOpen(false);
-                setSelectedSubcategory(null);
-              }}
-              size="large"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="primary"
-              danger
-              onClick={handleDeleteSubcategory}
-              loading={loading}
-              size="large"
-            >
-              Delete
-            </Button>
+            <div className="flex justify-center gap-3 mt-6">
+              <Button
+                onClick={() => {
+                  setDeleteModalOpen(false);
+                  setSelectedSubcategory(null);
+                }}
+                size="large"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="primary"
+                danger
+                onClick={handleDeleteSubcategory}
+                loading={loading}
+                size="large"
+              >
+                Delete
+              </Button>
+            </div>
           </div>
-        </div>
-      </Modal>
+        </Modal>
+      </ConfigProvider>
     </>
   );
 }
