@@ -6,15 +6,12 @@ import { useGetSingleUserQuery } from "../../redux/api/userApi";
 // import { imageUrl } from '../../Utils/server';
 
 const ActiveListings = ({ setIsModalOpen2, selectedUser }) => {
-  console.log("selectedUser from active listing", selectedUser);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
-  console.log("selectedItem", selectedItem);
   const { data: singleUser, isLoading } = useGetSingleUserQuery(
     { userId: selectedUser?._id },
     { skip: !selectedUser?._id }
   );
-  // console.log("singleUser of active list table", singleUser);
 
   const showModal = (record) => {
     setSelectedItem(record);
@@ -39,7 +36,8 @@ const ActiveListings = ({ setIsModalOpen2, selectedUser }) => {
     user_id: item?.userData?._id || "N/A",
     role: item?.userData?.role || "N/A",
     country: item?.country || "N/A",
-    imageUrl: (Array.isArray(item?.images) && item.images[0]) || item?.image || null,
+    imageUrl:
+      (Array.isArray(item?.images) && item.images[0]) || item?.image || null,
   }));
   console.log("dataSource of active list table", dataSource);
 
@@ -117,7 +115,6 @@ const ActiveListings = ({ setIsModalOpen2, selectedUser }) => {
         columns={columns}
         pagination={{ pageSize: 5 }}
         scroll={{ x: "max-content" }}
-        // loading={isLoading}
       />
       <Modal open={isModalOpen} centered onCancel={handleCancel} footer={null}>
         <div className="container mx-auto px-4 py-6">
@@ -136,7 +133,8 @@ const ActiveListings = ({ setIsModalOpen2, selectedUser }) => {
               <div>
                 <h1 className="text-2xl font-bold">{selectedItem?.name}</h1>
                 <div className="mt-1 text-lg font-semibold text-[#0091ff]">
-                  {selectedItem?.askingPrice !== undefined && selectedItem?.askingPrice !== null
+                  {selectedItem?.askingPrice !== undefined &&
+                  selectedItem?.askingPrice !== null
                     ? `$${selectedItem?.askingPrice}`
                     : "N/A"}
                 </div>
@@ -144,7 +142,9 @@ const ActiveListings = ({ setIsModalOpen2, selectedUser }) => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500">Category</h3>
+                  <h3 className="text-sm font-medium text-gray-500">
+                    Category
+                  </h3>
                   <p className="mt-1 bg-[#cce9ff] text-[#0091ff] px-2 py-1 rounded">
                     {selectedItem?.category_name || "N/A"}
                   </p>
@@ -171,7 +171,10 @@ const ActiveListings = ({ setIsModalOpen2, selectedUser }) => {
                   <h3 className="text-sm font-medium text-gray-500">Date</h3>
                   <p className="mt-1 bg-[#cce9ff] text-[#0091ff] px-2 py-1 rounded">
                     {selectedItem?.date
-                      ? new Date(selectedItem.date).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "2-digit" })
+                      ? new Date(selectedItem.date).toLocaleDateString(
+                          undefined,
+                          { year: "numeric", month: "short", day: "2-digit" }
+                        )
                       : "N/A"}
                   </p>
                 </div>
