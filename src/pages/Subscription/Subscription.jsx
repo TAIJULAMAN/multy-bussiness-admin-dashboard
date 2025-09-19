@@ -24,16 +24,30 @@ export default function Subscription({ role }) {
       const key = (item?.subscriptionPlanType || item?.name || item?._id || item?.id || `plan_${idx}`)
         ?.toString()
         .toLowerCase();
-      // Normalize price to an array of numbers
+      // Normalize into both numeric prices[] and rich priceItems[] for Broker
       let prices = [];
+      let priceItems = [];
       if (Array.isArray(item?.price)) {
-        prices = item.price
-          .map((p) => (typeof p === "object" && p !== null ? Number(p?.price ?? 0) : Number(p ?? 0)))
-          .filter((n) => !Number.isNaN(n));
+        priceItems = item.price
+          .map((p) =>
+            typeof p === "object" && p !== null
+              ? { _id: p?._id, duration: String(p?.duration ?? ""), price: Number(p?.price ?? 0) }
+              : { _id: undefined, duration: "", price: Number(p ?? 0) }
+          )
+          .filter((row) => !Number.isNaN(row.price));
+        prices = priceItems.map((r) => r.price);
       } else if (typeof item?.price === "object" && item?.price !== null) {
-        prices = [Number(item.price?.price ?? 0)].filter((n) => !Number.isNaN(n));
+        const it = { _id: item.price?._id, duration: String(item.price?.duration ?? ""), price: Number(item.price?.price ?? 0) };
+        if (!Number.isNaN(it.price)) {
+          priceItems = [it];
+          prices = [it.price];
+        }
       } else if (item?.price != null) {
-        prices = [Number(item.price)].filter((n) => !Number.isNaN(n));
+        const n = Number(item.price);
+        if (!Number.isNaN(n)) {
+          prices = [n];
+          priceItems = [{ _id: undefined, duration: "", price: n }];
+        }
       }
       mapped[key] = {
         // Persist the actual backend id for updates
@@ -46,6 +60,7 @@ export default function Subscription({ role }) {
           item?.name ||
           `Plan ${idx + 1}`,
         prices,
+        priceItems,
         features: Array.isArray(item?.features)
           ? item.features.map((f, i) => ({
               id: f?.id || i + 1,
@@ -74,7 +89,8 @@ export default function Subscription({ role }) {
   const [isFeatureModalOpen, setIsFeatureModalOpen] = useState(false);
 
   // Form states
-  const [newPrices, setNewPrices] = useState([""]); // separate numeric inputs (no add/remove)
+  const [newPrices, setNewPrices] = useState([""]); // for non-Broker
+  const [newPriceRows, setNewPriceRows] = useState([{ duration: "", price: "" }]); // for Broker
   const [newFeature, setNewFeature] = useState("");
   const [tempFeatures, setTempFeatures] = useState([]);
 
@@ -84,16 +100,26 @@ export default function Subscription({ role }) {
   // Update form values when selected plan changes
   useEffect(() => {
     if (selectedPlan && plans[selectedPlan]) {
-      const arr = plans[selectedPlan].prices || [];
-      setNewPrices(arr.length ? arr.map((p) => String(p)) : [""]);
+      if (role === "Broker") {
+        const items = plans[selectedPlan].priceItems || [];
+        setNewPriceRows(items.length ? items.map((r) => ({ duration: r.duration || "", price: String(r.price ?? "") })) : [{ duration: "", price: "" }]);
+      } else {
+        const arr = plans[selectedPlan].prices || [];
+        setNewPrices(arr.length ? arr.map((p) => String(p)) : [""]);
+      }
     }
   }, [selectedPlan, plans]);
 
   // Open price update modal for a specific plan
   const handleOpenPriceModal = (planKey) => {
     setSelectedPlan(planKey);
-    const list = plans[planKey].prices || [];
-    setNewPrices(list.length ? list.map((p) => String(p)) : [""]);
+    if (role === "Broker") {
+      const items = plans[planKey].priceItems || [];
+      setNewPriceRows(items.length ? items.map((r) => ({ duration: r.duration || "", price: String(r.price ?? "") })) : [{ duration: "", price: "" }]);
+    } else {
+      const list = plans[planKey].prices || [];
+      setNewPrices(list.length ? list.map((p) => String(p)) : [""]);
+    }
     setIsPriceModalOpen(true);
   };
 
@@ -102,27 +128,54 @@ export default function Subscription({ role }) {
     if (!selectedPlan || !plans[selectedPlan]) return;
     const sub = plans[selectedPlan];
     try {
-      // Build number array from individual inputs
-      const priceArray = newPrices
-        .map((s) => Number(String(s).trim()))
-        .filter((n) => !Number.isNaN(n));
-      if (priceArray.length === 0) {
-        toast.error("Please add at least one valid price");
-        return;
+      // Build payload depending on role
+      let payloadPrice;
+      if (role === "Broker") {
+        const rows = newPriceRows
+          .map((row, idx) => ({
+            duration: String(row.duration || "").trim(),
+            price: Number(String(row.price || "").trim()),
+            _id: plans[selectedPlan].priceItems?.[idx]?._id,
+          }))
+          .filter((r) => !Number.isNaN(r.price));
+        if (!rows.length) {
+          toast.error("Please add at least one valid price");
+          return;
+        }
+        payloadPrice = rows;
+      } else {
+        const priceArray = newPrices
+          .map((s) => Number(String(s).trim()))
+          .filter((n) => !Number.isNaN(n));
+        if (!priceArray.length) {
+          toast.error("Please add at least one valid price");
+          return;
+        }
+        payloadPrice = priceArray;
       }
+
       const res = await updateSubscriptionPlan({
         subscriptionId: sub.subscriptionId || sub.id,
         role,
-        data: { price: priceArray },
+        data: { price: payloadPrice },
       }).unwrap();
 
       // Use server response to ensure UI reflects backend truth
-      const serverPrices = Array.isArray(res?.data?.price)
-        ? res.data.price.map((n) => Number(n)).filter((n) => !Number.isNaN(n))
+      const serverPriceRaw = res?.data?.price;
+      const serverPrices = Array.isArray(serverPriceRaw)
+        ? serverPriceRaw.map((item) => (typeof item === "object" && item !== null ? Number(item?.price ?? 0) : Number(item))).filter((n) => !Number.isNaN(n))
         : priceArray;
+      const serverPriceItems = Array.isArray(serverPriceRaw)
+        ? serverPriceRaw.map((item) =>
+            typeof item === "object" && item !== null
+              ? { _id: item?._id, duration: String(item?.duration ?? ""), price: Number(item?.price ?? 0) }
+              : { _id: undefined, duration: "", price: Number(item ?? 0) }
+          )
+        : (plans[selectedPlan].priceItems || []);
+
       setPlans((prev) => ({
         ...prev,
-        [selectedPlan]: { ...prev[selectedPlan], prices: serverPrices },
+        [selectedPlan]: { ...prev[selectedPlan], prices: serverPrices, priceItems: serverPriceItems },
       }));
       setIsPriceModalOpen(false);
       toast.success("Subscription price updated");
@@ -270,24 +323,58 @@ export default function Subscription({ role }) {
         footer={null}
       >
         <Form layout="vertical" onFinish={handleSavePrice} className="mt-4">
-          <div className="space-y-3">
-            <label className="block text-sm font-medium text-gray-700">Prices</label>
-            {newPrices.map((val, idx) => (
-              <div key={idx} className="flex items-center gap-2">
-                <Input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={val}
-                  onChange={(e) => {
-                    const v = e.target.value;
-                    setNewPrices((prev) => prev.map((p, i) => (i === idx ? v : p)));
-                  }}
-                  placeholder={`Price #${idx + 1}`}
-                />
-              </div>
-            ))}
-          </div>
+          {role === "Broker" ? (
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-gray-700">Duration & Price</label>
+              {newPriceRows.map((row, idx) => (
+                <div key={idx} className="grid grid-cols-1 md:grid-cols-12 gap-2 items-center">
+                  <div className="md:col-span-7">
+                    <Input
+                      type="text"
+                      value={row.duration}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        setNewPriceRows((prev) => prev.map((r, i) => (i === idx ? { ...r, duration: v } : r)));
+                      }}
+                      placeholder={`e.g. 1 Months`}
+                    />
+                  </div>
+                  <div className="md:col-span-5">
+                    <Input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={row.price}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        setNewPriceRows((prev) => prev.map((r, i) => (i === idx ? { ...r, price: v } : r)));
+                      }}
+                      placeholder={`Price`}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-gray-700">Prices</label>
+              {newPrices.map((val, idx) => (
+                <div key={idx} className="flex items-center gap-2">
+                  <Input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={val}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      setNewPrices((prev) => prev.map((p, i) => (i === idx ? v : p)));
+                    }}
+                    placeholder={`Price #${idx + 1}`}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
 
           <div className="flex justify-end gap-2 mt-6">
             <Button onClick={() => setIsPriceModalOpen(false)} disabled={isUpdating}>Cancel</Button>
