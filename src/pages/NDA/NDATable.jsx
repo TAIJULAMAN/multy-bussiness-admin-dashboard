@@ -5,18 +5,12 @@ import { FaRegEye } from "react-icons/fa";
 import { getImageBaseUrl } from "../../config/envConfig";
 import { Link } from "react-router-dom";
 
-function NDATable({ data = [] }) {
+function NDATable({ data = [], ndaData }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedNDA, setSelectedNDA] = useState(null);
-  const [page, setPage] = useState(1);
 
   const handleCancel = () => {
     setIsModalOpen(false);
-  };
-
-  const handleViewNDA = (record) => {
-    setSelectedNDA(record);
-    setIsModalOpen(true);
   };
 
   // Transform NDA data for table display
@@ -81,11 +75,11 @@ function NDATable({ data = [] }) {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <Link 
-          to="/document" 
-          state={{ 
+        <Link
+          to="/document"
+          state={{
             ndaData: record,
-            pdfUrl: record.nda 
+            pdfUrl: record.nda,
           }}
         >
           <button className="border border-[#0091ff] rounded-lg p-1 bg-[#cce9ff] text-[#0091ff]">
@@ -95,6 +89,9 @@ function NDATable({ data = [] }) {
       ),
     },
   ];
+  const metaPage = ndaData?.meta?.page || page || 1;
+  const metaLimit = ndaData?.meta?.limit || 10;
+  const metaTotal = ndaData?.meta?.total || data?.length || 0;
 
   return (
     <ConfigProvider
@@ -120,19 +117,11 @@ function NDATable({ data = [] }) {
       <Table
         dataSource={dataSource}
         columns={columns}
-        // pagination={{
-        //   pageSize: listData?.pagination?.itemPerPage,
-        //   total: listData?.pagination?.totalItems,
-        //   current: listData?.pagination?.currentPage,
-        //   showSizeChanger: false,
-        //   onChange: (page) => setPage(page),
-        // }}
         pagination={{
-          pageSize: 10,
-          total: dataSource.length,
-          current: page,
-          showSizeChanger: false,
-          onChange: (page) => setPage(page),
+          pageSize: metaLimit,
+          total: metaTotal,
+          current: metaPage,
+          onChange: (newPage) => setPage(newPage),
         }}
         scroll={{ x: "max-content" }}
       />
