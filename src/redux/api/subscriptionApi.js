@@ -10,9 +10,19 @@ const subscriptionApi = baseApi.injectEndpoints({
       }),
       providesTags: ["subscription"],
     }),
+    updateSubscriptionPlan: builder.mutation({
+      query: ({ subscriptionId, role, data }) => ({
+        url: "subscription/update-subscription-plan",
+        method: "PATCH",
+        // Send both casings to be safe
+        params: { subscriptionId, role },
+        body: data,
+      }),
+      invalidatesTags: ["subscription"],
+    }),
   }),
 });
 
-export const { useGetSubscriptionPlansQuery } = subscriptionApi;
+export const { useGetSubscriptionPlansQuery, useUpdateSubscriptionPlanMutation } = subscriptionApi;
 
 export default subscriptionApi;

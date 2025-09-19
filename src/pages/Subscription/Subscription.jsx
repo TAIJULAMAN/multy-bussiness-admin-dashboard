@@ -1,117 +1,150 @@
-import React, { useState, useEffect } from 'react';
-import { Modal, Button, Form, Input, Select } from 'antd';
-import { CheckIcon, PlusIcon, XMarkIcon, PencilIcon } from './icons.jsx';
-import toast from 'react-hot-toast';
-import { CiWarning } from 'react-icons/ci';
+import React, { useState, useEffect, useMemo } from "react";
+import { Modal, Button, Form, Input, Select } from "antd";
+import { CheckIcon, PlusIcon, XMarkIcon, PencilIcon } from "./icons.jsx";
+import toast from "react-hot-toast";
+import { useGetSubscriptionPlansQuery, useUpdateSubscriptionPlanMutation } from "../../redux/api/subscriptionApi";
 
-export default function SubscriptionManagement() {
-  const initialPlans = {
-    bronze: {
-      id: 'bronze',
-      name: 'bronze',
-      displayName: 'Bronze Plan',
-      price: '2.99',
-      period: 'month',
-      features: [
-        { id: 1, text: 'Priority listing' },
-        { id: 2, text: 'Customer messaging' },
-        { id: 3, text: 'Basic analytics' },
-        { id: 4, text: 'Email support' },
-      ],
-    },
-    silver: {
-      id: 'silver',
-      name: 'silver',
-      displayName: 'Silver Plan',
-      price: '24.99',
-      period: 'month',
-      features: [
-        { id: 1, text: 'Priority listing' },
-        { id: 2, text: 'Customer messaging' },
-        { id: 3, text: 'Advanced analytics' },
-        { id: 4, text: 'Premium support' },
-        { id: 5, text: 'Unlimited listings' },
-      ],
-    },
-    gold: {
-      id: 'gold',
-      name: 'gold',
-      displayName: 'Gold Plan',
-      price: '232.99',
-      period: 'year',
-      features: [
-        { id: 1, text: 'Priority listing' },
-        { id: 2, text: 'Customer messaging' },
-        { id: 3, text: 'Advanced analytics' },
-        { id: 4, text: 'Premium support' },
-        { id: 5, text: 'Unlimited listings' },
-        { id: 6, text: 'Dedicated account manager' },
-      ],
-    },
-  };
+export default function Subscription({ role }) {
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  console.log("selectedPlan", selectedPlan);
+  const [plans, setPlans] = useState({});
 
-  const [selectedPlan, setSelectedPlan] = useState('bronze');
-  const [plans, setPlans] = useState(initialPlans);
+  const { data: plansResponse } = useGetSubscriptionPlansQuery({ role });
+
+  console.log("plansResponse", plansResponse);
+  console.log("role", role);
+
+  // Normalize API data shape into local plans object
+  const apiPlans = useMemo(() => {
+    if (!plansResponse) return null;
+    const list = plansResponse?.data || plansResponse?.plans || plansResponse;
+    if (!Array.isArray(list)) return null;
+    const mapped = {};
+    list.forEach((item, idx) => {
+      const key = (item?.subscriptionPlanType || item?.name || item?._id || item?.id || `plan_${idx}`)
+        ?.toString()
+        .toLowerCase();
+      // Normalize price to an array of numbers
+      let prices = [];
+      if (Array.isArray(item?.price)) {
+        prices = item.price
+          .map((p) => (typeof p === "object" && p !== null ? Number(p?.price ?? 0) : Number(p ?? 0)))
+          .filter((n) => !Number.isNaN(n));
+      } else if (typeof item?.price === "object" && item?.price !== null) {
+        prices = [Number(item.price?.price ?? 0)].filter((n) => !Number.isNaN(n));
+      } else if (item?.price != null) {
+        prices = [Number(item.price)].filter((n) => !Number.isNaN(n));
+      }
+      mapped[key] = {
+        // Persist the actual backend id for updates
+        id: item?._id || item?.id || key,
+        subscriptionId: item?._id || item?.id || null,
+        name: item?.subscriptionPlanType || key,
+        displayName:
+          item?.subscriptionPlanType ||
+          item?.title ||
+          item?.name ||
+          `Plan ${idx + 1}`,
+        prices,
+        features: Array.isArray(item?.features)
+          ? item.features.map((f, i) => ({
+              id: f?.id || i + 1,
+              text: f?.text || String(f),
+            }))
+          : [],
+      };
+    });
+    return mapped;
+  }, [plansResponse]);
+
+  // Apply API plans when available
+  useEffect(() => {
+    if (apiPlans && Object.keys(apiPlans).length > 0) {
+      setPlans(apiPlans);
+      // Ensure selectedPlan is valid among API keys
+      const firstKey = Object.keys(apiPlans)[0];
+      if (!apiPlans[selectedPlan]) {
+        setSelectedPlan(firstKey);
+      }
+    }
+  }, [apiPlans]);
 
   // Modals state
   const [isPriceModalOpen, setIsPriceModalOpen] = useState(false);
   const [isFeatureModalOpen, setIsFeatureModalOpen] = useState(false);
 
   // Form states
-  const [newPrice, setNewPrice] = useState('');
-  const [newPeriod, setNewPeriod] = useState('');
-  const [newFeature, setNewFeature] = useState('');
+  const [newPrices, setNewPrices] = useState([""]); // separate numeric inputs (no add/remove)
+  const [newFeature, setNewFeature] = useState("");
   const [tempFeatures, setTempFeatures] = useState([]);
+
+  // Update mutation
+  const [updateSubscriptionPlan, { isLoading: isUpdating }] = useUpdateSubscriptionPlanMutation();
 
   // Update form values when selected plan changes
   useEffect(() => {
-    if (plans[selectedPlan]) {
-      setNewPrice(plans[selectedPlan].price);
-      setNewPeriod(plans[selectedPlan].period);
+    if (selectedPlan && plans[selectedPlan]) {
+      const arr = plans[selectedPlan].prices || [];
+      setNewPrices(arr.length ? arr.map((p) => String(p)) : [""]);
     }
   }, [selectedPlan, plans]);
 
-  // Open price update modal
-  const handleOpenPriceModal = () => {
-    setNewPrice(plans[selectedPlan].price);
-    setNewPeriod(plans[selectedPlan].period);
+  // Open price update modal for a specific plan
+  const handleOpenPriceModal = (planKey) => {
+    setSelectedPlan(planKey);
+    const list = plans[planKey].prices || [];
+    setNewPrices(list.length ? list.map((p) => String(p)) : [""]);
     setIsPriceModalOpen(true);
   };
 
-  // Save updated price
-  const handleSavePrice = () => {
-    const updatedPlans = {
-      ...plans,
-      [selectedPlan]: {
-        ...plans[selectedPlan],
-        price: newPrice,
-        period: newPeriod,
-      },
-    };
+  // Save updated price -> calls API then updates local state
+  const handleSavePrice = async () => {
+    if (!selectedPlan || !plans[selectedPlan]) return;
+    const sub = plans[selectedPlan];
+    try {
+      // Build number array from individual inputs
+      const priceArray = newPrices
+        .map((s) => Number(String(s).trim()))
+        .filter((n) => !Number.isNaN(n));
+      if (priceArray.length === 0) {
+        toast.error("Please add at least one valid price");
+        return;
+      }
+      const res = await updateSubscriptionPlan({
+        subscriptionId: sub.subscriptionId || sub.id,
+        role,
+        data: { price: priceArray },
+      }).unwrap();
 
-    setPlans(updatedPlans);
-    setIsPriceModalOpen(false);
-
-    // Log data for backend integration
-    console.log('Updated price data:', {
-      planId: selectedPlan,
-      price: newPrice,
-      period: newPeriod,
-    });
+      // Use server response to ensure UI reflects backend truth
+      const serverPrices = Array.isArray(res?.data?.price)
+        ? res.data.price.map((n) => Number(n)).filter((n) => !Number.isNaN(n))
+        : priceArray;
+      setPlans((prev) => ({
+        ...prev,
+        [selectedPlan]: { ...prev[selectedPlan], prices: serverPrices },
+      }));
+      setIsPriceModalOpen(false);
+      toast.success("Subscription price updated");
+    } catch (e) {
+      toast.error("Failed to update price");
+      console.error(e);
+    }
   };
 
-  // Open feature management modal
-  const handleOpenFeatureModal = () => {
-    setTempFeatures([...plans[selectedPlan].features]);
+  // Open feature management modal for a specific plan
+  const handleOpenFeatureModal = (planKey) => {
+    setSelectedPlan(planKey);
+    setTempFeatures([...plans[planKey].features]);
     setIsFeatureModalOpen(true);
   };
 
   // Add a new feature
   const handleAddFeature = () => {
-    if (newFeature.trim() === '')
-      return toast.error('please add a valid feature');
+    if (newFeature.trim() === "")
+      return toast.error("please add a valid feature");
     if (tempFeatures.length >= 8) {
-      return toast.error('Feature limit reached.');
+      return toast.error("Feature limit reached.");
     }
     const newId =
       tempFeatures.length > 0
@@ -119,7 +152,7 @@ export default function SubscriptionManagement() {
         : 1;
 
     setTempFeatures([...tempFeatures, { id: newId, text: newFeature }]);
-    setNewFeature('');
+    setNewFeature("");
   };
 
   // Remove a feature
@@ -127,103 +160,95 @@ export default function SubscriptionManagement() {
     setTempFeatures(tempFeatures.filter((feature) => feature.id !== id));
   };
 
-  // Save updated features
+  // Save updated features -> calls API then updates local state
   function handleSaveFeatures() {
-    const updatedPlans = {
-      ...plans,
-      [selectedPlan]: {
-        ...plans[selectedPlan],
-        features: [...tempFeatures],
-      },
-    };
-
-    setPlans(updatedPlans);
-    setIsFeatureModalOpen(false);
-
-    // Log data for backend integration
-    console.log('Updated features data:', {
-      planId: selectedPlan,
-      features: tempFeatures,
-    });
+    if (!selectedPlan || !plans[selectedPlan]) return;
+    const sub = plans[selectedPlan];
+    const featurePayload = tempFeatures.map((f) => (typeof f === "string" ? f : f.text));
+    updateSubscriptionPlan({
+      subscriptionId: sub.id,
+      role,
+      data: { features: featurePayload },
+    })
+      .unwrap()
+      .then(() => {
+        setPlans((prev) => ({
+          ...prev,
+          [selectedPlan]: { ...prev[selectedPlan], features: [...tempFeatures] },
+        }));
+        setIsFeatureModalOpen(false);
+        toast.success("Features updated");
+      })
+      .catch((e) => {
+        toast.error("Failed to update features");
+        console.error(e);
+      });
   }
 
   return (
     <div className="">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">Buyers Subscription Plan</h1>
-
+        <h1 className="text-3xl font-bold">
+          {role ? `${role} Subscription Plans` : "Subscription Plans"}
+        </h1>
       </div>
 
-      {/* Plan Tabs */}
       <div className="w-full">
-        <div className="grid grid-cols-3 mb-8 border border-[#0091FF] rounded-md overflow-hidden">
-          {Object.keys(plans).map((planKey) => (
-            <button
-              key={planKey}
-              onClick={() => setSelectedPlan(planKey)}
-              className={`py-3 px-4 text-center transition-colors ${selectedPlan === planKey
-                ? 'bg-[#0091FF] !text-white'
-                : 'bg-white hover:bg-gray-50'
-                } cursor-pointer`}
-            >
-              {planKey.charAt(0).toUpperCase() + planKey.slice(1)}
-            </button>
-          ))}
-        </div>
-
-        {/* Plan Content */}
-        {Object.keys(plans).map((planKey) => (
-          <div
-            key={planKey}
-            className={`mt-0 ${selectedPlan !== planKey ? 'hidden' : ''}`}
-          >
-            <div className="border-2 border-[#0091FF] rounded-lg shadow-sm">
-              <div className="p-6 border-b">
-                <div>
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <h2 className="text-2xl font-bold">
-                        {plans[planKey].displayName}
-                      </h2>
-                      <p className="text-gray-500">
-                        Subscription details and features
-                      </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Object.keys(plans || {}).map((planKey) => (
+            <div key={planKey} className="mt-0">
+              <div className="border-2 border-[#0091FF] rounded-lg shadow-sm h-full flex flex-col">
+                <div className="p-6 border-b">
+                  <div>
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <h2 className="text-2xl font-bold">
+                          {plans[planKey].displayName}
+                        </h2>
+                      </div>
+                      <button
+                        onClick={() => handleOpenPriceModal(planKey)}
+                        className="bg-[#0091FF] cursor-pointer text-sm !text-white px-4 py-2 rounded-md flex items-center"
+                      >
+                        <PencilIcon className="h-4 w-4" />
+                      </button>
                     </div>
-                    <button
-                      onClick={handleOpenPriceModal}
-                      className="bg-[#0091FF] cursor-pointer !text-white px-4 py-2 rounded-md flex items-center"
-                    >
-                      <PencilIcon className="mr-2 h-4 w-4" />
-                      Update Price
-                    </button>
-                  </div>
-                  <div className="mb-6">
-                    <span className="text-[#0091FF] text-4xl font-bold">
-                      $ {plans[planKey].price}
-                    </span>
-                    <span className="text-gray-500 ml-1">
-                      /{plans[planKey].period}
-                    </span>
+                    {role !== "Broker" && (
+                      <div className="mb-6">
+                        {(() => {
+                          const priceList = Array.isArray(plans[planKey].prices) && plans[planKey].prices.length
+                            ? plans[planKey].prices
+                            : Array.isArray(plans[planKey].priceItems)
+                            ? plans[planKey].priceItems.map((r) => r?.price).filter((n) => typeof n === "number")
+                            : [];
+                          return priceList.length ? (
+                            <span className="text-[#0091FF] text-xl font-semibold">
+                              ${""}{priceList.join(", $")}
+                            </span>
+                          ) : (
+                            <span className="text-gray-500">No prices</span>
+                          );
+                        })()}
+                      </div>
+                    )}
                   </div>
                 </div>
-              </div>
-              <div className="p-6">
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
+                {/* Content section */}
+                <div className="p-5 flex-1">
+                  <div className="flex justify-between items-center mb-5">
                     <h3 className="text-2xl font-bold">Features</h3>
                     <button
-                      onClick={handleOpenFeatureModal}
-                      className="border border-[#022C22] text-[#022C22]  cursor-pointer hover:bg-[#022C22] hover:!text-white px-4 py-2 rounded-md flex items-center"
+                      onClick={() => handleOpenFeatureModal(planKey)}
+                      className="border border-[#022C22] text-[#022C22] cursor-pointer hover:bg-[#022C22] hover:!text-white px-4 py-2 rounded-md flex items-center"
                     >
                       <PencilIcon className="mr-2 h-4 w-4" />
                       Manage Features
                     </button>
                   </div>
-
                   <ul className="space-y-3 mt-4">
                     {plans[planKey].features.map((feature) => (
                       <li key={feature.id} className="flex items-center gap-2">
-                        <div className="flex-shrink-0 h-5 w-5 rounded-full bg-transparent border-1 bortder-[#022C22] flex items-center justify-center">
+                        <div className="flex-shrink-0 h-5 w-5 rounded-full bg-transparent border-1 border-[#022C22] flex items-center justify-center">
                           <CheckIcon className="h-3 w-3 text-[#022C22]" />
                         </div>
                         <span>{feature.text}</span>
@@ -233,8 +258,8 @@ export default function SubscriptionManagement() {
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       {/* Price Update Modal */}
@@ -244,43 +269,29 @@ export default function SubscriptionManagement() {
         onCancel={() => setIsPriceModalOpen(false)}
         footer={null}
       >
-        <Form
-          layout="vertical"
-          onFinish={handleSavePrice}
-          className="mt-4"
-        >
-          <Form.Item
-            name="price"
-            label="Price"
-            rules={[{ required: true, message: 'Please enter price' }]}
-          >
-            <Input
-              type="number"
-              step="0.01"
-              min="0"
-              value={newPrice}
-              onChange={(e) => setNewPrice(e.target.value)}
-              placeholder="Enter price"
-            />
-          </Form.Item>
-
-          <Form.Item
-            name="period"
-            label="Billing Period"
-            rules={[{ required: true, message: 'Please select billing period' }]}
-          >
-            <Select
-              value={newPeriod}
-              onChange={(e) => setNewPeriod(e.target.value)}
-            >
-              <Select.Option value="month">Monthly</Select.Option>
-              <Select.Option value="year">Yearly</Select.Option>
-            </Select>
-          </Form.Item>
+        <Form layout="vertical" onFinish={handleSavePrice} className="mt-4">
+          <div className="space-y-3">
+            <label className="block text-sm font-medium text-gray-700">Prices</label>
+            {newPrices.map((val, idx) => (
+              <div key={idx} className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={val}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    setNewPrices((prev) => prev.map((p, i) => (i === idx ? v : p)));
+                  }}
+                  placeholder={`Price #${idx + 1}`}
+                />
+              </div>
+            ))}
+          </div>
 
           <div className="flex justify-end gap-2 mt-6">
-            <Button onClick={() => setIsPriceModalOpen(false)}>Cancel</Button>
-            <Button type="primary" htmlType="submit" className="bg-blue-500">
+            <Button onClick={() => setIsPriceModalOpen(false)} disabled={isUpdating}>Cancel</Button>
+            <Button type="primary" htmlType="submit" className="bg-blue-500" loading={isUpdating}>
               Save Changes
             </Button>
           </div>
@@ -316,7 +327,7 @@ export default function SubscriptionManagement() {
                 type="primary"
                 onClick={handleAddFeature}
                 icon={<PlusIcon className="w-4 h-4" />}
-                disabled={newFeature.trim() === '' || tempFeatures.length >= 8}
+                disabled={newFeature.trim() === "" || tempFeatures.length >= 8}
               >
                 Add Feature
               </Button>
@@ -367,13 +378,12 @@ export default function SubscriptionManagement() {
 
           {/* Modal Actions */}
           <div className="flex justify-end gap-3 mt-6">
-            <Button onClick={() => setIsFeatureModalOpen(false)}>
-              Cancel
-            </Button>
+            <Button onClick={() => setIsFeatureModalOpen(false)} disabled={isUpdating}>Cancel</Button>
             <Button
               type="primary"
               onClick={handleSaveFeatures}
               className="bg-[#0091FF] hover:bg-[#0073CC]"
+              loading={isUpdating}
             >
               Save Changes
             </Button>

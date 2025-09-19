@@ -52,7 +52,7 @@ export default function SubcategoryManagement() {
       key: idx + 1,
       id: item._id || item.id || `${idx}`,
       subcategoryName: item.subcategoryName || item.name || "Untitled",
-      listingsCount: item.listingsCount ?? 0,
+      listingsCount: item?.businessCount ?? 0,
     }));
     setSubcategories(rows);
   }, [subcategoriesData]);
