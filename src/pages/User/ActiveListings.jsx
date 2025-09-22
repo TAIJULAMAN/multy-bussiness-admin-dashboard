@@ -12,6 +12,7 @@ const ActiveListings = ({ setIsModalOpen2, selectedUser }) => {
     { userId: selectedUser?._id },
     { skip: !selectedUser?._id }
   );
+  console.log("singleUser", singleUser);
 
   const showModal = (record) => {
     setSelectedItem(record);
@@ -39,7 +40,7 @@ const ActiveListings = ({ setIsModalOpen2, selectedUser }) => {
     imageUrl:
       (Array.isArray(item?.images) && item.images[0]) || item?.image || null,
   }));
-  console.log("dataSource of active list table", dataSource);
+  // console.log("dataSource of active list table", dataSource);
 
   const columns = [
     { title: "No", dataIndex: "no", key: "no" },
@@ -119,15 +120,6 @@ const ActiveListings = ({ setIsModalOpen2, selectedUser }) => {
       <Modal open={isModalOpen} centered onCancel={handleCancel} footer={null}>
         <div className="container mx-auto px-4 py-6">
           <div className="space-y-5">
-            {/* Image */}
-            <div className="relative rounded-lg overflow-hidden">
-              <img
-                src={selectedItem?.imageUrl || img}
-                alt={selectedItem?.name || "Listing"}
-                className="w-full h-[240px] object-cover"
-              />
-            </div>
-
             {/* Info */}
             <div className="space-y-4">
               <div>
@@ -142,6 +134,12 @@ const ActiveListings = ({ setIsModalOpen2, selectedUser }) => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
+                  <h3 className="text-sm font-medium text-gray-500">Name</h3>
+                  <p className="mt-1 bg-[#cce9ff] text-[#0091ff] px-2 py-1 rounded">
+                    {selectedItem?.name || "N/A"}
+                  </p>
+                </div>
+                <div>
                   <h3 className="text-sm font-medium text-gray-500">
                     Category
                   </h3>
@@ -150,9 +148,14 @@ const ActiveListings = ({ setIsModalOpen2, selectedUser }) => {
                   </p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500">Status</h3>
+                  <h3 className="text-sm font-medium text-gray-500">Date</h3>
                   <p className="mt-1 bg-[#cce9ff] text-[#0091ff] px-2 py-1 rounded">
-                    {selectedItem?.status || "N/A"}
+                    {selectedItem?.date
+                      ? new Date(selectedItem.date).toLocaleDateString(
+                          undefined,
+                          { year: "numeric", month: "short", day: "2-digit" }
+                        )
+                      : "N/A"}
                   </p>
                 </div>
                 <div>
@@ -162,11 +165,20 @@ const ActiveListings = ({ setIsModalOpen2, selectedUser }) => {
                   </p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500">Role</h3>
+                  <h3 className="text-sm font-medium text-gray-500">User</h3>
+                  <p className="mt-1 bg-[#cce9ff] text-[#0091ff] px-2 py-1 rounded">
+                    {selectedItem?.user || "N/A"}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-gray-500">
+                    User Role
+                  </h3>
                   <p className="mt-1 bg-[#cce9ff] text-[#0091ff] px-2 py-1 rounded">
                     {selectedItem?.role || "N/A"}
                   </p>
                 </div>
+
                 <div>
                   <h3 className="text-sm font-medium text-gray-500">Date</h3>
                   <p className="mt-1 bg-[#cce9ff] text-[#0091ff] px-2 py-1 rounded">

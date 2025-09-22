@@ -26,6 +26,8 @@ import {
 import { getImageBaseUrl } from "../../config/envConfig";
 import img1 from "../../assets/cover.png";
 import Swal from "sweetalert2";
+import { RiDeleteBin6Line } from "react-icons/ri";
+import { FiEdit } from "react-icons/fi";
 
 export default function Categories() {
   const navigate = useNavigate();
@@ -45,6 +47,7 @@ export default function Categories() {
     useCreateCategoryMutation();
   const [updateCategory, { isLoading: isUpdating }] =
     useUpdateCategoryMutation();
+    console.log("updateCategory", updateCategory)
   const [deleteCategory, { isLoading: isDeleting }] =
     useDeleteCategoryMutation();
 
@@ -62,27 +65,27 @@ export default function Categories() {
   const handleAddCategory = async (values) => {
     try {
       // Validate required fields
-      if (!values.categoryName?.trim()) {
-        Swal.fire({
-          icon: "error",
-          title: "Validation Error",
-          text: "Category name is required!",
-        });
-        return;
-      }
+      // if (!values.categoryName?.trim()) {
+      //   Swal.fire({
+      //     icon: "error",
+      //     title: "Validation Error",
+      //     text: "Category name is required!",
+      //   });
+      //   return;
+      // }
 
-      if (!values.image || values.image.fileList.length === 0) {
-        Swal.fire({
-          icon: "error",
-          title: "Validation Error",
-          text: "Category image is required!",
-        });
-        return;
-      }
+      // if (!values.image || values.image.fileList.length === 0) {
+      //   Swal.fire({
+      //     icon: "error",
+      //     title: "Validation Error",
+      //     text: "Category image is required!",
+      //   });
+      //   return;
+      // }
 
       // Create FormData for file upload
       const formData = new FormData();
-      formData.append("categoryName", values.categoryName.trim());
+      formData.append("categoryName", values?.categoryName?.trim());
       formData.append("category-image", values.image.fileList[0].originFileObj);
 
       // Call API
@@ -96,7 +99,6 @@ export default function Categories() {
         });
         setAddModalOpen(false);
         form.resetFields();
-        // Data will auto-refresh due to invalidatesTags
       } else {
         Swal.fire({
           icon: "error",
@@ -260,23 +262,19 @@ export default function Categories() {
       align: "center",
       render: (_, record) => (
         <Space size="small">
-          <Button
-            type="primary"
-            icon={<EditOutlined />}
-            size="small"
-            className="bg-blue-500"
+          <button
             onClick={() => handleOpenUpdateModal(record)}
-          />
-          <Button
-            type="primary"
-            danger
-            icon={<DeleteOutlined />}
-            size="small"
-            onClick={() => {
-              setCategory(record);
-              setDeleteModalOpen(true);
-            }}
-          />
+            className="border border-green-500 rounded-lg p-1 bg-green-100 text-green-600"
+            title="Edit Listing"
+          >
+            <FiEdit className="w-8 h-8 text-green-600" />
+          </button>
+          <button
+            onClick={() => handleDeleteCategory(record)}
+            className="bg-[#FEE2E2] border border-red-500 rounded-lg p-1 text-red-600"
+          >
+            <RiDeleteBin6Line className="w-8 h-8 text-xl text-[#EF4444] font-bold leading-none cursor-pointer" />
+          </button>
         </Space>
       ),
     },

@@ -29,6 +29,7 @@ const AllUsers = ({ search }) => {
     page,
     searchText: debouncedSearch,
   });
+  // console.log("usersData", usersData);
 
   const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
   const users = usersData?.data;
