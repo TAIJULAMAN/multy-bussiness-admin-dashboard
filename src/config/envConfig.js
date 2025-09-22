@@ -1,11 +1,11 @@
 // Function to get the base API URL
-export const url = "http://10.10.20.57:8001/api/v1/";
-export const pdfUrl = "http://10.10.20.57:8001";
-export const imageUrl = "http://10.10.20.57:8001/uploads";
+// export const url = "http://10.10.20.57:8001/api/v1/";
+// export const pdfUrl = "http://10.10.20.57:8001";
+// export const imageUrl = "http://10.10.20.57:8001/uploads";
 
-// export const url = "http://13.61.16.102:8001/api/v1/";
-// export const pdfUrl = "http://13.61.16.102:8001/";
-// export const imageUrl = "http://13.61.16.102:8001/uploads";
+export const url = "http://13.61.16.102:8001/api/v1/";
+export const pdfUrl = "http://13.61.16.102:8001/";
+export const imageUrl = "http://13.61.16.102:8001/uploads";
 
 export const getBaseUrl = () => {
   return url;
