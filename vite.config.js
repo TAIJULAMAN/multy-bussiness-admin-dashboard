@@ -8,6 +8,14 @@ export default defineConfig({
     port: 3000,
   },
   plugins: [react(), tailwindcss()],
+  allowOrigin: [
+    'https://admin.profitablebusinessesforsale.com',
+  ],
+  preview: {
+    allowedHosts: [
+      'admin.profitablebusinessesforsale.com', // your dashboard domain
+    ]
+  }
 });
 
 // import tailwindcss from "@tailwindcss/vite";
