@@ -1,15 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import {
-  Form,
-  Input,
-  Button,
-  InputNumber,
-  Upload,
-  message,
-  Image,
-  Space,
-} from "antd";
+import { Form, Input, Button, InputNumber, Upload, message, Image } from "antd";
 import { ArrowLeftOutlined, PlusOutlined } from "@ant-design/icons";
 import { useUpdateListingDetailsMutation } from "../../redux/api/listingApi";
 import { getImageBaseUrl } from "../../config/envConfig";
@@ -47,11 +38,8 @@ const EditListing = () => {
   const [previewTitle, setPreviewTitle] = useState("");
   const [currentImages, setCurrentImages] = useState([]);
 
-  // Get listing data from navigation state
   const listingData = location.state?.listing;
-  console.log("listingData from edit list", listingData);
 
-  // Update listing details mutation
   const [updateListingDetails, { isLoading }] =
     useUpdateListingDetailsMutation();
 
@@ -67,7 +55,8 @@ const EditListing = () => {
       message.error("Image must be smaller than 2MB!");
       return Upload.LIST_IGNORE;
     }
-    return isImage && isLt2M;
+    // prevent auto-upload; we'll submit in onFinish via FormData
+    return false;
   };
 
   const handleChange = ({ fileList: newFileList }) => {
@@ -100,8 +89,7 @@ const EditListing = () => {
         category: listingData.category || "",
         subCategory: listingData.subCategory || "",
         businessType: listingData.businessType || "",
-        ownerShipType: listingData?.ownerShipType
-        || "No OwnerShip Type",
+        ownerShipType: listingData?.ownerShipType || "No OwnerShip Type",
         askingPrice: listingData.askingPrice || 0,
         price: listingData.price || 0,
         country: listingData.country || "",
@@ -111,19 +99,8 @@ const EditListing = () => {
         reason: listingData.reason || "",
         business_image: listingData.data?.image || "",
         description: listingData.description || "",
+        image: listingData?.image || "",
       });
-
-      // Set current images from listing data
-      if (listingData.images && listingData.images.length > 0) {
-        const imageUrls = listingData.images.map((img) =>
-          typeof img === "string" ? img : getImageBaseUrl(img)
-        );
-        setCurrentImages(imageUrls);
-      } else if (listingData.image || listingData.business_image) {
-        // fallback to single image field
-        const singleUrl = listingData.image || listingData.business_image;
-        setCurrentImages([singleUrl]);
-      }
     } else {
       message.error("No listing data found. Please select a listing to edit.");
       navigate("/listing-management");
@@ -131,38 +108,61 @@ const EditListing = () => {
   }, [form, navigate, listingData]);
 
   const onFinish = async (values) => {
-    if (!listingData?._id) {
-      message.error("No listing ID found");
-      return;
-    }
-
     try {
-      // Prepare update data
-      const businessImageFromUI = extractFileName(currentImages?.[0]);
-      const updateData = {
-        title: values.title,
-        category: values.category,
-        country: values.country,
-        business_image:
-          businessImageFromUI || extractFileName(values.business_image),
-        reason: values.reason,
-        subCategory: values.subCategory,
-        state: values.state,
-        city: values.city,
-        countryName: values.countryName,
-        askingPrice: values.askingPrice,
-        price: values.price,
-        ownerShipType: values.ownerShipType,
-        businessType: values.businessType,
-        description: values.description,
-      };
+      // If a new file is selected, send multipart FormData; otherwise send JSON
+      const newFile = fileList?.originFileObj;
 
-      // Call update mutation
-      await updateListingDetails({
-        businessId: listingData._id,
-        user: listingData?.user?._id,
-        data: updateData,
-      }).unwrap();
+      if (newFile) {
+        const formData = new FormData();
+        formData.append("title", values.title);
+        formData.append("category", values.category);
+        formData.append("country", values.country);
+        formData.append("reason", values.reason);
+        formData.append("subCategory", values.subCategory ?? "");
+        formData.append("state", values.state ?? "");
+        formData.append("city", values.city ?? "");
+        formData.append("countryName", values.countryName ?? "");
+        formData.append("askingPrice", String(values.askingPrice ?? ""));
+        formData.append("price", String(values.price ?? ""));
+        formData.append("ownerShipType", values.ownerShipType ?? "");
+        formData.append("businessType", values.businessType ?? "");
+        formData.append("description", values.description ?? "");
+        // backend serves under /business-image/, so likely expects 'business-image'
+        formData.append("business-image", newFile);
+
+        await updateListingDetails({
+          businessId: listingData._id,
+          user: listingData?.user?._id,
+          data: formData,
+        }).unwrap();
+      } else {
+        // Prepare JSON update with existing filename
+        const businessImageFromUI = extractFileName(
+          (Array.isArray(currentImages) ? currentImages[0] : currentImages) || values.image
+        );
+        const updateData = {
+          title: values.title,
+          category: values.category,
+          country: values.country,
+          image: businessImageFromUI || values.image || "",
+          reason: values.reason,
+          subCategory: values.subCategory,
+          state: values.state,
+          city: values.city,
+          countryName: values.countryName,
+          askingPrice: values.askingPrice,
+          price: values.price,
+          ownerShipType: values.ownerShipType,
+          businessType: values.businessType,
+          description: values.description,
+        };
+
+        await updateListingDetails({
+          businessId: listingData._id,
+          user: listingData?.user?._id,
+          data: updateData,
+        }).unwrap();
+      }
 
       // Show success message
       Swal.fire({
@@ -207,6 +207,20 @@ const EditListing = () => {
           </Button>
         </div>
 
+        <div className="mt-2">
+          <img
+            src={
+              (listingData?.image &&
+                `${getImageBaseUrl()}/business-image/${listingData.image}`) ||
+              "default-image.jpg"
+            }
+            width={80}
+            height={80}
+            alt="current Product Image"
+            className="bg-slate-100 border cursor-pointer"
+          />
+        </div>
+
         <Form
           form={form}
           name="editListing"
@@ -220,32 +234,6 @@ const EditListing = () => {
             <h3 className="text-lg font-medium text-gray-900 mb-4">
               Current Images
             </h3>
-            <div className="flex flex-wrap gap-4 mb-4">
-              {currentImages.map((image, index) => (
-                <div key={`current-${index}`} className="relative group">
-                  <Image
-                    src={image}
-                    width={120}
-                    height={120}
-                    className="rounded-lg object-cover border border-gray-200"
-                    preview={{
-                      src: image,
-                    }}
-                  />
-                  <button
-                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      const newImages = [...currentImages];
-                      newImages.splice(index, 1);
-                      setCurrentImages(newImages);
-                    }}
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
-            </div>
           </div>
 
           {/* Image Upload Section */}
@@ -254,20 +242,21 @@ const EditListing = () => {
               Upload New Images
             </h3>
             <Upload
-              action="https://www.mocky.io/v2/5cc8019d300000980a055e76" // Replace with your upload endpoint
+              // do not auto-upload; we submit via onFinish
               listType="picture-card"
               fileList={fileList}
               onPreview={handlePreview}
               onChange={handleChange}
               beforeUpload={beforeUpload}
               onRemove={handleRemove}
-              multiple
+              multiple={false}
+              maxCount={1}
               accept="image/*"
             >
-              {fileList.length >= 8 ? null : uploadButton}
+              {fileList.length >= 1 ? null : uploadButton}
             </Upload>
             <p className="text-sm text-gray-500 mt-2">
-              Upload up to 8 images. Recommended size: 800x800px, max 2MB each.
+              Upload one image. Recommended size: 800x800px, max 2MB.
             </p>
           </div>
 
