@@ -3,9 +3,9 @@
 // export const pdfUrl = "http://10.10.20.57:8001";
 // export const imageUrl = "http://10.10.20.57:8001/uploads";
 
-export const url = "http://13.61.16.102:8001/api/v1/";
-export const pdfUrl = "http://13.61.16.102:8001/";
-export const imageUrl = "http://13.61.16.102:8001/uploads";
+export const url = "https://api.profitablebusinessesforsale.com/api/v1/";
+export const pdfUrl = "https://api.profitablebusinessesforsale.com/";
+export const imageUrl = "https://api.profitablebusinessesforsale.com/uploads";
 
 export const getBaseUrl = () => {
   return url;

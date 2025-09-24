@@ -132,6 +132,7 @@ export default function Categories() {
           values.image.fileList[0].originFileObj
         );
       }
+      // console.log(selectedCategory);
       const response = await updateCategory({
         categoryId: selectedCategory.id,
         data: formData,
@@ -175,6 +176,7 @@ export default function Categories() {
 
   const handleDeleteCategory = async () => {
     try {
+      // console.log(selectedCategory);
       const response = await deleteCategory(category.id).unwrap();
 
       if (response?.success) {
@@ -270,7 +272,10 @@ export default function Categories() {
             <FiEdit className="w-8 h-8 text-green-600" />
           </button>
           <button
-            onClick={() => handleDeleteCategory(record)}
+            onClick={() => {
+              setCategory(record); // Set the category state for deletion
+              setDeleteModalOpen(true); // Open the confirmation modal
+            }}
             className="bg-[#FEE2E2] border border-red-500 rounded-lg p-1 text-red-600"
           >
             <RiDeleteBin6Line className="w-8 h-8 text-xl text-[#EF4444] font-bold leading-none cursor-pointer" />
