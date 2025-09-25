@@ -24,14 +24,15 @@ import AllSubscriber from "../pages/AllSubscriber/AllSubscriber";
 import EditListing from "../pages/Listings/EditListing";
 import Formation from "../pages/formation/Formation";
 import SubcategoryManagement from "../pages/Categories/SubcategoryManagement";
+import PrivateRoute from "./PrivetRoute";
 
 export const Routes = createBrowserRouter([
   {
     path: "/",
     element: (
-      <PrivateRoute>
+    //   <PrivateRoute>
           <Dashboard />
-      </PrivateRoute>
+      // </PrivateRoute>
     ),
     children: [
       {
