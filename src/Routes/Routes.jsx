@@ -29,9 +29,9 @@ export const Routes = createBrowserRouter([
   {
     path: "/",
     element: (
-      // <PrivateRoute>
-      <Dashboard />
-      // </PrivateRoute>
+      <PrivateRoute>
+          <Dashboard />
+      </PrivateRoute>
     ),
     children: [
       {

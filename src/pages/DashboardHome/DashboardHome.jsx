@@ -16,17 +16,17 @@ function DashboardHome() {
   const cardData = [
     {
       title: "Total Users",
-      value: isLoading ? <Loader /> : dashboardData?.data?.totalUser || 110,
+      value: isLoading ? <Loader /> : dashboardData?.data?.totalUser || 0,
       icon: <img src={user} alt="Driver Icon" />,
     },
     {
       title: "Total Business",
-      value: isLoading ? <Loader /> : dashboardData?.data?.totalBusiness || 20,
+      value: isLoading ? <Loader /> : dashboardData?.data?.totalBusiness || 0,
       icon: <img src={list} alt="User Icon" />,
     },
     {
       title: "Total Category",
-      value: isLoading ? <Loader /> : dashboardData?.data?.totalCategory || 30,
+      value: isLoading ? <Loader /> : dashboardData?.data?.totalCategory || 0,
       icon: <img src={category} alt="Car Icon" />,
     },
   ];
