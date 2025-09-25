@@ -20,7 +20,7 @@ export const getPDFUrl = () => {
 };
 
 export const getImageUrl = (imagePath) => {
-  if (imagePath.includes("http")) {
+  if (imagePath.includes("https")) {
     return imagePath;
   }
   return `${imageUrl}${imagePath}`;
