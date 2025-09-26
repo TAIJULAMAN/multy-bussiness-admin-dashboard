@@ -1,28 +1,34 @@
-import React from 'react';
-import { jwtDecode } from 'jwt-decode';
-import { useEffect, useState } from 'react';
-import { Navigate } from 'react-router';
+import React from "react";
+import { jwtDecode } from "jwt-decode";
+import { useEffect, useState } from "react";
+import { Navigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const PrivateRoute = ({ children }) => {
+  const token = useSelector((state) => state.auth?.token);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem('accessToken');
+    console.log("token from private route", token);
     if (token) {
       try {
         const decoded = jwtDecode(token);
-        if (decoded.role === 'ADMIN') {
+        console.log(decoded);
+        if (decoded.role === "Admin") {
           setIsAuthorized(true);
         } else {
           setIsAuthorized(false);
         }
       } catch (error) {
-        console.error('Invalid token', error);
+        console.error("Invalid token", error);
+        setIsAuthorized(false);
       }
+    } else {
+      setIsAuthorized(false);
     }
     setIsLoading(false);
-  }, []);
+  }, [token]);
 
   if (isLoading) {
     return (
