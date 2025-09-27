@@ -9,22 +9,24 @@ const NDA = () => {
   const [page, setPage] = useState(1);
 
   const { data: ndaData, isLoading } = useGetAllNDAQuery({ page });
-
+  // console.log(ndaData);
   const getFilteredNDAData = () => {
     if (!ndaData?.data) return [];
 
     switch (activeTab) {
       case "sellerNDA":
-        return ndaData?.data?.filter((nda) => nda?.role === "Seller");
+        return ndaData?.data?.filter((nda) => nda?.userRole === "Seller");
       case "buyerNDA":
-        return ndaData?.data?.filter((nda) => nda?.role === "Buyer");
+        return ndaData?.data?.filter((nda) => nda?.userRole === "Buyer");
       case "businessAssetSellerNDA":
-        return ndaData?.data?.filter((nda) => nda?.role === "Asset Seller");
+        return ndaData?.data?.filter((nda) => nda?.userRole === "Asset Seller");
       case "investorNDA":
-        return ndaData?.data?.filter((nda) => nda?.role === "Investor");
+        return ndaData?.data?.filter((nda) => nda?.userRole === "Investor");
+      case "brokerNDA":
+        return ndaData?.data?.filter((nda) => nda?.userRole === "Broker");
       case "franchisorNDA":
         return ndaData?.data?.filter(
-          (nda) => nda?.role === "Business Idea Lister"
+          (nda) => nda?.userRole === "Business Idea Lister"
         );
       default:
         return (
@@ -37,6 +39,7 @@ const NDA = () => {
 
   const renderContent = () => {
     const filteredData = getFilteredNDAData();
+    // console.log(filteredData);
     return (
       <div className="p-4">
         <NDATable data={filteredData} ndaData={ndaData} page={page} setPage={setPage} />
@@ -89,6 +92,13 @@ const NDA = () => {
           className={tabStyle("franchisorNDA")}
         >
           Franchisor NDA
+        </button>
+
+         <button
+          onClick={() => setActiveTab("brokerNDA")}
+          className={tabStyle("brokerNDA")}
+        >
+          Broker NDA
         </button>
       </div>
       {renderContent()}
