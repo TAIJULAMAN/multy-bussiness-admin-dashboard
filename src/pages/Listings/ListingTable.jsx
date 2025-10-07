@@ -446,21 +446,26 @@ export default function ListingTable({ businessRole = "", status = "" }) {
 
             {/* Action Buttons */}
             <div className="w-full pt-5 border-t border-gray-200 flex gap-2">
+              {/* Approve button - active only when not approved */}
               <button
                 onClick={handleApprove}
-                disabled={isUpdating}
-                className={`w-full px-3 py-2 border text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed
-    ${
-      selectedListing?.isApproved === true
-        ? "bg-red-500 border-red-500 hover:bg-red-600 text-white"
-        : "bg-blue-500 border-blue-500 hover:bg-blue-600 text-white"
-    }`}
+                disabled={isUpdating || selectedListing?.isApproved === true}
+                className={`w-1/2 px-3 py-2 border !text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed
+                  ${"bg-blue-500 border-blue-500 hover:bg-blue-600 text-white"}`}
+                title="Approve Listing"
               >
-                {isUpdating
-                  ? "Processing..."
-                  : selectedListing?.isApproved === true
-                  ? "Mark as Rejected"
-                  : "Mark as Approve"}
+                {isUpdating ? "Processing..." : "Mark as Approve"}
+              </button>
+
+              {/* Reject button - active only when currently approved */}
+              <button
+                onClick={handleApprove}
+                disabled={isUpdating || selectedListing?.isApproved !== true}
+                className={`w-1/2 px-3 py-2 border !text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed
+                  ${"bg-red-500 border-red-500 hover:bg-red-600 text-white"}`}
+                title="Reject Listing"
+              >
+                {isUpdating ? "Processing..." : "Mark as Rejected"}
               </button>
             </div>
           </div>
