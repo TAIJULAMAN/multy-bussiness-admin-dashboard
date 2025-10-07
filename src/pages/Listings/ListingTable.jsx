@@ -19,6 +19,7 @@ export default function ListingTable({ businessRole = "", status = "" }) {
   const [selectedListing, setSelectedListing] = useState(null);
   console.log("selectedListing", selectedListing);
   const [page, setPage] = useState(1);
+  const [activeAction, setActiveAction] = useState(null); // 'approve' | 'reject' | null
   const navigate = useNavigate();
 
   // Fetch listings data from API with filters
@@ -102,6 +103,12 @@ export default function ListingTable({ businessRole = "", status = "" }) {
         text: "Failed to approve listing. Please try again.",
       });
     }
+    setActiveAction(null);
+  };
+
+  const handleApproveClick = async (action) => {
+    setActiveAction(action); // 'approve' or 'reject'
+    await handleApprove();
   };
 
   const dataSource = listingsData?.data?.map((listing, index) => ({
@@ -448,24 +455,24 @@ export default function ListingTable({ businessRole = "", status = "" }) {
             <div className="w-full pt-5 border-t border-gray-200 flex gap-2">
               {/* Approve button - active only when not approved */}
               <button
-                onClick={handleApprove}
+                onClick={() => handleApproveClick("approve")}
                 disabled={isUpdating || selectedListing?.isApproved === true}
                 className={`w-1/2 px-3 py-2 border !text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed
                   ${"bg-blue-500 border-blue-500 hover:bg-blue-600 text-white"}`}
                 title="Approve Listing"
               >
-                {isUpdating ? "Processing..." : "Mark as Approve"}
+                {isUpdating && activeAction === "approve" ? "Processing..." : "Mark as Approve"}
               </button>
 
               {/* Reject button - active only when currently approved */}
               <button
-                onClick={handleApprove}
+                onClick={() => handleApproveClick("reject")}
                 disabled={isUpdating || selectedListing?.isApproved !== true}
                 className={`w-1/2 px-3 py-2 border !text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed
                   ${"bg-red-500 border-red-500 hover:bg-red-600 text-white"}`}
                 title="Reject Listing"
               >
-                {isUpdating ? "Processing..." : "Mark as Rejected"}
+                {isUpdating && activeAction === "reject" ? "Processing..." : "Mark as Rejected"}
               </button>
             </div>
           </div>

@@ -3,10 +3,21 @@ import { baseApi } from "./baseApi";
 const categoryApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getAllCategory: builder.query({
-      query: ({ page }) => ({
-        url: "category/get-category-dashboard",
+      query: (arg) => {
+        const page = arg?.page;
+        return {
+          url: "category/get-category-dashboard",
+          method: "GET",
+          params: page ? { page } : {},
+        };
+      },
+      providesTags: ["category"],
+    }),
+    // fetch all categories (no pagination)
+    getAllCategoryList: builder.query({
+      query: () => ({
+        url: "category/get-all-category",
         method: "GET",
-        params: { page },
       }),
       providesTags: ["category"],
     }),
@@ -41,6 +52,7 @@ const categoryApi = baseApi.injectEndpoints({
 export const {
   useCreateCategoryMutation,
   useGetAllCategoryQuery,
+  useGetAllCategoryListQuery,
   useUpdateCategoryMutation,
   useDeleteCategoryMutation,
 } = categoryApi;

@@ -109,6 +109,8 @@ const TransactionTable = () => {
             pageSize: metaLimit,
             total: metaTotal,
             current: metaPage,
+            showSizeChanger: false,
+
             onChange: (newPage) => setPage(newPage),
           }}
           scroll={{ x: "max-content" }}

@@ -12,6 +12,7 @@ const ListingsTabs = () => {
     { key: "Asset Seller", label: "Franchise Listings" },
     { key: "Francise Seller", label: "Business Asset Listings" },
     { key: "Business Idea Lister", label: "Business Idea Lister" },
+    { key: "Broker", label: "Broker" },
   ];
 
   const renderContent = () => {
@@ -52,6 +53,12 @@ const ListingsTabs = () => {
             <ListingTable businessRole="Business Idea Lister" />
           </div>
         );
+        case "Broker":
+          return (
+            <div className="p-4">
+              <ListingTable businessRole="Broker" />
+            </div>
+          );
       default:
         return (
           <div className="p-4">

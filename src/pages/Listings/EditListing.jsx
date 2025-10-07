@@ -1,14 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Form, Input, Button, InputNumber, Upload, message, Image } from "antd";
+import {
+  Form,
+  Input,
+  Button,
+  InputNumber,
+  Upload,
+  message,
+  Image,
+  Select,
+} from "antd";
 import { ArrowLeftOutlined, PlusOutlined } from "@ant-design/icons";
 import { useUpdateListingDetailsMutation } from "../../redux/api/listingApi";
+import { useGetAllCategoryListQuery } from "../../redux/api/categoryApi";
 import { getImageBaseUrl } from "../../config/envConfig";
 import Swal from "sweetalert2";
+import { useGetAllSubCategoryQuery } from "../../redux/api/subCatagoryApi";
 
-const { TextArea } = Input;
-
-// helper to get filename from url
 const extractFileName = (path) => {
   if (!path) return null;
   try {
@@ -17,6 +25,44 @@ const extractFileName = (path) => {
     return idx >= 0 ? url.substring(idx + 1) : url;
   } catch (e) {
     return path;
+  }
+};
+
+const priceToRange = (val) => {
+  if (val == null) return "";
+  const n = Number(val);
+  if (!Number.isNaN(n)) {
+    if (n < 50000) return "under $50k";
+    if (n < 100000) return "$50k-$100k";
+    if (n < 250000) return "$100k-$250k";
+    if (n < 500000) return "$250k-$500k";
+    if (n < 1000000) return "$500k-$1m";
+    return "over $1m";
+  }
+  const s = String(val).trim();
+  const options = [
+    "under $50k",
+    "$50k-$100k",
+    "$100k-$250k",
+    "$250k-$500k",
+    "$500k-$1m",
+    "over $1m",
+  ];
+  return options.includes(s) ? s : s;
+};
+
+const htmlToPlainText = (html) => {
+  if (!html || typeof window === "undefined") return "";
+  try {
+    const div = document.createElement("div");
+    // Replace <br> with newlines so they are preserved in text
+    const normalized = String(html).replace(/<br\s*\/?>/gi, "\n");
+    div.innerHTML = normalized;
+    const text = div.textContent || div.innerText || "";
+    // Collapse excessive whitespace
+    return text.replace(/\s+/g, " ").trim();
+  } catch {
+    return String(html);
   }
 };
 
@@ -39,20 +85,53 @@ const EditListing = () => {
   const [currentImages, setCurrentImages] = useState([]);
 
   const listingData = location.state?.listing;
+  console.log("listingData from edit listing", listingData);
 
   const [updateListingDetails, { isLoading }] =
     useUpdateListingDetailsMutation();
 
-  // Handle image upload
+  const { data: categoriesResp, isLoading: isLoadingCategories } =
+    useGetAllCategoryListQuery();
+  // const categoryName = categoriesResp?.data?.map((c) => c.categoryName);
+  // console.log("categoryName from edit listing", categoryName);
+  const rawCategories = Array.isArray(categoriesResp?.data)
+    ? categoriesResp.data
+    : Array.isArray(categoriesResp)
+    ? categoriesResp
+    : [];
+
+  const categoryOptions = rawCategories.map((c, idx) => {
+    const name = c?.categoryName || c?.name || c?.title || `Category ${idx + 1}`;
+    return { label: name, value: name };
+  });
+
+  // Watch selected category and derive sub categories list
+  const watchedCategory = Form.useWatch("category", form);
+  const selectedCategoryName = watchedCategory || listingData?.category;
+  const selectedCategory = rawCategories.find(
+    (c) => (c?.categoryName || c?.name || c?.title) === selectedCategoryName
+  );
+  const subCategoryOptions = (Array.isArray(selectedCategory?.subCategories)
+    ? selectedCategory.subCategories
+    : [])
+    .map((s, idx) => {
+      const name = s?.subCategoryName || s?.name || s?.title || `Sub Category ${idx + 1}`;
+      return { label: name, value: name };
+    });
+
+  // Clear subCategory if it is not valid for the selected category
+  useEffect(() => {
+    const current = form.getFieldValue("subCategory");
+    const valid = subCategoryOptions.some((opt) => opt.value === current);
+    if (!valid) {
+      form.setFieldsValue({ subCategory: undefined });
+    }
+  }, [selectedCategoryName, subCategoryOptions, form]);
+
   const beforeUpload = (file) => {
     const isImage = file.type.startsWith("image/");
     if (!isImage) {
       message.error("You can only upload image files!");
-      return Upload.LIST_IGNORE;
-    }
-    const isLt2M = file.size / 1024 / 1024 < 2;
-    if (!isLt2M) {
-      message.error("Image must be smaller than 2MB!");
       return Upload.LIST_IGNORE;
     }
     // prevent auto-upload; we'll submit in onFinish via FormData
@@ -60,7 +139,8 @@ const EditListing = () => {
   };
 
   const handleChange = ({ fileList: newFileList }) => {
-    setFileList(newFileList);
+    // Always keep only one file in the field
+    setFileList(newFileList.slice(-1));
   };
 
   const handlePreview = async (file) => {
@@ -81,26 +161,36 @@ const EditListing = () => {
     </div>
   );
 
-  // Initialize form with listing data
   useEffect(() => {
     if (listingData) {
       form.setFieldsValue({
         title: listingData?.title || "",
-        category: listingData.category || "",
-        subCategory: listingData.subCategory || "",
-        businessType: listingData.businessType || "",
+        category: listingData?.category || "",
+        subCategory: listingData?.subCategory || "",
+        businessType: listingData?.businessType || "",
         ownerShipType: listingData?.ownerShipType || "No OwnerShip Type",
-        askingPrice: listingData.askingPrice || 0,
-        price: listingData.price || 0,
-        country: listingData.country || "",
-        countryName: listingData.countryName || "",
-        state: listingData.state || "",
-        city: listingData.city || "",
-        reason: listingData.reason || "",
+        askingPrice: priceToRange(listingData?.askingPrice),
+        price: listingData?.price || 0,
+        countryName: listingData?.countryName || "",
+        state: listingData?.state || "",
+        city: listingData?.city || "",
+        reason: listingData?.reason || "",
         business_image: listingData.data?.image || "",
-        description: listingData.description || "",
+        description: htmlToPlainText(listingData?.description || ""),
         image: listingData?.image || "",
       });
+      if (listingData?.image) {
+        setFileList([
+          {
+            uid: "-1",
+            name: extractFileName(listingData?.image) || "current-image",
+            status: "done",
+            url: `${getImageBaseUrl()}/business-image/${listingData?.image}`,
+          },
+        ]);
+      } else {
+        setFileList([]);
+      }
     } else {
       message.error("No listing data found. Please select a listing to edit.");
       navigate("/listing-management");
@@ -109,14 +199,14 @@ const EditListing = () => {
 
   const onFinish = async (values) => {
     try {
-      // If a new file is selected, send multipart FormData; otherwise send JSON
-      const newFile = fileList?.originFileObj;
+      const newFile = Array.isArray(fileList)
+        ? fileList[0]?.originFileObj
+        : undefined;
 
       if (newFile) {
         const formData = new FormData();
         formData.append("title", values.title);
         formData.append("category", values.category);
-        formData.append("country", values.country);
         formData.append("reason", values.reason);
         formData.append("subCategory", values.subCategory ?? "");
         formData.append("state", values.state ?? "");
@@ -127,7 +217,6 @@ const EditListing = () => {
         formData.append("ownerShipType", values.ownerShipType ?? "");
         formData.append("businessType", values.businessType ?? "");
         formData.append("description", values.description ?? "");
-        // backend serves under /business-image/, so likely expects 'business-image'
         formData.append("business-image", newFile);
 
         await updateListingDetails({
@@ -138,12 +227,12 @@ const EditListing = () => {
       } else {
         // Prepare JSON update with existing filename
         const businessImageFromUI = extractFileName(
-          (Array.isArray(currentImages) ? currentImages[0] : currentImages) || values.image
+          (Array.isArray(currentImages) ? currentImages[0] : currentImages) ||
+            values.image
         );
         const updateData = {
           title: values.title,
           category: values.category,
-          country: values.country,
           image: businessImageFromUI || values.image || "",
           reason: values.reason,
           subCategory: values.subCategory,
@@ -188,8 +277,6 @@ const EditListing = () => {
   };
 
   const handleRemove = (file) => {
-    // In a real app, you might want to mark the image for deletion
-    // or remove it from the fileList state
     return true;
   };
 
@@ -229,13 +316,6 @@ const EditListing = () => {
           autoComplete="off"
           className="space-y-6"
         >
-          {/* Current Images Section */}
-          <div className="mb-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              Current Images
-            </h3>
-          </div>
-
           {/* Image Upload Section */}
           <div className="mb-8">
             <h3 className="text-lg font-medium text-gray-900 mb-4">
@@ -256,7 +336,7 @@ const EditListing = () => {
               {fileList.length >= 1 ? null : uploadButton}
             </Upload>
             <p className="text-sm text-gray-500 mt-2">
-              Upload one image. Recommended size: 800x800px, max 2MB.
+              Upload one image. Recommended size: 800x800px.
             </p>
           </div>
 
@@ -299,15 +379,7 @@ const EditListing = () => {
                   },
                 ]}
               >
-                <InputNumber
-                  size="large"
-                  className="w-full"
-                  min={0}
-                  formatter={(value) =>
-                    `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  }
-                  parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
-                />
+                <InputNumber size="large" min={0} addonBefore="$" />
               </Form.Item>
 
               <Form.Item
@@ -316,15 +388,32 @@ const EditListing = () => {
                 rules={[
                   {
                     required: true,
-                    message: "Please input the category!",
+                    message: "Please select a category!",
                   },
                 ]}
               >
-                <Input size="large" placeholder="Enter category" />
+                <Select
+                  size="large"
+                  placeholder={
+                    isLoadingCategories
+                      ? "Loading categories..."
+                      : "Select category"
+                  }
+                  options={categoryOptions}
+                  loading={isLoadingCategories}
+                  showSearch
+                  optionFilterProp="label"
+                />
               </Form.Item>
 
               <Form.Item label="Sub Category" name="subCategory">
-                <Input size="large" placeholder="Enter sub category" />
+                <Select
+                  size="large"
+                  placeholder={"Select sub category"}
+                  options={subCategoryOptions}
+                  showSearch
+                  optionFilterProp="label"
+                />
               </Form.Item>
 
               <Form.Item label="Business Type" name="businessType">
@@ -338,22 +427,26 @@ const EditListing = () => {
                 <Input size="large" placeholder="Enter ownership type" />
               </Form.Item>
 
-              <Form.Item label="Asking Price ($)" name="askingPrice">
-                <InputNumber
+              <Form.Item
+                label="Asking Price"
+                name="askingPrice"
+                rules={[
+                  { required: true, message: "Please select a price range" },
+                ]}
+              >
+                <Select
                   size="large"
-                  className="w-full"
-                  min={0}
-                  formatter={(value) =>
-                    `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  }
-                  parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+                  placeholder="Select price range"
+                  options={[
+                    { label: "under $50k", value: "under $50k" },
+                    { label: "$50k-$100k", value: "$50k-$100k" },
+                    { label: "$100k-$250k", value: "$100k-$250k" },
+                    { label: "$250k-$500k", value: "$250k-$500k" },
+                    { label: "$500k-$1m", value: "$500k-$1m" },
+                    { label: "over $1m", value: "over $1m" },
+                  ]}
                 />
               </Form.Item>
-
-              <Form.Item label="Country" name="country">
-                <Input size="large" placeholder="Enter country code" />
-              </Form.Item>
-
               <Form.Item label="Country Name" name="countryName">
                 <Input size="large" placeholder="Enter country name" />
               </Form.Item>
@@ -382,7 +475,7 @@ const EditListing = () => {
               },
             ]}
           >
-            <TextArea
+            <Input.TextArea
               rows={4}
               placeholder="Enter detailed description about the product"
               className="resize-none"

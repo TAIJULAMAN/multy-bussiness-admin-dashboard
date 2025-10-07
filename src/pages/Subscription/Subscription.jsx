@@ -253,15 +253,15 @@ export default function Subscription({ role }) {
               <div className="border-2 border-[#0091FF] rounded-lg shadow-sm h-full flex flex-col">
                 <div className="p-6 border-b">
                   <div>
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h2 className="text-2xl font-bold">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-2">
+                      <div className="min-w-0">
+                        <h2 className="text-2xl font-bold truncate">
                           {plans[planKey].displayName}
                         </h2>
                       </div>
                       <button
                         onClick={() => handleOpenPriceModal(planKey)}
-                        className="bg-[#0091FF] cursor-pointer text-sm !text-white px-4 py-2 rounded-md flex items-center"
+                        className="bg-[#0091FF] cursor-pointer text-sm !text-white px-4 py-2 rounded-md flex items-center self-start sm:self-auto shrink-0"
                       >
                         <PencilIcon className="h-4 w-4" />
                       </button>

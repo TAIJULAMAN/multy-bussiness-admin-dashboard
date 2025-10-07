@@ -43,11 +43,12 @@ export default function Categories() {
   const { data: categoriesResponse, isLoading } = useGetAllCategoryQuery({
     page,
   });
+ 
   const [createCategory, { isLoading: isCreating }] =
     useCreateCategoryMutation();
   const [updateCategory, { isLoading: isUpdating }] =
     useUpdateCategoryMutation();
-    console.log("updateCategory", updateCategory)
+  console.log("updateCategory", updateCategory);
   const [deleteCategory, { isLoading: isDeleting }] =
     useDeleteCategoryMutation();
 
@@ -64,31 +65,10 @@ export default function Categories() {
 
   const handleAddCategory = async (values) => {
     try {
-      // Validate required fields
-      // if (!values.categoryName?.trim()) {
-      //   Swal.fire({
-      //     icon: "error",
-      //     title: "Validation Error",
-      //     text: "Category name is required!",
-      //   });
-      //   return;
-      // }
-
-      // if (!values.image || values.image.fileList.length === 0) {
-      //   Swal.fire({
-      //     icon: "error",
-      //     title: "Validation Error",
-      //     text: "Category image is required!",
-      //   });
-      //   return;
-      // }
-
-      // Create FormData for file upload
       const formData = new FormData();
       formData.append("categoryName", values?.categoryName?.trim());
       formData.append("category-image", values.image.fileList[0].originFileObj);
 
-      // Call API
       const response = await createCategory(formData).unwrap();
 
       if (response?.success) {
@@ -132,7 +112,6 @@ export default function Categories() {
           values.image.fileList[0].originFileObj
         );
       }
-      // console.log(selectedCategory);
       const response = await updateCategory({
         categoryId: selectedCategory.id,
         data: formData,
