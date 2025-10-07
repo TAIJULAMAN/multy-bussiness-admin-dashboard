@@ -2,12 +2,13 @@ import React from "react";
 import { ConfigProvider, Modal, Table } from "antd";
 import { useState } from "react";
 import { FaRegEye } from "react-icons/fa";
-import { FiEdit } from "react-icons/fi";
+import { FiEdit, FiTrash2 } from "react-icons/fi";
 
 import { useNavigate } from "react-router-dom";
 import {
   useGetAllListingsQuery,
   useUpdateListingMutation,
+  useDeleteListingMutation,
 } from "../../redux/api/listingApi";
 import Loader from "../../Components/Shared/Loaders/Loader";
 import { getImageBaseUrl } from "../../config/envConfig";
@@ -31,10 +32,43 @@ export default function ListingTable({ businessRole = "", status = "" }) {
 
   // Update listing mutation
   const [updateListing, { isLoading: isUpdating }] = useUpdateListingMutation();
+  const [deleteListing, { isLoading: isDeleting }] = useDeleteListingMutation();
 
   const showModal = (record) => {
     setSelectedListing(record);
     setIsModalOpen(true);
+  };
+
+  const handleDelete = async (record) => {
+    if (!record?._id) return;
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: `This will permanently delete "${record?.title || "this listing"}"`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await deleteListing({ businessId: record._id }).unwrap();
+        Swal.fire({
+          icon: "success",
+          title: "Deleted!",
+          text: `Listing "${record?.title || ""}" has been deleted successfully.`,
+          timer: 1800,
+          showConfirmButton: false,
+        });
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: error?.data?.message || "Failed to delete listing. Please try again.",
+        });
+      }
+    }
   };
 
   const handleApprove = async () => {
@@ -80,6 +114,7 @@ export default function ListingTable({ businessRole = "", status = "" }) {
     catrgory: listing?.category || "N/A",
     productImg: listing?.image,
     price: listing?.price || "N/A",
+    views: listing?.views || "N/A",
     date: listing?.createdAt
       ? new Date(listing?.createdAt).toLocaleDateString()
       : "N/A",
@@ -147,6 +182,11 @@ export default function ListingTable({ businessRole = "", status = "" }) {
       ),
     },
     {
+      title: "Views",
+      dataIndex: "views",
+      key: "views",
+    },
+    {
       title: "Price",
       key: "price",
       render: (_, record) => (
@@ -185,6 +225,14 @@ export default function ListingTable({ businessRole = "", status = "" }) {
             title="Edit Listing"
           >
             <FiEdit className="w-8 h-8 text-green-600" />
+          </button>
+          <button
+            onClick={() => handleDelete(record)}
+            disabled={isDeleting}
+            className="border border-red-500 rounded-lg p-1 bg-red-100 text-red-600"
+            title="Delete Listing"
+          >
+            <FiTrash2 className={`w-8 h-8 ${isDeleting ? "opacity-50" : "text-red-600"}`} />
           </button>
         </div>
       ),

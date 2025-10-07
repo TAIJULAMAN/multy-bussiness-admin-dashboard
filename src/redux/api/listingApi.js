@@ -21,13 +21,20 @@ const listingApi = baseApi.injectEndpoints({
       },
       invalidatesTags: ["listings"],
     }),
-    // Update listing details (title, price, category, etc.)
     updateListingDetails: builder.mutation({
       query: ({ businessId, user, data }) => ({
         url: "business/update-business",
         method: "PATCH",
         params: { businessId, user },
         body: data,
+      }),
+      invalidatesTags: ["listings"],
+    }),
+    deleteListing: builder.mutation({
+      query: ({ businessId }) => ({
+        url: "business/delete-business",
+        method: "DELETE",
+        params: { businessId },
       }),
       invalidatesTags: ["listings"],
     }),
@@ -38,6 +45,7 @@ export const {
   useGetAllListingsQuery,
   useUpdateListingMutation,
   useUpdateListingDetailsMutation,
+  useDeleteListingMutation,
 } = listingApi;
 
 export default listingApi;

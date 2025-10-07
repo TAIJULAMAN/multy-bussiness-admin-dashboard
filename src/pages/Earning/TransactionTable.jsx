@@ -15,7 +15,7 @@ const TransactionTable = () => {
   const dataSource = earningData?.data?.allPayment
     ? [...earningData.data.allPayment]
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        .slice(0, 5)
+        .slice(0, 10)
         .map((payment) => ({
           key: payment._id,
           _id: payment._id,
