@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import {
   BarChart,
   Bar,
@@ -11,9 +11,9 @@ import {
 } from "recharts";
 import { Select } from "antd";
 import { useGetEarningQuery } from "../../redux/api/earningApi";
-import Loader from "../../Components/Shared/Loaders/Loader";
+import Loader from "../../Components/Loaders/Loader";
 
-const BookingChart = () => {
+export default function BookingChart() {
   const currentYear = new Date().getFullYear();
   const [year, setYear] = useState(currentYear);
   const [years] = useState(() => {
@@ -47,7 +47,10 @@ const BookingChart = () => {
     // Create an array with 12 months initialized to 0
     const monthlyValues = new Array(12).fill(0);
 
-    if (apiData?.data?.monthWiseEarnings && Array.isArray(apiData.data.monthWiseEarnings)) {
+    if (
+      apiData?.data?.monthWiseEarnings &&
+      Array.isArray(apiData.data.monthWiseEarnings)
+    ) {
       apiData.data.monthWiseEarnings.forEach((item) => {
         // Only process if month is valid
         if (item.month >= 1 && item.month <= 12) {
@@ -156,6 +159,4 @@ const BookingChart = () => {
       </ResponsiveContainer>
     </div>
   );
-};
-
-export default BookingChart;
+}

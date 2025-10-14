@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import PageHeading from "../../Components/Shared/PageHeading";
 import NDATable from "./NDATable";
 import { useGetAllNDAQuery } from "../../redux/api/NDAApi";
-import Loader from "../../Components/Shared/Loaders/Loader";
+import Loader from "../../Components/Loaders/Loader";
 
 const NDA = () => {
   const [activeTab, setActiveTab] = useState("sellerNDA");

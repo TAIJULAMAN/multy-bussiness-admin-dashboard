@@ -6,7 +6,7 @@ export default defineConfig({
 
   server: {
 
-    host: "0.0.0.0",
+    host: "10.10.20.72",
 
     port: 3000,
 

@@ -1,24 +1,14 @@
-import React from "react";
-import {
-  ConfigProvider,
-  Modal,
-  Table,
-  Form,
-  Input,
-  Select,
-  DatePicker,
-  Checkbox,
-  Spin,
-} from "antd";
+import { ConfigProvider, Table, Form } from "antd";
 import { useState } from "react";
 import Swal from "sweetalert2";
 import dayjs from "dayjs";
 
 import { CiEdit } from "react-icons/ci";
-import { RiDeleteBin6Line } from "react-icons/ri";
+import DeleteCouponButton from "../../Components/coupons/DeleteCouponButton";
 
 import PageHeading from "../../Components/Shared/PageHeading";
-import Loader from "../../Components/Shared/Loaders/Loader";
+import Loader from "../../Components/Loaders/Loader";
+import CouponModal from "../../Components/coupons/CouponModal";
 
 import {
   useGet_all_couponQuery,
@@ -32,14 +22,12 @@ function Coupon() {
   const [page, setPage] = useState(1);
   const [form] = Form.useForm();
   const [editingRecord, setEditingRecord] = useState(null);
-  const { Option } = Select;
 
   const { data, isLoading } = useGet_all_couponQuery({ page });
   const [addCoupon, { isLoading: isAddingCoupon }] = useAdd_couponMutation();
   const [updateCoupon, { isLoading: isUpdatingCoupon }] =
     useUpdate_couponMutation();
-  const [deleteCoupon, { isLoading: isDeletingCoupon }] =
-    useDelete_couponMutation();
+  const [deleteCoupon] = useDelete_couponMutation();
 
   const dataSource =
     data?.data?.map((coupon, index) => ({
@@ -104,11 +92,6 @@ function Coupon() {
     }
   };
 
-  const handleAdd = () => {
-    setIsModalOpen(true);
-    setEditingRecord(null);
-  };
-
   const handleEdit = (record) => {
     setIsModalOpen(true);
     setEditingRecord(record);
@@ -123,30 +106,7 @@ function Coupon() {
     });
   };
 
-  const handleDeleteAdmin = async (record) => {
-    const result = await Swal.fire({
-      title: "Are you sure?",
-      text: `You are about to delete the coupon: ${record.code}`,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, delete it!",
-    });
-
-    if (result.isConfirmed) {
-      try {
-        await deleteCoupon({ couponId: record._id }).unwrap();
-        Swal.fire("Deleted!", "Your coupon has been deleted.", "success");
-      } catch (error) {
-        Swal.fire(
-          "Error!",
-          error?.data?.message || error?.message || "Failed to delete coupon",
-          "error"
-        );
-      }
-    }
-  };
+  
 
   const columns = [
     {
@@ -208,15 +168,7 @@ function Coupon() {
             <CiEdit className="text-xl text-white font-bold leading-none cursor-pointer" />
           </button>
 
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleDeleteAdmin(record);
-            }}
-            className="bg-[#FEE2E2] rounded-lg  p-2"
-          >
-            <RiDeleteBin6Line className="text-xl text-[#EF4444] font-bold leading-none cursor-pointer" />
-          </button>
+          <DeleteCouponButton record={record} />
         </div>
       ),
     },
@@ -235,7 +187,10 @@ function Coupon() {
       <div className="flex items-center justify-between mb-5">
         <PageHeading title="Coupon Management" />
         <button
-          onClick={handleAdd}
+          onClick={() => {
+            setIsModalOpen(true);
+            setEditingRecord(null);
+          }}
           className="bg-[#0091FF] !text-white px-5 py-3 rounded"
         >
           + Add New Coupon
@@ -276,144 +231,19 @@ function Coupon() {
         />
       </ConfigProvider>
 
-      <Modal
+      <CouponModal
         open={isModalOpen}
         onCancel={() => {
           setIsModalOpen(false);
           form.resetFields();
           setEditingRecord(null);
         }}
-        footer={false}
-        width={700}
-      >
-        <div className="flex flex-col gap-2">
-          <h1 className="text-2xl font-bold text-[#000000] mb-5 mt-10 text-center ">
-            {editingRecord ? "Edit Coupon" : "Add New Coupon"}
-          </h1>
-          <p className="text-gray-500 text-sm text-center mb-5">
-            {" "}
-            {editingRecord
-              ? "Update your existing coupon details below."
-              : "Create a new promotional coupon to offer discounts and boost engagement."}
-          </p>
-        </div>
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={onFinish}
-          initialValues={{
-            status: "Active",
-          }}
-        >
-          <Form.Item
-            label="Coupon Code"
-            name="code"
-            rules={[{ required: true, message: "Please enter coupon code" }]}
-          >
-            <Input placeholder="Enter coupon code" />
-          </Form.Item>
-
-          <Form.Item
-            label="Reason"
-            name="reason"
-            rules={[{ required: true, message: "Please enter reason" }]}
-          >
-            <Input.TextArea placeholder="Enter reason for coupon" rows={2} />
-          </Form.Item>
-
-          <Form.Item
-            label="Discount (%)"
-            name="discount"
-            rules={[{ required: true, message: "Please enter discount" }]}
-          >
-            <Input
-              type="number"
-              placeholder="Enter discount percentage"
-              addonAfter="%"
-            />
-          </Form.Item>
-
-          <div className="flex gap-2 w-full">
-            <Form.Item
-              name="validFrom"
-              label="Valid From"
-              rules={[
-                { required: true, message: "Please select valid from date" },
-              ]}
-              className="!w-1/2"
-            >
-              <DatePicker placeholder="Select valid from date" />
-            </Form.Item>
-
-            <Form.Item
-              name="validTo"
-              label="Valid To"
-              rules={[
-                { required: true, message: "Please select valid to date" },
-              ]}
-              className="!w-1/2"
-            >
-              <DatePicker placeholder="Select valid to date" />
-            </Form.Item>
-          </div>
-
-          <Form.Item
-            label="Usage Limit"
-            name="useLimit"
-            tooltip="Maximum number of times this coupon can be used. Leave empty for unlimited uses."
-          >
-            <Input
-              type="number"
-              min="1"
-              placeholder="Leave empty for unlimited"
-            />
-          </Form.Item>
-
-          <Form.Item
-            name="subscriberOnly"
-            valuePropName="checked"
-            initialValue={false}
-          >
-            <Checkbox>Subscriber Only</Checkbox>
-          </Form.Item>
-
-          <Form.Item label="Status" name="status">
-            <Select placeholder="Select status" allowClear>
-              <Option value="Active">Active</Option>
-              <Option value="Expired">Expired</Option>
-            </Select>
-          </Form.Item>
-        </Form>
-        <div className="flex gap-2 mt-5 w-full">
-          <button
-            onClick={() => {
-              setIsModalOpen(false);
-              form.resetFields();
-              setEditingRecord(null);
-            }}
-            className="bg-[#FEF2F2] rounded  py-3 w-1/2  !text-[#EF4444] border-[1px] border-[#EF4444]"
-            disabled={isAddingCoupon || isUpdatingCoupon}
-          >
-            Cancel
-          </button>
-          <button
-            onClick={() => form.submit()}
-            className="bg-[#0091FF] !text-white rounded  py-3 w-1/2 disabled:opacity-50"
-            disabled={isAddingCoupon || isUpdatingCoupon}
-          >
-            {isAddingCoupon || isUpdatingCoupon ? (
-              <div className="flex items-center justify-center gap-2">
-                <Spin size="small" />
-                {editingRecord ? "Updating..." : "Adding..."}
-              </div>
-            ) : editingRecord ? (
-              "Update"
-            ) : (
-              "Add"
-            )}
-          </button>
-        </div>
-      </Modal>
+        form={form}
+        editingRecord={editingRecord}
+        onFinish={onFinish}
+        isAddingCoupon={isAddingCoupon}
+        isUpdatingCoupon={isUpdatingCoupon}
+      />
     </div>
   );
 }

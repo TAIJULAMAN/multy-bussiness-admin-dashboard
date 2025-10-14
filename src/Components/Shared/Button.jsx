@@ -1,5 +1,4 @@
-import React from "react";
-const Button = ({ style, text, icon, classNames, type, handler }) => {
+export default function Button({ style, text, icon, classNames, type, handler }) {
   return (
     <button
       onClick={() => {
@@ -13,5 +12,4 @@ const Button = ({ style, text, icon, classNames, type, handler }) => {
     </button>
   );
 };
-
-export default Button;
+    

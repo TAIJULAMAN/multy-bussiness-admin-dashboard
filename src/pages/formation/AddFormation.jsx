@@ -7,7 +7,7 @@ import PageHeading from '../../Components/Shared/PageHeading';
 const { Dragger } = Upload;
 const { TextArea } = Input;
 
-const AddFormation = () => {
+export default function AddFormation() {
           const [form] = Form.useForm();
           const navigate = useNavigate();
           const [imageUrl, setImageUrl] = useState('');
@@ -131,5 +131,3 @@ const AddFormation = () => {
                     </>
           );
 };
-
-export default AddFormation;

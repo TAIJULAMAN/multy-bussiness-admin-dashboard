@@ -1,11 +1,9 @@
-import React from "react";
 import EarningManage from "./EarningManage";
 import BookingChart from "./BookingChart";
 import PageHeading from "../../Components/Shared/PageHeading";
 import TransactionTable from "./TransactionTable";
 
-function EarningPage() {
- 
+export default function EarningPage() {
   return (
     <div>
       <PageHeading title={"Earnings"} />
@@ -26,5 +24,3 @@ function EarningPage() {
     </div>
   );
 }
-
-export default EarningPage;

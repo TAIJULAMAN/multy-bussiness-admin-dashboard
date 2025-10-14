@@ -1,17 +1,13 @@
-import { Modal, Form, Input, Select } from "antd";
+import { Form } from "antd";
 import { useState } from "react";
 import { FaChevronDown } from "react-icons/fa6";
 import { FaRegQuestionCircle } from "react-icons/fa";
-import { RiDeleteBin6Line } from "react-icons/ri";
 import { CiEdit } from "react-icons/ci";
-import Swal from "sweetalert2";
 import PageHeading from "../../Components/Shared/PageHeading";
-import {
-  useGetAllFaqQuery,
-  useCreateFaqMutation,
-  useUpdateFaqMutation,
-  useDeleteFaqMutation,
-} from "../../redux/api/faqApi";
+import AddFaqModal from "../../Components/faq/AddFaqModal";
+import EditFaqModal from "../../Components/faq/EditFaqModal";
+import DeleteFaqButton from "../../Components/faq/DeleteFaqButton";
+import { useGetAllFaqQuery, useDeleteFaqMutation } from "../../redux/api/faqApi";
 
 const FAQ = () => {
   const [isAccordionOpen, setIsAccordionOpen] = useState(null);
@@ -22,10 +18,7 @@ const FAQ = () => {
   const [editForm] = Form.useForm();
 
   const { data: faqData } = useGetAllFaqQuery({ role: activeTab });
-  const [createFaq] = useCreateFaqMutation();
-  const [updateFaq] = useUpdateFaqMutation();
   const [deleteFaq] = useDeleteFaqMutation();
-  // console.log("faqData of faq page", faqData);
 
   const tabs = [
     { key: "Buyer", label: "Buyer" },
@@ -64,16 +57,7 @@ const FAQ = () => {
                   <CiEdit className="text-xl text-white font-bold" />
                 </button>
               </div>
-              <div className="bg-[#FECACA] border border-[#EF4444] rounded  px-1.5 py-1">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDeleteAdmin(faq);
-                  }}
-                >
-                  <RiDeleteBin6Line className="text-xl text-[#EF4444] font-bold" />
-                </button>
-              </div>
+              <DeleteFaqButton faq={faq} />
               <FaChevronDown
                 className={`transition-transform duration-300 ${
                   isAccordionOpen === index ? "rotate-180" : ""
@@ -91,25 +75,6 @@ const FAQ = () => {
     </div>
   );
 
-  const handleAddFaq = async (values) => {
-    try {
-      await createFaq(values).unwrap();
-      Swal.fire({
-        icon: "success",
-        title: "FAQ Added",
-        text: "New FAQ was added successfully!",
-      });
-      setIsAddModalVisible(false);
-      form.resetFields();
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Failed to add FAQ. Please try again.",
-      });
-    }
-  };
-
   const handleOpenEditModal = (faq) => {
     editForm.setFieldsValue({
       _id: faq._id,
@@ -118,54 +83,6 @@ const FAQ = () => {
       answer: faq?.answer,
     });
     setIsEditModalVisible(true);
-  };
-
-  const handleEditFaq = async (values) => {
-    try {
-      const { _id, ...data } = values;
-      await updateFaq({ _id, data }).unwrap();
-      Swal.fire({
-        icon: "success",
-        title: "FAQ Updated",
-        text: "FAQ has been updated successfully!",
-      });
-      setIsEditModalVisible(false);
-      editForm.resetFields();
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Failed to update FAQ. Please try again.",
-      });
-    }
-  };
-  const handleDeleteAdmin = (faq) => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "You are about to delete this FAQ",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, delete it!",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          await deleteFaq({ _id: faq?._id }).unwrap();
-          Swal.fire({
-            icon: "success",
-            title: "Deleted!",
-            text: "FAQ has been deleted successfully!",
-          });
-        } catch (error) {
-          Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: "Failed to delete FAQ. Please try again.",
-          });
-        }
-      }
-    });
   };
 
   return (
@@ -211,175 +128,34 @@ const FAQ = () => {
         )}
       </div>
 
-      {/* Add FAQ Modal */}
-      <Modal
-        centered
+      <AddFaqModal
         open={isAddModalVisible}
         onCancel={() => {
           setIsAddModalVisible(false);
           form.resetFields();
         }}
-        footer={[
-          <div key="footer" className="grid grid-cols-2 gap-4 mt-6">
-            <button
-              onClick={() => {
-                setIsAddModalVisible(false);
-                form.resetFields();
-              }}
-              className="py-2 px-4 rounded-lg border border-[#EF4444] bg-red-50"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={() => form.submit()}
-              className="py-2 px-4 rounded-lg bg-[#0091FF] !text-white"
-            >
-              Save
-            </button>
-          </div>,
-        ]}
-      >
-        <div className="p-5">
-          <h2 className="text-2xl font-bold text-center mb-2">Add FAQ</h2>
-          <p className="text-center mb-6 text-gray-700">
-            Fill out the details below to add a new FAQ. Ensure the answer
-            provides clarity and helps users quickly resolve their queries.
-          </p>
-          <Form
-            requiredMark={false}
-            form={form}
-            onFinish={handleAddFaq}
-            layout="vertical"
-          >
-            <Form.Item
-              name="role"
-              label="Role"
-              rules={[{ required: true, message: "Please select a role" }]}
-              initialValue={activeTab}
-            >
-              <Select placeholder="Select role">
-                {tabs.map((tab) => (
-                  <Select.Option key={tab.key} value={tab.key}>
-                    {tab.label}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-            <Form.Item
-              name="question"
-              label="Question"
-              rules={[
-                { required: true, message: "Please enter the question" },
-                {
-                  max: 200,
-                  message: "Question cannot be longer than 200 characters",
-                },
-              ]}
-            >
-              <Input placeholder="Enter question" />
-            </Form.Item>
-            <Form.Item
-              name="answer"
-              label="Answer"
-              rules={[
-                { required: true, message: "Please enter the answer" },
-                {
-                  max: 1000,
-                  message: "Answer cannot be longer than 1000 characters",
-                },
-              ]}
-            >
-              <Input.TextArea rows={4} placeholder="Enter answer" />
-            </Form.Item>
-          </Form>
-        </div>
-      </Modal>
+        form={form}
+        onDone={() => {
+          setIsAddModalVisible(false);
+          form.resetFields();
+        }}
+        tabs={tabs}
+        activeTab={activeTab}
+      />
 
-      {/* Edit FAQ Modal */}
-      <Modal
-        centered
+      <EditFaqModal
         open={isEditModalVisible}
         onCancel={() => {
           setIsEditModalVisible(false);
           editForm.resetFields();
         }}
-        footer={[
-          <div key="footer" className="grid grid-cols-2 gap-4 mt-6">
-            <button
-              onClick={() => {
-                setIsEditModalVisible(false);
-                editForm.resetFields();
-              }}
-              className="py-2 px-4 rounded-lg border border-[#EF4444] bg-red-50"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={() => editForm.submit()}
-              className="py-2 px-4 rounded-lg bg-[#0091FF] !text-white"
-            >
-              Save
-            </button>
-          </div>,
-        ]}
-      >
-        <div className="p-5">
-          <h2 className="text-2xl font-bold text-center mb-2">Edit FAQ</h2>
-          <p className="text-center mb-6 text-gray-700">
-            Fill out the details below to edit the FAQ. Ensure the answer
-            provides clarity and helps users quickly resolve their queries.
-          </p>
-          <Form
-            requiredMark={false}
-            form={editForm}
-            onFinish={handleEditFaq}
-            layout="vertical"
-          >
-            <Form.Item name="_id" hidden>
-              <Input />
-            </Form.Item>
-            <Form.Item
-              name="role"
-              label="Role"
-              rules={[{ required: true, message: "Please select a role" }]}
-            >
-              <Select placeholder="Select role">
-                {tabs.map((tab) => (
-                  <Select.Option key={tab.key} value={tab.key}>
-                    {tab.label}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-            <Form.Item
-              name="question"
-              label="Question"
-              rules={[
-                { required: true, message: "Please enter the question" },
-                {
-                  max: 200,
-                  message: "Question cannot be longer than 200 characters",
-                },
-              ]}
-            >
-              <Input placeholder="Enter question" />
-            </Form.Item>
-            <Form.Item
-              name="answer"
-              label="Answer"
-              rules={[
-                { required: true, message: "Please enter the answer" },
-                {
-                  max: 1000,
-                  message: "Answer cannot be longer than 1000 characters",
-                },
-              ]}
-            >
-              <Input.TextArea rows={4} placeholder="Enter answer" />
-            </Form.Item>
-          </Form>
-        </div>
-      </Modal>
+        form={editForm}
+        onDone={() => {
+          setIsEditModalVisible(false);
+          editForm.resetFields();
+        }}
+        tabs={tabs}
+      />
     </>
   );
 };

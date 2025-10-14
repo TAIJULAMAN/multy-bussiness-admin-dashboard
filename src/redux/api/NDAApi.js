@@ -10,9 +10,16 @@ const ndaApi = baseApi.injectEndpoints({
       }),
       providesTags: ["NDA"],
     }),
+    deleteAgreement: builder.mutation({
+      query: (id) => ({
+        url: `agreement/delete-agreement/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["NDA"],
+    }),
   }),
 });
 
-export const { useGetAllNDAQuery } = ndaApi;
+export const { useGetAllNDAQuery, useDeleteAgreementMutation } = ndaApi;
 
 export default ndaApi;

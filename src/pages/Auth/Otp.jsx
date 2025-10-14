@@ -1,4 +1,3 @@
-import React from "react";
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useVerifyEmailMutation } from "../../redux/api/authApi";
@@ -10,7 +9,6 @@ function VerificationCode() {
   const [verifyEmail] = useVerifyEmailMutation();
 
   const email = searchParams.get("email");
-  console.log("email", email);
   const navigate = useNavigate();
 
   const handleChange = (value, index) => {
@@ -99,10 +97,6 @@ function VerificationCode() {
             >
               Continue
             </button>
-            {/* <p className="text-[#6A6D76] text-center mt-10">
-              You have not received the email?{" "}
-              <span className="text-[#00B047]"> Resend</span>
-            </p> */}
           </div>
         </form>
       </div>

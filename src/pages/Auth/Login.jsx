@@ -1,17 +1,14 @@
-import React from "react";
-
 import { useState } from "react";
 import "antd/dist/reset.css";
 import { Link, useNavigate } from "react-router";
 import BrandLogo from "../../Components/Shared/BrandLogo";
 import Logo from "../../assets/icons/logo.png";
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
-// import Swal from "sweetalert2";
+import Swal from "sweetalert2";
 import { setUser } from "../../redux/Slice/authSlice";
 import { useDispatch } from "react-redux";
 import { useLogInMutation } from "../../redux/api/authApi";
-import Swal from "sweetalert2";
-//
+
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

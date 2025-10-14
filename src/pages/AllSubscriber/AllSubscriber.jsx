@@ -1,8 +1,8 @@
 import React from "react";
 import { ConfigProvider, Table } from "antd";
 import { useGetAllSubscriberQuery } from "../../redux/api/allSubscriberApi";
-import Loader from "../../Components/Shared/Loaders/Loader";
 import { useState } from "react";
+import Loader from "../../Components/Loaders/Loader";
 
 export default function AllSubscriber() {
   const [page, setPage] = useState(1);
@@ -24,8 +24,8 @@ export default function AllSubscriber() {
   const columns = [
     {
       title: "No",
-      dataIndex: "no",
       key: "no",
+      render: (_, __, index) => (metaPage - 1) * metaLimit + (index + 1),
     },
 
     {

@@ -1,13 +1,25 @@
 import React from "react";
-import { ConfigProvider, Modal, Table, Tag } from "antd";
+import { ConfigProvider, Modal, Table, Tag, Popconfirm, message } from "antd";
 import { useState } from "react";
 import { FaRegEye } from "react-icons/fa";
 import { getImageBaseUrl } from "../../config/envConfig";
 import { Link } from "react-router-dom";
+import { useDeleteAgreementMutation } from "../../redux/api/NDAApi";
+import NDADetailsModal from "../../Components/nda/NDADetailsModal";
 
 function NDATable({ data = [], ndaData }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedNDA, setSelectedNDA] = useState(null);
+  const [deleteAgreement, { isLoading: deleting }] = useDeleteAgreementMutation();
+
+  const handleDelete = async (id) => {
+    try {
+      await deleteAgreement(id).unwrap();
+      message.success("NDA deleted successfully");
+    } catch (e) {
+      message.error(e?.data?.message || "Failed to delete NDA");
+    }
+  };
 
 
 
@@ -73,17 +85,30 @@ function NDATable({ data = [], ndaData }) {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <Link
-          to="/document"
-          state={{
-            ndaData: record,
-            pdfUrl: record.nda,
-          }}
-        >
-          <button className="border border-[#0091ff] rounded-lg p-1 bg-[#cce9ff] text-[#0091ff]">
-            <FaRegEye className="w-8 h-8 text-[#0091ff]" />
-          </button>
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            to="/document"
+            state={{
+              ndaData: record,
+              pdfUrl: record.nda,
+            }}
+          >
+            <button className="border border-[#0091ff] rounded-lg p-1 bg-[#cce9ff] text-[#0091ff]">
+              <FaRegEye className="w-8 h-8 text-[#0091ff]" />
+            </button>
+          </Link>
+          <Popconfirm
+            title="Delete NDA?"
+            description="This action cannot be undone."
+            okButtonProps={{ danger: true, loading: deleting }}
+            okText="Delete"
+            onConfirm={() => handleDelete(record?._id)}
+          >
+            <button className="border border-red-500 rounded-lg px-3 py-1 bg-red-50 text-red-600">
+              Delete
+            </button>
+          </Popconfirm>
+        </div>
       ),
     },
   ];
@@ -123,113 +148,11 @@ function NDATable({ data = [], ndaData }) {
         }}
         scroll={{ x: "max-content" }}
       />
-      <Modal
+      <NDADetailsModal
         open={isModalOpen}
-        centered
-        onCancel={() => {
-          setIsModalOpen(false);
-        }}
-        footer={null}
-        title="NDA Details"
-      >
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex flex-col gap-5">
-            {/* User Info */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-4">
-                <img
-                  src={
-                    selectedNDA?.userId?.image
-                      ? `${getImageBaseUrl()}/profile-image/${
-                          selectedNDA?.userId?.image
-                        }`
-                      : "https://avatar.iran.liara.run/public/20"
-                  }
-                  alt={selectedNDA?.userName}
-                  className="w-16 h-16 object-cover rounded-full"
-                />
-                <div>
-                  <h1 className="text-2xl font-bold">
-                    {selectedNDA?.userName}
-                  </h1>
-                  <p className="text-gray-600">{selectedNDA?.email}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* NDA Details */}
-            <div className="space-y-6">
-              <div className="space-y-4">
-                <div>
-                  <h2 className="text-xl font-bold mb-2">NDA Information</h2>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-500">
-                      User Role
-                    </h3>
-                    <p className="mt-1 bg-[#cce9ff] text-[#0091ff] p-2 rounded">
-                      {selectedNDA?.userRole}
-                    </p>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-500">
-                      Agreement Type
-                    </h3>
-                    <p className="mt-1 bg-[#cce9ff] text-[#0091ff] p-2 rounded">
-                      {selectedNDA?.agreementType}
-                    </p>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-500">
-                      Contact Number
-                    </h3>
-                    <p className="mt-1 bg-[#cce9ff] text-[#0091ff] p-2 rounded">
-                      {selectedNDA?.contactNumber}
-                    </p>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-500">
-                      Business Location
-                    </h3>
-                    <p className="mt-1 bg-[#cce9ff] text-[#0091ff] p-2 rounded">
-                      {selectedNDA?.country}
-                    </p>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-500">
-                      Submission Date
-                    </h3>
-                    <p className="mt-1 bg-[#cce9ff] text-[#0091ff] p-2 rounded">
-                      {selectedNDA?.date}
-                    </p>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-500">
-                      Status
-                    </h3>
-                    <p className="mt-1 bg-[#cce9ff] text-[#0091ff] p-2 rounded">
-                      {selectedNDA?.status}
-                    </p>
-                  </div>
-                </div>
-
-                {selectedNDA?.agreementContent && (
-                  <div>
-                    <h2 className="text-xl font-bold mb-2">
-                      Agreement Content
-                    </h2>
-                    <p className="mt-1 p-4 bg-gray-50 rounded border">
-                      {selectedNDA?.agreementContent}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </Modal>
+        onCancel={() => setIsModalOpen(false)}
+        selectedNDA={selectedNDA}
+      />
     </ConfigProvider>
   );
 }

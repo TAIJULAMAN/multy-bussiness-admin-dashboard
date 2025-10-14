@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Card } from 'antd';
 import { Link, useParams } from 'react-router-dom';
 import img1 from "../../assets/cover.png";
@@ -6,7 +6,7 @@ import img2 from "../../assets/cover1.png";
 import img3 from "../../assets/cover2.png";
 import PageHeading from '../../Components/Shared/PageHeading';
 
-const BusinessInfo = () => {
+export default function BusinessInfo() {
           const { id } = useParams();
           const [serviceDetails, setServiceDetails] = useState(null);
           const formationServices = [
@@ -145,5 +145,3 @@ const BusinessInfo = () => {
                     </>
           );
 };
-
-export default BusinessInfo;

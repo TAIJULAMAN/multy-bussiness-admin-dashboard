@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   Form,
@@ -15,7 +15,12 @@ import { useUpdateListingDetailsMutation } from "../../redux/api/listingApi";
 import { useGetAllCategoryListQuery } from "../../redux/api/categoryApi";
 import { getImageBaseUrl } from "../../config/envConfig";
 import Swal from "sweetalert2";
-import { useGetAllSubCategoryQuery } from "../../redux/api/subCatagoryApi";
+
+
+import { Country, State, City }  from 'country-state-city';
+console.log(Country.getAllCountries())
+console.log(State.getAllStates())
+console.log(City.getAllCities())
 
 const extractFileName = (path) => {
   if (!path) return null;
@@ -92,8 +97,6 @@ const EditListing = () => {
 
   const { data: categoriesResp, isLoading: isLoadingCategories } =
     useGetAllCategoryListQuery();
-  // const categoryName = categoriesResp?.data?.map((c) => c.categoryName);
-  // console.log("categoryName from edit listing", categoryName);
   const rawCategories = Array.isArray(categoriesResp?.data)
     ? categoriesResp.data
     : Array.isArray(categoriesResp)
@@ -101,25 +104,25 @@ const EditListing = () => {
     : [];
 
   const categoryOptions = rawCategories.map((c, idx) => {
-    const name = c?.categoryName || c?.name || c?.title || `Category ${idx + 1}`;
+    const name =
+      c?.categoryName || c?.name || c?.title || `Category ${idx + 1}`;
     return { label: name, value: name };
   });
-
-  // Watch selected category and derive sub categories list
   const watchedCategory = Form.useWatch("category", form);
   const selectedCategoryName = watchedCategory || listingData?.category;
   const selectedCategory = rawCategories.find(
     (c) => (c?.categoryName || c?.name || c?.title) === selectedCategoryName
   );
-  const subCategoryOptions = (Array.isArray(selectedCategory?.subCategories)
-    ? selectedCategory.subCategories
-    : [])
-    .map((s, idx) => {
-      const name = s?.subCategoryName || s?.name || s?.title || `Sub Category ${idx + 1}`;
-      return { label: name, value: name };
-    });
+  const subCategoryOptions = (
+    Array.isArray(selectedCategory?.subCategories)
+      ? selectedCategory.subCategories
+      : []
+  ).map((s, idx) => {
+    const name =
+      s?.subCategoryName || s?.name || s?.title || `Sub Category ${idx + 1}`;
+    return { label: name, value: name };
+  });
 
-  // Clear subCategory if it is not valid for the selected category
   useEffect(() => {
     const current = form.getFieldValue("subCategory");
     const valid = subCategoryOptions.some((opt) => opt.value === current);
@@ -134,12 +137,10 @@ const EditListing = () => {
       message.error("You can only upload image files!");
       return Upload.LIST_IGNORE;
     }
-    // prevent auto-upload; we'll submit in onFinish via FormData
     return false;
   };
 
   const handleChange = ({ fileList: newFileList }) => {
-    // Always keep only one file in the field
     setFileList(newFileList.slice(-1));
   };
 
@@ -160,6 +161,76 @@ const EditListing = () => {
       <div style={{ marginTop: 8 }}>Upload</div>
     </div>
   );
+
+  // Country/State/City cascading dropdowns
+  const [countries] = useState(() => Country.getAllCountries());
+  const [countryCode, setCountryCode] = useState();
+  const [states, setStates] = useState([]);
+  const [stateCode, setStateCode] = useState();
+  const [cities, setCities] = useState([]);
+
+  // Initialize from existing listing data
+  useEffect(() => {
+    if (!listingData) return;
+    const existingCountryName = listingData?.countryName;
+    if (existingCountryName) {
+      const c = countries.find((x) => x.name === existingCountryName);
+      if (c?.isoCode) {
+        setCountryCode(c.isoCode);
+        const st = State.getStatesOfCountry(c.isoCode) || [];
+        setStates(st);
+        const existingStateName = listingData?.state;
+        if (existingStateName) {
+          const s = st.find((x) => x.name === existingStateName);
+          if (s?.isoCode) {
+            setStateCode(s.isoCode);
+            const ct = City.getCitiesOfState(c.isoCode, s.isoCode) || [];
+            setCities(ct);
+          }
+        }
+      }
+    }
+  }, [listingData, countries]);
+
+  // When country changes, load states and reset dependent fields
+  useEffect(() => {
+    if (!countryCode) {
+      setStates([]);
+      setStateCode(undefined);
+      setCities([]);
+      return;
+    }
+    const st = State.getStatesOfCountry(countryCode) || [];
+    setStates(st);
+    setStateCode(undefined);
+    setCities([]);
+  }, [countryCode]);
+
+  // When state changes, load cities
+  useEffect(() => {
+    if (!countryCode || !stateCode) {
+      setCities([]);
+      return;
+    }
+    const ct = City.getCitiesOfState(countryCode, stateCode) || [];
+    setCities(ct);
+  }, [countryCode, stateCode]);
+
+  const handleCountryChange = (countryName) => {
+    form.setFieldsValue({ countryName, state: undefined, city: undefined });
+    const c = countries.find((x) => x.name === countryName);
+    setCountryCode(c?.isoCode);
+  };
+
+  const handleStateChange = (stateName) => {
+    form.setFieldsValue({ state: stateName, city: undefined });
+    const s = states.find((x) => x.name === stateName);
+    setStateCode(s?.isoCode);
+  };
+
+  const handleCityChange = (cityName) => {
+    form.setFieldsValue({ city: cityName });
+  };
 
   useEffect(() => {
     if (listingData) {
@@ -448,15 +519,38 @@ const EditListing = () => {
                 />
               </Form.Item>
               <Form.Item label="Country Name" name="countryName">
-                <Input size="large" placeholder="Enter country name" />
+                <Select
+                  size="large"
+                  placeholder="Select country"
+                  showSearch
+                  optionFilterProp="label"
+                  onChange={handleCountryChange}
+                  options={(countries || []).map((c) => ({ label: c.name, value: c.name }))}
+                />
               </Form.Item>
 
               <Form.Item label="State" name="state">
-                <Input size="large" placeholder="Enter state" />
+                <Select
+                  size="large"
+                  placeholder={countryCode ? "Select state" : "Select country first"}
+                  showSearch
+                  optionFilterProp="label"
+                  onChange={handleStateChange}
+                  disabled={!countryCode}
+                  options={(states || []).map((s) => ({ label: s.name, value: s.name }))}
+                />
               </Form.Item>
 
               <Form.Item label="City" name="city">
-                <Input size="large" placeholder="Enter city" />
+                <Select
+                  size="large"
+                  placeholder={stateCode ? "Select city" : "Select state first"}
+                  showSearch
+                  optionFilterProp="label"
+                  onChange={handleCityChange}
+                  disabled={!stateCode}
+                  options={(cities || []).map((c) => ({ label: c.name, value: c.name }))}
+                />
               </Form.Item>
 
               <Form.Item label="Reason" name="reason">

@@ -1,8 +1,7 @@
-import React from "react";
 import { Cell, Pie, PieChart } from "recharts";
 import { useGetAllDashboardQuery } from "../../redux/api/dashboardApi";
 
-const ActivityStatisticsChart = () => {
+export default function ActivityStatisticsChart() {
   const { data: dashboardData } = useGetAllDashboardQuery();
 
   const data = [
@@ -67,6 +66,4 @@ const ActivityStatisticsChart = () => {
       </div>
     </div>
   );
-};
-
-export default ActivityStatisticsChart;
+}

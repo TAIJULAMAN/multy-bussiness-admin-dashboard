@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "antd/dist/reset.css";
 import Swal from "sweetalert2";
 import { useForgotPasswordMutation } from "../../redux/api/authApi";
 
-function ForgetPassword() {
+export default function ForgetPassword() {
   const [email, setEmail] = useState("");
   const navigate = useNavigate();
 
@@ -83,4 +83,4 @@ function ForgetPassword() {
   );
 }
 
-export default ForgetPassword;
+

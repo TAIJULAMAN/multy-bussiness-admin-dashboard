@@ -3,9 +3,10 @@ import { baseApi } from "./baseApi";
 const formationApis = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     get_all_formation: builder.query({
-      query: () => ({
+      query: ({ page } = {}) => ({
         url: "formation/get-all-format",
         method: "GET",
+        params: { page },
       }),
       providesTags: ["formation"],
     }),

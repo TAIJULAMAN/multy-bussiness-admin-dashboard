@@ -1,8 +1,7 @@
-import React from 'react';
-import { FaArrowLeftLong } from 'react-icons/fa6';
-import { Link } from 'react-router-dom';
+import { FaArrowLeftLong } from "react-icons/fa6";
+import { Link } from "react-router-dom";
 
-function PageHeading({ title }) {
+export default function PageHeading({ title }) {
   return (
     <div className="flex !items-center  justify-between">
       <Link to={-1}>
@@ -13,5 +12,3 @@ function PageHeading({ title }) {
     </div>
   );
 }
-
-export default PageHeading;

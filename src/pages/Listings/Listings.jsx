@@ -9,8 +9,8 @@ const ListingsTabs = () => {
     { key: "allListings", label: "ALL Listings" },
     { key: "listingsUnderApproval", label: "Listings Under Approval" },
     { key: "Seller", label: "Business Listings" },
-    { key: "Asset Seller", label: "Franchise Listings" },
-    { key: "Francise Seller", label: "Business Asset Listings" },
+    { key: "Asset Seller", label: "Asset Seller" },
+    { key: "Francise Seller", label: "Francise Seller" },
     { key: "Business Idea Lister", label: "Business Idea Lister" },
     { key: "Broker", label: "Broker" },
   ];

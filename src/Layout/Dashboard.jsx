@@ -1,7 +1,7 @@
 import Sidebar from "../Components/Shared/Sidebar.jsx";
 import Header from "../Components/Shared/Header.jsx";
 import { Outlet } from "react-router";
-const Dashboard = () => {
+export default function Dashboard() {
   return (
     <div className="max-h-screen bg-[#f0f6ff] overflow-hidden">
       <Header />
@@ -18,5 +18,3 @@ const Dashboard = () => {
     </div>
   );
 };
-
-export default Dashboard;

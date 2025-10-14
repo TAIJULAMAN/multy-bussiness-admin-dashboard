@@ -1,12 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "antd/dist/reset.css";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useResetPasswordMutation } from "../../redux/api/authApi";
 import Swal from "sweetalert2";
 import BrandLogo from "../../Components/Shared/BrandLogo";
-
-// import { getResetToken } from "../../services/auth.service";
 
 const ResetPassword = () => {
   const [newPassword, setNewPassword] = useState("");
@@ -40,17 +38,6 @@ const ResetPassword = () => {
       });
       return;
     }
-
-    // const resetToken = getResetToken();
-    // console.log("resetToken from reset password", resetToken);
-    // if (!resetToken) {
-    //   Swal.fire({
-    //     icon: "error",
-    //     title: "Invalid Request",
-    //     text: "The password reset token is invalid. Please try again.",
-    //   });
-    //   return;
-    // }
 
     try {
       await resetPassword({

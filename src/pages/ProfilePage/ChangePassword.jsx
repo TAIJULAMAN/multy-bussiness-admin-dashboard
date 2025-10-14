@@ -1,23 +1,13 @@
-import React, { useState } from 'react';
-import { Button, Form, Input, message, Spin } from 'antd';
-// import { usePatchNewPasswordMutation } from '../../Redux/services/authApis';
+import { useState } from 'react';
+import { Button, Form, Input, message } from 'antd';
 
 const ChangePassword = () => {
   const [form] = Form.useForm();
-  const [showOldPassword, setShowOldPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  // const [setNewPassword, { isLoading: isNewPassChange }] =
-  //   usePatchNewPasswordMutation({});
+  const [showOldPassword,] = useState(false);
+
 
   const onFinish = async (values) => {
-    const ChangePasswordDatas = {
-      oldPassword: values.oldPassword,
-      newPassword: values.newPassword,
-      confirmPassword: values.confirmPassword,
-    };
     try {
-      // await setNewPassword(ChangePasswordDatas).unwrap();
       message.success('Password Changed successfully.');
     } catch (error) {
       console.error('Failed to change password:', error);
@@ -107,11 +97,9 @@ const ChangePassword = () => {
       <Button
         type="primary"
         htmlType="submit"
-        // disabled={isNewPassChange}
         className="!bg-[#3872F0] !hover:bg-[#3872F0] active:bg-[#3872F0] w-full"
       >
-        {/* {isNewPassChange ? <Spin /> : "Update password"} */}
-        update pass
+        update
       </Button>
     </Form>
   );

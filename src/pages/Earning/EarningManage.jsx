@@ -1,14 +1,12 @@
-import React from "react";
 import earn from "../../assets/icons/earn.png";
 import { FaDollarSign } from "react-icons/fa6";
 import { useGetEarningQuery } from "../../redux/api/earningApi";
 
-function EarningManage() {
+export default function EarningManage() {
   const currentYear = new Date().getFullYear();
   const { data: earningData } = useGetEarningQuery({
     year: currentYear,
   });
-  console.log("earningData", earningData);
 
   return (
     <div>
@@ -31,5 +29,3 @@ function EarningManage() {
     </div>
   );
 }
-
-export default EarningManage;

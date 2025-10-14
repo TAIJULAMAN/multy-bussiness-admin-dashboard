@@ -10,16 +10,16 @@ import {
   useUpdateListingMutation,
   useDeleteListingMutation,
 } from "../../redux/api/listingApi";
-import Loader from "../../Components/Shared/Loaders/Loader";
+import Loader from "../../Components/Loaders/Loader";
 import { getImageBaseUrl } from "../../config/envConfig";
 import Swal from "sweetalert2";
 
 export default function ListingTable({ businessRole = "", status = "" }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedListing, setSelectedListing] = useState(null);
-  console.log("selectedListing", selectedListing);
+  // console.log("selectedListing", selectedListing);
   const [page, setPage] = useState(1);
-  const [activeAction, setActiveAction] = useState(null); // 'approve' | 'reject' | null
+  const [activeAction, setActiveAction] = useState(null);
   const navigate = useNavigate();
 
   // Fetch listings data from API with filters
@@ -29,7 +29,6 @@ export default function ListingTable({ businessRole = "", status = "" }) {
     page,
     limit: 10,
   });
-  // console.log("listingsData from list page", listingsData);
 
   // Update listing mutation
   const [updateListing, { isLoading: isUpdating }] = useUpdateListingMutation();

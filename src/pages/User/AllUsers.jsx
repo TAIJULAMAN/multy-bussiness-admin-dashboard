@@ -11,16 +11,19 @@ import {
   useGetAllUserQuery,
   useUpdateUserMutation,
 } from "../../redux/api/userApi";
-import Loader from "../../Components/Shared/Loaders/Loader";
+import Loader from "../../Components/Loaders/Loader";
 import { useDebounced } from "../../Utils/hook";
 
-const AllUsers = ({ search }) => {
+export default function AllUsers({ search }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [page, setPage] = useState(1);
   const [isModalOpen2, setIsModalOpen2] = useState(false);
   const [activeTab, setActiveTab] = useState("User Statics");
   const [selectedUser, setSelectedUser] = useState(null);
-  const debouncedSearch = useDebounced({ searchTerm: search || "", delay: 400 });
+  const debouncedSearch = useDebounced({
+    searchTerm: search || "",
+    delay: 400,
+  });
   useEffect(() => {
     setPage(1);
   }, [debouncedSearch]);
@@ -29,7 +32,7 @@ const AllUsers = ({ search }) => {
     page,
     searchText: debouncedSearch,
   });
-  // console.log("usersData", usersData);
+  console.log("usersData", usersData);
 
   const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
   const users = usersData?.data;
@@ -167,6 +170,7 @@ const AllUsers = ({ search }) => {
           pageSize: metaLimit,
           total: metaTotal,
           current: metaPage,
+          showSizeChanger: false,
           onChange: (newPage) => setPage(newPage),
         }}
         scroll={{ x: "max-content" }}
@@ -279,6 +283,4 @@ const AllUsers = ({ search }) => {
       </Modal>
     </ConfigProvider>
   );
-};
-
-export default AllUsers;
+}

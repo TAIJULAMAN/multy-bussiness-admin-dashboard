@@ -1,6 +1,4 @@
-import React from 'react';
-
-function SkeletonLoader() {
+export default function SkeletonLoader() {
   return (
     <div className="flex flex-row gap-2">
       <div className="animate-pulse bg-gray-300 w-14 h-14 rounded-lg"></div>
@@ -12,5 +10,3 @@ function SkeletonLoader() {
     </div>
   );
 }
-
-export default SkeletonLoader;

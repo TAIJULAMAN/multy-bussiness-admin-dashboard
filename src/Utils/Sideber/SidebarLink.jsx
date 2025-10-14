@@ -52,7 +52,7 @@ export const SidebarLink = [
   },
   {
     path: "/formation",
-    label: "Formation",
+    label: "Blog",
     icon: <BiCategory size={24} />,
   },
   {

@@ -8,7 +8,7 @@ import {
   useUpdateTermsAndConditionsMutation,
 } from "../../redux/api/termsApi.js";
 import Swal from "sweetalert2";
-import Loader from "../../Components/Shared/Loaders/Loader.jsx";
+import Loader from "../../Components/Loaders/Loader.jsx";
 
 const TermsCondition = () => {
   const [content, setContent] = useState("");

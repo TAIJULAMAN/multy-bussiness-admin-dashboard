@@ -1,17 +1,21 @@
 /* eslint-disable no-unused-vars */
-import React, { useEffect, useState } from 'react';
-import { Button } from 'antd';
+import React, { useEffect, useState } from "react";
+import { Button } from "antd";
 import Swal from "sweetalert2";
-import Loader from '../../Components/Shared/Loaders/Loader.jsx';
-import { useGetPrivacyQuery, useUpdatePrivacyMutation } from '../../redux/api/privacyApi.js';
-import PageHeading from '../../Components/Shared/PageHeading.jsx';
-import JoditComponent from '../../Components/Shared/JoditComponent.jsx';
+import Loader from "../../Components/Loaders/Loader.jsx";
+import {
+  useGetPrivacyQuery,
+  useUpdatePrivacyMutation,
+} from "../../redux/api/privacyApi.js";
+import PageHeading from "../../Components/Shared/PageHeading.jsx";
+import JoditComponent from "../../Components/Shared/JoditComponent.jsx";
 
-const PrivacyPolicy = () => {
+export default function PrivacyPolicy() {
   const [content, setContent] = useState("");
   const { data, isLoading } = useGetPrivacyQuery({});
-  const [updatePrivacy, { isLoading: isSubmitting }] = useUpdatePrivacyMutation();
-  
+  const [updatePrivacy, { isLoading: isSubmitting }] =
+    useUpdatePrivacyMutation();
+
   useEffect(() => {
     if (data?.data?.description) {
       setContent(data?.data?.description);
@@ -65,6 +69,4 @@ const PrivacyPolicy = () => {
       </Button>
     </>
   );
-};
-
-export default PrivacyPolicy;
+}

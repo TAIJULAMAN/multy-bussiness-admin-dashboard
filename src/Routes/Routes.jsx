@@ -15,7 +15,6 @@ import PrivacyPolicy from "../pages/PrivacyPolicy/PrivacyPolicy";
 import TermsCondition from "../pages/TermsCondition/TermsCondition";
 import Faq from "../pages/Faq/Faq";
 import BusinessInfo from "../pages/Categories/BussinessInfo";
-import AddFormation from "../pages/Categories/AddFormation";
 import MainSubscriptionPage from "../pages/Subscription/MainSubscriptionPage";
 import NDA from "../pages/NDA/NDA";
 import DocumentPage from "../pages/NDA/DocumentPage";
@@ -25,6 +24,7 @@ import EditListing from "../pages/Listings/EditListing";
 import Formation from "../pages/formation/Formation";
 import SubcategoryManagement from "../pages/Categories/SubcategoryManagement";
 import PrivateRoute from "./PrivetRoute";
+import AddFormation from "../pages/formation/AddFormation";
 
 export const Routes = createBrowserRouter([
   {

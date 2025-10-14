@@ -1,10 +1,9 @@
-import React from "react";
 import { ConfigProvider, Table } from "antd";
-import Loader from "../../Components/Shared/Loaders/Loader";
+import Loader from "../../Components/Loaders/Loader";
 import { useGetEarningQuery } from "../../redux/api/earningApi";
 import { useState } from "react";
 
-const TransactionTable = () => {
+export default function TransactionTable() {
   const [page, setPage] = useState(1);
   const currentYear = new Date().getFullYear();
   const { data: earningData, isLoading } = useGetEarningQuery({
@@ -118,6 +117,4 @@ const TransactionTable = () => {
       </ConfigProvider>
     </>
   );
-};
-
-export default TransactionTable;
+}

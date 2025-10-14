@@ -8,12 +8,12 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
-import React, { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Select } from "antd";
 import { useGetUserGrowthQuery } from "../../redux/api/dashboardApi";
-import Loader from "../Shared/Loaders/Loader";
+import Loader from "../Loaders/Loader";
 
-const UserGrowthChart = () => {
+export default function UserGrowthChart() {
   const currentYear = new Date().getFullYear();
   const [year, setYear] = useState(currentYear);
   const [years] = useState(() => {
@@ -166,6 +166,4 @@ const UserGrowthChart = () => {
       </ResponsiveContainer>
     </div>
   );
-};
-
-export default UserGrowthChart;
+}
