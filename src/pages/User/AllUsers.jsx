@@ -1,6 +1,6 @@
 import { ConfigProvider, Modal, Table, Tag } from "antd";
 import { useEffect, useState } from "react";
-import { AiOutlineMail, AiOutlinePhone } from "react-icons/ai";
+import { AiOutlineMail, AiOutlinePhone, AiOutlineDelete } from "react-icons/ai";
 import { FaRegEye } from "react-icons/fa";
 import { MdBlockFlipped } from "react-icons/md";
 
@@ -10,6 +10,7 @@ import UserStats from "../../pages/User/UserStatics";
 import {
   useGetAllUserQuery,
   useUpdateUserMutation,
+  useDeleteUserMutation,
 } from "../../redux/api/userApi";
 import Loader from "../../Components/Loaders/Loader";
 import { useDebounced } from "../../Utils/hook";
@@ -18,6 +19,7 @@ export default function AllUsers({ search }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [page, setPage] = useState(1);
   const [isModalOpen2, setIsModalOpen2] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("User Statics");
   const [selectedUser, setSelectedUser] = useState(null);
   const debouncedSearch = useDebounced({
@@ -35,6 +37,7 @@ export default function AllUsers({ search }) {
   console.log("usersData", usersData);
 
   const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
+  const [deleteUser, { isLoading: isDeleting }] = useDeleteUserMutation();
   const users = usersData?.data;
   const metaPage = usersData?.meta?.page || page || 1;
   const metaLimit = usersData?.meta?.limit || 10;
@@ -48,6 +51,11 @@ export default function AllUsers({ search }) {
   const showModal2 = (user) => {
     setSelectedUser(user);
     setIsModalOpen2(true);
+  };
+
+  const showDeleteModal = (user) => {
+    setSelectedUser(user);
+    setIsDeleteModalOpen(true);
   };
 
   const handleBlock = async () => {
@@ -131,6 +139,14 @@ export default function AllUsers({ search }) {
             className="border border-[#0091ff] rounded-lg p-1 bg-[#cce9ff] text-[#0091ff]"
           >
             <FaRegEye className="w-8 h-8 text-[#0091ff]" />
+          </button>
+          <button
+            onClick={() => showDeleteModal(record)}
+            className="border border-red-500 rounded-lg p-1 bg-red-100 text-red-600"
+            aria-label="Delete user"
+            title="Delete user"
+          >
+            <AiOutlineDelete className="w-8 h-8 text-red-600" />
           </button>
         </div>
       ),
@@ -279,6 +295,49 @@ export default function AllUsers({ search }) {
               setIsModalOpen2={setIsModalOpen2}
             />
           )}
+        </div>
+      </Modal>
+
+      {/* Delete Modal */}
+      <Modal
+        open={isDeleteModalOpen}
+        centered
+        onCancel={() => {
+          setIsDeleteModalOpen(false);
+        }}
+        footer={null}
+      >
+        <div className="flex flex-col justify-center items-center py-10">
+          <img src={img} alt="Confirmation" className="w-40 h-40 mb-5" />
+          <p className="text-3xl text-center text-gray-800">Delete User</p>
+          <p className="text-xl text-center mt-5">
+            Are you sure you want to permanently delete this user?
+          </p>
+          <div className="text-center py-5 w-full flex justify-center gap-4">
+            <button
+              onClick={() => {
+                setIsDeleteModalOpen(false);
+              }}
+              className="border-2 border-gray-400 text-gray-800 font-semibold w-1/3 py-3 px-5 rounded-lg"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={async () => {
+                if (!selectedUser?._id) return;
+                try {
+                  await deleteUser(selectedUser._id).unwrap();
+                  setIsDeleteModalOpen(false);
+                } catch (error) {
+                  console.error("Failed to delete user:", error);
+                }
+              }}
+              disabled={isDeleting}
+              className="bg-red-600 !text-white font-semibold w-1/3 py-3 px-5 rounded-lg disabled:opacity-50"
+            >
+              {isDeleting ? "Deleting..." : "Confirm"}
+            </button>
+          </div>
         </div>
       </Modal>
     </ConfigProvider>

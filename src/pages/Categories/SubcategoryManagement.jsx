@@ -168,9 +168,7 @@ export default function SubcategoryManagement() {
             onChange: (newPage) => setPage(newPage),
           }}
           scroll={{ x: "max-content" }}
-          loading={
-            isLoading || loading || isUpdating || isCreating || isDeleting
-          }
+          loading={isLoading || loading}
         />
 
         <AddSubcategoryModal

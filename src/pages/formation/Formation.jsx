@@ -36,13 +36,13 @@ export default function Formation() {
   return (
     <>
       <div className="flex justify-between items-center mb-5">
-        <PageHeading title="Formation Management" />
+        <PageHeading title="Blog Management" />
         <div className="text-white">
           <button
             onClick={() => setAddModalOpen(true)}
             className="bg-[#0091FF] px-6 py-3 rounded cursor-pointer"
           >
-            + Add New Formation
+            + Add New Blog
           </button>
         </div>
       </div>

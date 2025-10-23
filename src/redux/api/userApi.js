@@ -12,7 +12,6 @@ export const userApi = baseApi.injectEndpoints({
       }),
       providesTags: ["user"],
     }),
-
     getSingleUser: builder.query({
       query: ({ userId }) => ({
         url: "dashboard/users-business-statistics",
@@ -23,10 +22,8 @@ export const userApi = baseApi.injectEndpoints({
       }),
       providesTags: ["user"],
     }),
-
     updateUser: builder.mutation({
       query: (userId) => {
-        // console.log("updateUser API - userId:", userId);
         return {
           url: `dashboard/block-user?userId=${userId}`,
           method: "PATCH",
@@ -34,7 +31,20 @@ export const userApi = baseApi.injectEndpoints({
       },
       invalidatesTags: ["user"],
     }),
+    deleteUser: builder.mutation({
+      query: (userId) => ({
+        url: `dashboard/delete-user/${userId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["user"],
+    }),
+    
   }),
 });
 
-export const { useGetAllUserQuery, useGetSingleUserQuery, useUpdateUserMutation } = userApi;
+export const {
+  useGetAllUserQuery,
+  useGetSingleUserQuery,
+  useUpdateUserMutation,
+  useDeleteUserMutation,
+} = userApi;
