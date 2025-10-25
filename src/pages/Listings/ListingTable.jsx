@@ -29,6 +29,7 @@ export default function ListingTable({ businessRole = "", status = "" }) {
     page,
     limit: 10,
   });
+  console.log("listingsData from list page", listingsData);
 
   // Update listing mutation
   const [updateListing, { isLoading: isUpdating }] = useUpdateListingMutation();
@@ -275,7 +276,7 @@ export default function ListingTable({ businessRole = "", status = "" }) {
         columns={columns}
         pagination={{
           pageSize: 10,
-          total: listingsData?.total || dataSource?.length || 0,
+          total: listingsData?.meta?.total || dataSource?.length || 0,
           current: page,
           showSizeChanger: false,
           onChange: (newPage) => setPage(newPage),

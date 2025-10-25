@@ -1,33 +1,23 @@
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
- 
+
 export default defineConfig({
-
   server: {
-
-    host: "10.10.20.72",
+    host: "0.0.0.0",
 
     port: 3000,
 
+    allowedHosts: ["admin.profitablebusinessesforsale.com"],
   },
 
   plugins: [react(), tailwindcss()],
 
   preview: {
+    port: 4174,
 
-    port: 4174, // or your chosen port
+    host: "0.0.0.0",
 
-    host: "0.0.0.0", // make sure it listens on all interfaces
-
-    allowedHosts: [
-
-      "admin.profitablebusinessesforsale.com", 
-
-    ],
-
+    allowedHosts: ["admin.profitablebusinessesforsale.com"],
   },
-
 });
-
- 

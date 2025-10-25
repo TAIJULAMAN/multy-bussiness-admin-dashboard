@@ -93,7 +93,7 @@ export default function Formation() {
           ))
         ) : (
           <div className="col-span-full flex justify-center items-center py-8">
-            <div className="text-lg text-gray-600">No formations found</div>
+            <div className="text-lg text-gray-600">No blog found</div>
           </div>
         )}
         <div className="col-span-full flex justify-center mt-6">

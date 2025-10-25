@@ -6,11 +6,13 @@ import { getImageBaseUrl } from "../../config/envConfig";
 import { Link } from "react-router-dom";
 import { useDeleteAgreementMutation } from "../../redux/api/NDAApi";
 import NDADetailsModal from "../../Components/nda/NDADetailsModal";
+import { AiOutlineDelete } from "react-icons/ai";
 
 function NDATable({ data = [], ndaData }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedNDA, setSelectedNDA] = useState(null);
-  const [deleteAgreement, { isLoading: deleting }] = useDeleteAgreementMutation();
+  const [deleteAgreement, { isLoading: deleting }] =
+    useDeleteAgreementMutation();
 
   const handleDelete = async (id) => {
     try {
@@ -20,8 +22,6 @@ function NDATable({ data = [], ndaData }) {
       message.error(e?.data?.message || "Failed to delete NDA");
     }
   };
-
-
 
   const dataSource =
     data?.map((nda, index) => ({
@@ -36,7 +36,7 @@ function NDATable({ data = [], ndaData }) {
       date: new Date(nda?.createdAt).toLocaleDateString() || "N/A",
       ...nda,
     })) || [];
-    
+
   const columns = [
     {
       title: "No",
@@ -104,8 +104,8 @@ function NDATable({ data = [], ndaData }) {
             okText="Delete"
             onConfirm={() => handleDelete(record?._id)}
           >
-            <button className="border border-red-500 rounded-lg px-3 py-1 bg-red-50 text-red-600">
-              Delete
+            <button className="border border-red-500 rounded-lg px-1 py-1 bg-red-50 text-red-600">
+              <AiOutlineDelete className="w-8 h-8 text-red-600" />
             </button>
           </Popconfirm>
         </div>

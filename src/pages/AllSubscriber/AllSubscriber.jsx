@@ -10,6 +10,8 @@ export default function AllSubscriber() {
     page,
   });
 
+  console.log("subscriberData", subscriberData);
+
   const dataSource =
     subscriberData?.data?.map((subscriber, index) => ({
       key: subscriber._id || index.toString(),

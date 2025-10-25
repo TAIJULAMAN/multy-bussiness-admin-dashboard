@@ -24,9 +24,13 @@ const NDA = () => {
         return ndaData?.data?.filter((nda) => nda?.userRole === "Investor");
       case "brokerNDA":
         return ndaData?.data?.filter((nda) => nda?.userRole === "Broker");
-      case "franchisorNDA":
+      case "businessIdeaListerNDA":
         return ndaData?.data?.filter(
           (nda) => nda?.userRole === "Business Idea Lister"
+        );
+      case "franchisorNDA":
+        return ndaData?.data?.filter(
+          (nda) => nda?.userRole === "Francise Seller"
         );
       default:
         return (
@@ -42,7 +46,12 @@ const NDA = () => {
     // console.log(filteredData);
     return (
       <div className="p-4">
-        <NDATable data={filteredData} ndaData={ndaData} page={page} setPage={setPage} />
+        <NDATable
+          data={filteredData}
+          ndaData={ndaData}
+          page={page}
+          setPage={setPage}
+        />
       </div>
     );
   };
@@ -93,8 +102,14 @@ const NDA = () => {
         >
           Franchisor NDA
         </button>
+        <button
+          onClick={() => setActiveTab("businessIdeaListerNDA")}
+          className={tabStyle("businessIdeaListerNDA")}
+        >
+          Business Idea Lister NDA
+        </button>
 
-         <button
+        <button
           onClick={() => setActiveTab("brokerNDA")}
           className={tabStyle("brokerNDA")}
         >

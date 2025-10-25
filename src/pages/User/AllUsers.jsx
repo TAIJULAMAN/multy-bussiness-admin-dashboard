@@ -94,7 +94,6 @@ export default function AllUsers({ search }) {
         </div>
       ),
     },
-    // { title: "Email", dataIndex: "email", key: "email" },
     { title: "Contact Number", dataIndex: "mobile", key: "mobile" },
     {
       title: "User Role",
@@ -113,7 +112,7 @@ export default function AllUsers({ search }) {
       title: "Subscription",
       key: "subscription",
       render: (_, record) =>
-        record?.subscriptionPlan?.subscriptionPlanType || "Free Plan",
+        record?.subscriptionPlanType || "Free Plan",
     },
     {
       title: "Action",

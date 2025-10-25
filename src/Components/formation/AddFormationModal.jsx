@@ -47,7 +47,7 @@ export default function AddFormationModal({ open, onCancel, form, onDone }) {
           label="Title"
           rules={[
             { required: true, message: "Please enter formation title" },
-            { max: 100, message: "Title cannot exceed 100 characters" },
+            
           ]}
         >
           <Input placeholder="Enter formation title" />
@@ -58,7 +58,7 @@ export default function AddFormationModal({ open, onCancel, form, onDone }) {
           label="Detail"
           rules={[
             { required: true, message: "Please enter formation detail" },
-            { max: 500, message: "Detail cannot exceed 500 characters" },
+           
           ]}
         >
           <Input.TextArea rows={4} placeholder="Enter formation detail" />

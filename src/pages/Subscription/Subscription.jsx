@@ -196,7 +196,7 @@ export default function Subscription({ role }) {
   const handleAddFeature = () => {
     if (newFeature.trim() === "")
       return toast.error("please add a valid feature");
-    if (tempFeatures.length >= 8) {
+    if (tempFeatures.length >= 20) {
       return toast.error("Feature limit reached.");
     }
     const newId =
@@ -391,7 +391,7 @@ export default function Subscription({ role }) {
           <div className="flex items-center justify-between w-full">
             <span className="text-lg font-semibold">Manage Features</span>
             <span className="text-sm text-gray-500">
-              {tempFeatures.length}/8 Features
+              {tempFeatures.length}/20 Features
             </span>
           </div>
         }
@@ -414,12 +414,12 @@ export default function Subscription({ role }) {
                 type="primary"
                 onClick={handleAddFeature}
                 icon={<PlusIcon className="w-4 h-4" />}
-                disabled={newFeature.trim() === "" || tempFeatures.length >= 8}
+                disabled={newFeature.trim() === "" || tempFeatures.length >= 20}
               >
                 Add Feature
               </Button>
             </div>
-            {tempFeatures.length >= 8 && (
+            {tempFeatures.length >= 20 && (
               <div className="mt-2 text-sm text-red-500">
                 Maximum feature limit reached
               </div>
