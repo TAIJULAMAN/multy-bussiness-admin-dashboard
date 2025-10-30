@@ -25,17 +25,17 @@ export default function AddFormationModal({ open, onCancel, form, onDone }) {
       }
 
       await addFormation(formData).unwrap();
-      Swal.fire({ icon: "success", title: "Success", text: "Formation added successfully!" });
+      Swal.fire({ icon: "success", title: "Success", text: "Blog added successfully!" });
       form.resetFields();
       onDone?.();
       onCancel?.();
     } catch (error) {
-      Swal.fire({ icon: "error", title: "Error", text: "Failed to add formation. Please try again." });
+      Swal.fire({ icon: "error", title: "Error", text: "Failed to add Blog. Please try again." });
     }
   };
   return (
     <Modal
-      title="Add New Formation"
+      title="Add New Blog"
       open={open}
       onCancel={onCancel}
       footer={null}
@@ -45,28 +45,22 @@ export default function AddFormationModal({ open, onCancel, form, onDone }) {
         <Form.Item
           name="title"
           label="Title"
-          rules={[
-            { required: true, message: "Please enter formation title" },
-            
-          ]}
+    
         >
-          <Input placeholder="Enter formation title" />
+          <Input placeholder="Enter Blog title" />
         </Form.Item>
 
         <Form.Item
           name="detail"
           label="Detail"
-          rules={[
-            { required: true, message: "Please enter formation detail" },
-           
-          ]}
+       
         >
-          <Input.TextArea rows={4} placeholder="Enter formation detail" />
+          <Input.TextArea rows={16} placeholder="Enter Blog detail" />
         </Form.Item>
 
         <Form.Item
           name="formation-image"
-          label="Formation Image"
+          label="Blog Image"
           rules={[{ required: true, message: "Please upload an image" }]}
         >
           <Upload listType="picture" maxCount={1} beforeUpload={() => false} accept="image/*">
@@ -77,7 +71,7 @@ export default function AddFormationModal({ open, onCancel, form, onDone }) {
         <div className="flex justify-end gap-3 mt-6">
           <Button onClick={onCancel}>Cancel</Button>
           <Button type="primary" htmlType="submit" loading={isSubmitting} className="bg-[#0091FF]">
-            {isSubmitting ? "Adding..." : "Add Formation"}
+            {isSubmitting ? "Adding..." : "Add Blog"}
           </Button>
         </div>
       </Form>

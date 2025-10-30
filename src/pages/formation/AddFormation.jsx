@@ -29,7 +29,7 @@ export default function AddFormation() {
                               reader.onload = () => {
                                         setImageUrl(reader.result);
                               };
-                              return false; // Prevent actual upload
+                              return false; 
                     },
                     onDrop(e) {
                               console.log('Dropped files', e.dataTransfer.files);
@@ -39,13 +39,13 @@ export default function AddFormation() {
           const onFinish = async (values) => {
                     try {
                               setLoading(true);
-                              // Add your API call here to save the formation
+                              // Add your API call here to save the Blog
                               console.log('Form values:', { ...values, imageUrl });
 
-                              message.success('Formation added successfully');
+                              message.success('Blog added successfully');
                               navigate('/categories');
                     } catch (error) {
-                              message.error('Failed to add formation');
+                              message.error('Failed to add Blog');
                     } finally {
                               setLoading(false);
                     }
@@ -53,7 +53,7 @@ export default function AddFormation() {
 
           return (
                     <>
-                              <PageHeading title="Add New Formation" />
+                              <PageHeading title="Add New Blog" />
                               <Card className="mt-6 shadow-md">
                                         <Form
                                                   form={form}
@@ -79,7 +79,7 @@ export default function AddFormation() {
                                                                                                     <InboxOutlined className="text-[#0091FF]" />
                                                                                           </p>
                                                                                           <p className="ant-upload-text text-lg">
-                                                                                                    + Upload Business Formation Image
+                                                                                                    + Upload Business Blog Image
                                                                                           </p>
                                                                                           <p className="ant-upload-hint text-gray-500">
                                                                                                     Click or drag file to this area to upload
@@ -91,12 +91,12 @@ export default function AddFormation() {
 
                                                   {/* Title */}
                                                   <Form.Item
-                                                            label="Business Formation Title"
+                                                            label="Business Blog Title"
                                                             name="title"
-                                                            rules={[{ required: true, message: 'Please enter formation title' }]}
+                                                            rules={[{ required: true, message: 'Please enter Blog title' }]}
                                                   >
                                                             <Input
-                                                                      placeholder="Enter formation title"
+                                                                      placeholder="Enter Blog title"
                                                                       className="h-12"
                                                             />
                                                   </Form.Item>
@@ -108,7 +108,7 @@ export default function AddFormation() {
                                                             rules={[{ required: true, message: 'Please enter description' }]}
                                                   >
                                                             <TextArea
-                                                                      placeholder="Enter formation description"
+                                                                      placeholder="Enter Blog description"
                                                                       rows={6}
                                                                       className="resize-none"
                                                             />
