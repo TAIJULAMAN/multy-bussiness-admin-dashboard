@@ -8,7 +8,7 @@ export default function DeleteFormationButton({ formation, className = "p-2 text
   const onClick = async () => {
     const result = await Swal.fire({
       title: "Are you sure?",
-      text: `You are about to delete "${formation.title}" blog. This action cannot be undone!`,
+      text: `You are about to delete "${formation.title}" Blog. This action cannot be undone!`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#d33",
@@ -32,7 +32,7 @@ export default function DeleteFormationButton({ formation, className = "p-2 text
       Swal.fire({
         icon: "success",
         title: "Deleted!",
-        text: "blog has been deleted successfully!",
+        text: "Blog has been deleted successfully!",
         timer: 2000,
         showConfirmButton: false,
       });

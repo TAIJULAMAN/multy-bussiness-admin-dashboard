@@ -24,7 +24,7 @@ import EditListing from "../pages/Listings/EditListing";
 import Formation from "../pages/formation/Formation";
 import SubcategoryManagement from "../pages/Categories/SubcategoryManagement";
 import PrivateRoute from "./PrivetRoute";
-import AddFormation from "../pages/formation/AddFormation";
+// import AddFormation from "../pages/formation/AddFormation";
 
 export const Routes = createBrowserRouter([
   {
@@ -79,10 +79,10 @@ export const Routes = createBrowserRouter([
         path: "/categories/:id",
         element: <BusinessInfo />,
       },
-      {
-        path: "/categories/add",
-        element: <AddFormation />,
-      },
+      // {
+      //   path: "/categories/add",
+      //   element: <AddFormation />,
+      // },
 
       {
         path: "/NDA",

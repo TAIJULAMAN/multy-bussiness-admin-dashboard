@@ -31,17 +31,17 @@ export default function AddFormationModal({ open, onCancel, form, onDone }) {
       }
 
       await addFormation(formData).unwrap();
-      Swal.fire({ icon: "success", title: "Success", text: "blog added successfully!" });
+      Swal.fire({ icon: "success", title: "Success", text: "Blog added successfully!" });
       form.resetFields();
       onDone?.();
       onCancel?.();
     } catch (error) {
-      Swal.fire({ icon: "error", title: "Error", text: "Failed to add blog. Please try again." });
+      Swal.fire({ icon: "error", title: "Error", text: "Failed to add Blog. Please try again." });
     }
   };
   return (
     <Modal
-      title="Add New blog"
+      title="Add New Blog"
       open={open}
       onCancel={onCancel}
       footer={null}
@@ -51,12 +51,9 @@ export default function AddFormationModal({ open, onCancel, form, onDone }) {
         <Form.Item
           name="title"
           label="Title"
-          rules={[
-            { required: true, message: "Please enter blog title" },
-            
-          ]}
+    
         >
-          <Input placeholder="Enter blog title" />
+          <Input placeholder="Enter Blog title" />
         </Form.Item>
 
         <Form.Item
@@ -114,7 +111,7 @@ export default function AddFormationModal({ open, onCancel, form, onDone }) {
         <div className="flex justify-end gap-3 mt-6">
           <Button onClick={onCancel}>Cancel</Button>
           <Button type="primary" htmlType="submit" loading={isSubmitting} className="bg-[#0091FF]">
-            {isSubmitting ? "Adding..." : "Add blog"}
+            {isSubmitting ? "Adding..." : "Add Blog"}
           </Button>
         </div>
       </Form>
