@@ -1,16 +1,22 @@
-import { Modal, Form, Input, Upload, Button } from "antd";
+import { Modal, Form, Input, Upload, Button, Select } from "antd";
+import React, { useState } from "react";
 import { UploadOutlined } from "@ant-design/icons";
 import Swal from "sweetalert2";
 import { useAdd_formationMutation } from "../../redux/api/formationApi";
+import JoditComponent from "../Shared/JoditComponent";
 
 export default function AddFormationModal({ open, onCancel, form, onDone }) {
   const [addFormation, { isLoading: isSubmitting }] = useAdd_formationMutation();
+  const [detailContent, setDetailContent] = useState("");
 
   const handleFinish = async (values) => {
     try {
       const formData = new FormData();
       formData.append("title", values.title);
       formData.append("detail", values.detail);
+      formData.append("metaTitle", values.metaTitle || "");
+      formData.append("metaDescription", values.metaDescription || "");
+      formData.append("metaKeywords", JSON.stringify(values.metaKeywords || []));
 
       if (
         values?.["formation-image"] &&
@@ -25,17 +31,17 @@ export default function AddFormationModal({ open, onCancel, form, onDone }) {
       }
 
       await addFormation(formData).unwrap();
-      Swal.fire({ icon: "success", title: "Success", text: "Formation added successfully!" });
+      Swal.fire({ icon: "success", title: "Success", text: "blog added successfully!" });
       form.resetFields();
       onDone?.();
       onCancel?.();
     } catch (error) {
-      Swal.fire({ icon: "error", title: "Error", text: "Failed to add formation. Please try again." });
+      Swal.fire({ icon: "error", title: "Error", text: "Failed to add blog. Please try again." });
     }
   };
   return (
     <Modal
-      title="Add New Formation"
+      title="Add New blog"
       open={open}
       onCancel={onCancel}
       footer={null}
@@ -46,28 +52,59 @@ export default function AddFormationModal({ open, onCancel, form, onDone }) {
           name="title"
           label="Title"
           rules={[
-            { required: true, message: "Please enter formation title" },
+            { required: true, message: "Please enter blog title" },
             
           ]}
         >
-          <Input placeholder="Enter formation title" />
+          <Input placeholder="Enter blog title" />
         </Form.Item>
 
         <Form.Item
           name="detail"
           label="Detail"
-          rules={[
-            { required: true, message: "Please enter formation detail" },
-           
-          ]}
+          rules={[{ required: true, message: "Please enter blog detail" }]}
         >
-          <Input.TextArea rows={4} placeholder="Enter formation detail" />
+          <JoditComponent
+            content={detailContent}
+            setContent={(c) => {
+              setDetailContent(c);
+              form.setFieldsValue({ detail: c });
+            }}
+          />
+        </Form.Item>
+
+        <Form.Item
+          name="metaTitle"
+          label="Meta Title"
+          rules={[{ required: true, message: "Please enter meta title" }]}
+        >
+          <Input placeholder="Enter meta title" />
+        </Form.Item>
+
+        <Form.Item
+          name="metaDescription"
+          label="Meta Description"
+          rules={[{ required: true, message: "Please enter meta description" }]}
+        >
+          <Input.TextArea rows={3} placeholder="Enter meta description" />
+        </Form.Item>
+
+        <Form.Item
+          name="metaKeywords"
+          label="Meta Keywords"
+          rules={[{ required: true, message: "Please enter at least one keyword" }]}
+        >
+          <Select
+            mode="tags"
+            tokenSeparators={[","]}
+            placeholder="Type and press Enter to add keywords"
+          />
         </Form.Item>
 
         <Form.Item
           name="formation-image"
-          label="Formation Image"
-          rules={[{ required: true, message: "Please upload an image" }]}
+          label="blog Image"
+          rules={[{ required: true, message: "Please upload an blog image" }]}
         >
           <Upload listType="picture" maxCount={1} beforeUpload={() => false} accept="image/*">
             <Button icon={<UploadOutlined />}>Upload Image</Button>
@@ -77,7 +114,7 @@ export default function AddFormationModal({ open, onCancel, form, onDone }) {
         <div className="flex justify-end gap-3 mt-6">
           <Button onClick={onCancel}>Cancel</Button>
           <Button type="primary" htmlType="submit" loading={isSubmitting} className="bg-[#0091FF]">
-            {isSubmitting ? "Adding..." : "Add Formation"}
+            {isSubmitting ? "Adding..." : "Add blog"}
           </Button>
         </div>
       </Form>

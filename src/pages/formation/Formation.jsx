@@ -20,11 +20,20 @@ export default function Formation() {
   const [form] = Form.useForm();
   const [updateForm] = Form.useForm();
   const [selectedFormation, setSelectedFormation] = useState(null);
+  const htmlToText = (html) => {
+    if (!html) return "";
+    const div = document.createElement("div");
+    div.innerHTML = html;
+    return div.textContent || div.innerText || "";
+  };
   const handleOpenUpdateModal = (formation) => {
     setSelectedFormation(formation);
     updateForm.setFieldsValue({
       title: formation.title,
       detail: formation.detail,
+      metaTitle: formation.metaTitle,
+      metaDescription: formation.metaDescription,
+      metaKeywords: formation.metaKeywords || [],
     });
     setUpdateModalOpen(true);
   };
@@ -71,7 +80,7 @@ export default function Formation() {
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     <span className="inline-flex items-center text-sm text-gray-600">
-                      {formation.detail}
+                      {htmlToText(formation.detail)}
                     </span>
                   </div>
                 </div>
