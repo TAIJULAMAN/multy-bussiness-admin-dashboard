@@ -125,13 +125,30 @@ const EditListing = () => {
     return { label: name, value: name };
   });
 
+  // Ensure category and subCategory are set correctly when options load
+  useEffect(() => {
+    // If the category field is empty but we have one from listingData and options are ready, set it
+    if (!form.getFieldValue("category") && listingData?.category && categoryOptions.length) {
+      form.setFieldsValue({ category: listingData.category });
+    }
+  }, [categoryOptions, listingData, form]);
+
   useEffect(() => {
     const current = form.getFieldValue("subCategory");
-    const valid = subCategoryOptions.some((opt) => opt.value === current);
-    if (!valid) {
-      form.setFieldsValue({ subCategory: undefined });
+    const fromListing = listingData?.subCategory;
+    // When options are available, try to restore listing subCategory if not set
+    if (subCategoryOptions.length) {
+      const hasCurrent = subCategoryOptions.some((opt) => opt.value === current);
+      const hasListing = fromListing && subCategoryOptions.some((opt) => opt.value === fromListing);
+      if (!hasCurrent && hasListing) {
+        form.setFieldsValue({ subCategory: fromListing });
+        return;
+      }
+      if (current && !hasCurrent) {
+        form.setFieldsValue({ subCategory: undefined });
+      }
     }
-  }, [selectedCategoryName, subCategoryOptions, form]);
+  }, [subCategoryOptions, listingData, form]);
 
   const beforeUpload = (file) => {
     const isImage = file.type.startsWith("image/");
