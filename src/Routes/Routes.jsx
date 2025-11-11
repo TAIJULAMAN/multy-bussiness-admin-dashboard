@@ -24,7 +24,6 @@ import EditListing from "../pages/Listings/EditListing";
 import Formation from "../pages/formation/Formation";
 import SubcategoryManagement from "../pages/Categories/SubcategoryManagement";
 import PrivateRoute from "./PrivetRoute";
-// import AddFormation from "../pages/formation/AddFormation";
 
 export const Routes = createBrowserRouter([
   {

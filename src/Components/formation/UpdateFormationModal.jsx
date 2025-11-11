@@ -82,6 +82,8 @@ export default function UpdateFormationModal({
       onCancel={onCancel}
       footer={null}
       centered
+      width={800}
+      styles={{ body: { maxHeight: "70vh", overflowY: "auto" } }}
     >
       <Form
         form={form}
