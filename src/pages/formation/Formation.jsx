@@ -5,7 +5,7 @@ import PageHeading from "../../Components/Shared/PageHeading";
 import Loader from "../../Components/Loaders/Loader";
 import { useGet_all_formationQuery } from "../../redux/api/formationApi";
 import { getImageBaseUrl } from "../../config/envConfig";
-import { FiEdit } from "react-icons/fi";
+import { FiEdit, FiEye } from "react-icons/fi";
 import AddFormationModal from "../../Components/formation/AddFormationModal";
 import UpdateFormationModal from "../../Components/formation/UpdateFormationModal";
 import DeleteFormationButton from "../../Components/formation/DeleteFormationButton";
@@ -64,9 +64,9 @@ export default function Formation() {
           formationData?.data?.map((formation) => (
             <div
               key={formation._id}
-              className="max-w-md w-full mx-auto border border-gray-300 rounded-lg p-5 bg-white"
+              className="max-w-md w-full mx-auto border border-gray-300 rounded-lg p-5 bg-white h-full flex flex-col"
             >
-              <div className="space-y-4">
+              <div className="space-y-4 flex-1">
                 <img
                   src={
                     formation.image
@@ -88,32 +88,32 @@ export default function Formation() {
                     </span>
                   </div>
                 </div>
-                {/* Action Buttons */}
-                <div className="flex items-center justify-between pt-2 border-t border-gray-200 mt-4">
-                  <button
-                    onClick={() => handleOpenUpdateModal(formation)}
-                    className="p-2 text-green-600 hover:text-green-800"
-                  >
-                    <FiEdit size={24} className="text-[#0091FF]" />
-                  </button>
+              </div>
+              {/* Action Buttons */}
+              <div className="flex items-center justify-between pt-2 border-t border-gray-200 mt-auto">
+                <button
+                  onClick={() => handleOpenUpdateModal(formation)}
+                  className="p-2 text-green-600 hover:text-green-800"
+                >
+                  <FiEdit size={24} className="text-[#0091FF]" />
+                </button>
 
-                  <div className="h-6 w-px bg-gray-200"></div>
+                <div className="h-6 w-px bg-gray-200"></div>
 
-                  <button
-                    onClick={() =>
-                      navigate(`/formation/${formation._id}`, {
-                        state: { formation },
-                      })
-                    }
-                    className="px-3 py-1.5 text-sm rounded bg-[#0091FF] text-white hover:opacity-90"
-                  >
-                    View
-                  </button>
+                <button
+                  onClick={() =>
+                    navigate(`/formation/${formation._id}`, {
+                      state: { formation },
+                    })
+                  }
+                  className="p-2 text-green-600 hover:text-green-800"
+                >
+                  <FiEye size={24} className="text-[#0091FF]" />
+                </button>
 
-                  <div className="h-6 w-px bg-gray-200"></div>
+                <div className="h-6 w-px bg-gray-200"></div>
 
-                  <DeleteFormationButton formation={formation} />
-                </div>
+                <DeleteFormationButton formation={formation} />
               </div>
             </div>
           ))
