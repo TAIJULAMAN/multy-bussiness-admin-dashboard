@@ -1,5 +1,6 @@
 import { Form, Pagination } from "antd";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import PageHeading from "../../Components/Shared/PageHeading";
 import Loader from "../../Components/Loaders/Loader";
 import { useGet_all_formationQuery } from "../../redux/api/formationApi";
@@ -20,12 +21,15 @@ export default function Formation() {
   const [form] = Form.useForm();
   const [updateForm] = Form.useForm();
   const [selectedFormation, setSelectedFormation] = useState(null);
+  const navigate = useNavigate();
   const htmlToText = (html) => {
     if (!html) return "";
     const div = document.createElement("div");
     div.innerHTML = html;
     return div.textContent || div.innerText || "";
   };
+  const truncate = (str = "", max = 100) =>
+    str.length > max ? `${str.slice(0, max)}...` : str;
   const handleOpenUpdateModal = (formation) => {
     setSelectedFormation(formation);
     updateForm.setFieldsValue({
@@ -80,7 +84,7 @@ export default function Formation() {
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     <span className="inline-flex items-center text-sm text-gray-600">
-                      {htmlToText(formation.detail)}
+                      {truncate(htmlToText(formation.detail), 100)}
                     </span>
                   </div>
                 </div>
@@ -91,6 +95,19 @@ export default function Formation() {
                     className="p-2 text-green-600 hover:text-green-800"
                   >
                     <FiEdit size={24} className="text-[#0091FF]" />
+                  </button>
+
+                  <div className="h-6 w-px bg-gray-200"></div>
+
+                  <button
+                    onClick={() =>
+                      navigate(`/formation/${formation._id}`, {
+                        state: { formation },
+                      })
+                    }
+                    className="px-3 py-1.5 text-sm rounded bg-[#0091FF] text-white hover:opacity-90"
+                  >
+                    View
                   </button>
 
                   <div className="h-6 w-px bg-gray-200"></div>

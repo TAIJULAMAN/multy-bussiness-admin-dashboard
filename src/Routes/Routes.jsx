@@ -22,6 +22,7 @@ import Coupon from "../pages/Coupon/Coupon";
 import AllSubscriber from "../pages/AllSubscriber/AllSubscriber";
 import EditListing from "../pages/Listings/EditListing";
 import Formation from "../pages/formation/Formation";
+import FormationDetail from "../pages/formation/FormationDetail";
 import SubcategoryManagement from "../pages/Categories/SubcategoryManagement";
 import PrivateRoute from "./PrivetRoute";
 
@@ -73,6 +74,10 @@ export const Routes = createBrowserRouter([
       {
         path: "/formation",
         element: <Formation />,
+      },
+      {
+        path: "/formation/:id",
+        element: <FormationDetail />,
       },
       {
         path: "/categories/:id",
