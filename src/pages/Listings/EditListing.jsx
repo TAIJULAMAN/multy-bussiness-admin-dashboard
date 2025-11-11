@@ -15,6 +15,7 @@ import { useUpdateListingDetailsMutation } from "../../redux/api/listingApi";
 import { useGetAllCategoryListQuery } from "../../redux/api/categoryApi";
 import { getImageBaseUrl } from "../../config/envConfig";
 import Swal from "sweetalert2";
+import JoditComponent from "../../Components/Shared/JoditComponent";
 
 
 import { Country, State, City }  from "country-state-city";
@@ -88,6 +89,7 @@ const EditListing = () => {
   const [previewImage, setPreviewImage] = useState("");
   const [previewTitle, setPreviewTitle] = useState("");
   const [currentImages, setCurrentImages] = useState([]);
+  const [descriptionContent, setDescriptionContent] = useState("");
 
   const listingData = location.state?.listing;
   console.log("listingData from edit listing", listingData);
@@ -247,9 +249,10 @@ const EditListing = () => {
         city: listingData?.city || "",
         reason: listingData?.reason || "",
         business_image: listingData.data?.image || "",
-        description: htmlToPlainText(listingData?.description || ""),
+        description: listingData?.description || "",
         image: listingData?.image || "",
       });
+      setDescriptionContent(listingData?.description || "");
       if (listingData?.image) {
         setFileList([
           {
@@ -569,10 +572,12 @@ const EditListing = () => {
               },
             ]}
           >
-            <Input.TextArea
-              rows={4}
-              placeholder="Enter detailed description about the product"
-              className="resize-none"
+            <JoditComponent
+              content={descriptionContent}
+              setContent={(c) => {
+                setDescriptionContent(c);
+                form.setFieldsValue({ description: c });
+              }}
             />
           </Form.Item>
 
