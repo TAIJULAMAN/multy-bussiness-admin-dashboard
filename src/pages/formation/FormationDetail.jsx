@@ -41,16 +41,16 @@ export default function FormationDetail() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div>
-              <div className="text-gray-500">Meta Title</div>
+              <div className="text-gray-1200 font-semibold mb-2">Meta Title :</div>
               <div className="text-gray-800">{formation.metaTitle || "—"}</div>
             </div>
             <div>
-              <div className="text-gray-500">Meta Description</div>
+              <div className="text-gray-1200 font-semibold mb-2">Meta Description :</div>
               <div className="text-gray-800">{formation.metaDescription || "—"}</div>
             </div>
             <div className="md:col-span-2">
-              <div className="text-gray-500">Meta Keywords</div>
-              <div className="text-gray-800">
+              <div className="text-gray-1200 font-semibold mb-2">Meta Keywords :</div>
+              <div className="text-[16px] text-black-100 font-bold">
                 {Array.isArray(formation.metaKeywords) && formation.metaKeywords.length
                   ? formation.metaKeywords.join(", ")
                   : "—"}
@@ -59,7 +59,7 @@ export default function FormationDetail() {
           </div>
 
           <div>
-            <div className="text-gray-900 font-medium mb-2">Detail</div>
+            <div className="text-gray-900 font-semibold mb-4">Detail :</div>
             <div
               className="prose max-w-none"
               dangerouslySetInnerHTML={{ __html: formation.detail || "" }}
