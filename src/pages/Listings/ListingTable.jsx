@@ -21,6 +21,17 @@ export default function ListingTable({ businessRole = "", status = "" }) {
   const [page, setPage] = useState(1);
   const [activeAction, setActiveAction] = useState(null);
   const navigate = useNavigate();
+  const toPlainText = (html) => {
+    if (!html) return "";
+    try {
+      const doc = new DOMParser().parseFromString(html, "text/html");
+      return doc.body.textContent || "";
+    } catch (e) {
+      return String(html)
+        .replace(/<[^>]+>/g, " ")
+        .trim();
+    }
+  };
 
   // Fetch listings data from API with filters
   const { data: listingsData, isLoading } = useGetAllListingsQuery({
@@ -58,7 +69,9 @@ export default function ListingTable({ businessRole = "", status = "" }) {
         Swal.fire({
           icon: "success",
           title: "Deleted!",
-          text: `Listing "${record?.title || ""}" has been deleted successfully.`,
+          text: `Listing "${
+            record?.title || ""
+          }" has been deleted successfully.`,
           timer: 1800,
           showConfirmButton: false,
         });
@@ -66,7 +79,9 @@ export default function ListingTable({ businessRole = "", status = "" }) {
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: error?.data?.message || "Failed to delete listing. Please try again.",
+          text:
+            error?.data?.message ||
+            "Failed to delete listing. Please try again.",
         });
       }
     }
@@ -239,7 +254,11 @@ export default function ListingTable({ businessRole = "", status = "" }) {
             className="border border-red-500 rounded-lg p-1 bg-red-100 text-red-600"
             title="Delete Listing"
           >
-            <FiTrash2 className={`w-8 h-8 ${isDeleting ? "opacity-50" : "text-red-600"}`} />
+            <FiTrash2
+              className={`w-8 h-8 ${
+                isDeleting ? "opacity-50" : "text-red-600"
+              }`}
+            />
           </button>
         </div>
       ),
@@ -290,13 +309,9 @@ export default function ListingTable({ businessRole = "", status = "" }) {
           setIsModalOpen(false);
         }}
         footer={null}
-        width="800px"
-        style={{ top: 20 }}
-        bodyStyle={{
-          padding: 0,
-          maxHeight: "calc(100vh - 40px)",
-          overflowY: "auto",
-        }}
+        width={1000}
+        styles={{ body: { maxHeight: "70vh", overflowY: "auto" } }}
+      
       >
         <div className="container mx-auto p-5 bg-white">
           {/* Image Gallery Section */}
@@ -410,7 +425,7 @@ export default function ListingTable({ businessRole = "", status = "" }) {
               </h3>
               <div className="space-y-3 text-gray-700">
                 <p>
-                  {selectedListing?.description ||
+                  {toPlainText(selectedListing?.description) ||
                     "No description available for this business listing."}
                 </p>
               </div>
@@ -461,7 +476,9 @@ export default function ListingTable({ businessRole = "", status = "" }) {
                   ${"bg-blue-500 border-blue-500 hover:bg-blue-600 text-white"}`}
                 title="Approve Listing"
               >
-                {isUpdating && activeAction === "approve" ? "Processing..." : "Mark as Approve"}
+                {isUpdating && activeAction === "approve"
+                  ? "Processing..."
+                  : "Mark as Approve"}
               </button>
 
               {/* Reject button - active only when currently approved */}
@@ -472,7 +489,9 @@ export default function ListingTable({ businessRole = "", status = "" }) {
                   ${"bg-red-500 border-red-500 hover:bg-red-600 text-white"}`}
                 title="Reject Listing"
               >
-                {isUpdating && activeAction === "reject" ? "Processing..." : "Mark as Rejected"}
+                {isUpdating && activeAction === "reject"
+                  ? "Processing..."
+                  : "Mark as Rejected"}
               </button>
             </div>
           </div>

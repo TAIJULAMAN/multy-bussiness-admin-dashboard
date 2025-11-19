@@ -8,7 +8,7 @@ const JoditComponent = ({ content, setContent }) => {
     <div>
       <JoditEditor
         ref={editor}
-        value={content || 'tmr content ase nai'}
+        value={content || ''}
         onBlur={(newContent) => setContent(newContent)}
         config={{
           readonly: false,
