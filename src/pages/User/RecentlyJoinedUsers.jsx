@@ -34,7 +34,7 @@ const RecentlyJoinedUsers = () => {
       title: "Subscription",
       key: "subscription",
       render: (_, record) =>
-        record?.subscriptionPlan?.subscriptionPlanType || "Free Plan",
+        record?.subscriptionPlanType || "Free Plan",
     },
   ];
 
