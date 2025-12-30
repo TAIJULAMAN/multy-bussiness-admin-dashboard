@@ -88,7 +88,7 @@ const EditListing = () => {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [previewTitle, setPreviewTitle] = useState("");
-  const [currentImages, setCurrentImages] = useState([]);
+  const [currentImages, setCurrentImages] = useState("");
   const [descriptionContent, setDescriptionContent] = useState("");
 
   const listingData = location.state?.listing;
@@ -308,7 +308,7 @@ const EditListing = () => {
         formData.append("ownerShipType", values.ownerShipType ?? "");
         formData.append("businessType", values.businessType ?? "");
         formData.append("description", values.description ?? "");
-        formData.append("business-image", newFile);
+        formData.append("business_image", newFile);
 
         await updateListingDetails({
           businessId: listingData._id,
@@ -317,14 +317,14 @@ const EditListing = () => {
         }).unwrap();
       } else {
         // Prepare JSON update with existing filename
-        const businessImageFromUI = extractFileName(
-          (Array.isArray(currentImages) ? currentImages[0] : currentImages) ||
-            values.image
-        );
+        // const businessImageFromUI = extractFileName(
+        //   (Array.isArray(currentImages) ? currentImages[0] : currentImages) ||
+        //     values.image
+        // );
         const updateData = {
           title: values.title,
           category: values.category,
-          image: businessImageFromUI || values.image || "",
+          image: currentImages || values.image || "",
           reason: values.reason,
           subCategory: values.subCategory,
           state: values.state,
@@ -427,7 +427,7 @@ const EditListing = () => {
               {fileList.length >= 1 ? null : uploadButton}
             </Upload>
             <p className="text-sm text-gray-500 mt-2">
-              Upload one image. Recommended size: 800x800px.
+              Upload one image.
             </p>
           </div>
 
