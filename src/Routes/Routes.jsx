@@ -25,6 +25,7 @@ import Formation from "../pages/formation/Formation";
 import FormationDetail from "../pages/formation/FormationDetail";
 import SubcategoryManagement from "../pages/Categories/SubcategoryManagement";
 import PrivateRoute from "./PrivetRoute";
+import RefundPolicy from "../pages/refundPolicy/RefundPolicy";
 
 export const Routes = createBrowserRouter([
   {
@@ -108,6 +109,10 @@ export const Routes = createBrowserRouter([
       {
         path: "/privacy-policy",
         element: <PrivacyPolicy />,
+      },
+      {
+        path: "/refund-policy",
+        element: <RefundPolicy />,
       },
       {
         path: "/profile",

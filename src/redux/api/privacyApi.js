@@ -17,7 +17,26 @@ const privacyApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["privacy"],
     }),
+
+
+getRefundPolicy: builder.query({
+      query: () => ({
+        url: "home/get-refund-policy",
+        method: "GET",
+      }),
+      providesTags: ["privacy"],
+    }),
+    updateRefundPolicy: builder.mutation({
+      query: ({ requestData }) => ({
+        url: "home/update-refund-policy",
+        method: "PATCH",
+        body: requestData,
+      }),
+      invalidatesTags: ["privacy"],
+    }),
+
+
   }),
 });
 
-export const { useGetPrivacyQuery, useUpdatePrivacyMutation } = privacyApi;
+export const { useGetPrivacyQuery, useUpdatePrivacyMutation, useGetRefundPolicyQuery, useUpdateRefundPolicyMutation } = privacyApi;

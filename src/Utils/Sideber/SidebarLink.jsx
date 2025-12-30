@@ -79,5 +79,11 @@ export const SidebarLink = [
     path: "/terms-condition",
     label: "Terms & Condition",
     icon: <CiCircleQuestion size={24} />,
+  },
+   {
+    path: "/refund-policy",
+    label: "Refund Policy",
+    icon: <CiCircleQuestion size={24} />,
   }
+
 ];
