@@ -242,7 +242,7 @@ export default function Subscription({ role }) {
     <div className="">
       <div className="mb-8">
         <h1 className="text-3xl font-bold">
-          {role ? `${role} Subscription Plans` : "Subscription Plans"}
+          {role === 'Francise Seller' ? 'Franchise Seller Subscription Plans' : `${role} Subscription Plans`}
         </h1>
       </div>
 
@@ -256,7 +256,7 @@ export default function Subscription({ role }) {
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-2">
                       <div className="min-w-0">
                         <h2 className="text-2xl font-bold truncate">
-                          {plans[planKey].displayName}
+                          {plans[planKey].displayName === '1 Months' ? '1 Month' : plans[planKey].displayName}
                         </h2>
                       </div>
                       <button
