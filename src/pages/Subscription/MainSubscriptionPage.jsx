@@ -9,7 +9,7 @@ const MainSubscriptionPage = () => {
     { key: "Buyer", label: "Buyer" },
     { key: "Seller", label: "Seller" },
     { key: "Broker", label: "Broker" },
-    { key: "Francise Seller", label: "Francise Seller" },
+    { key: "Francise Seller", label: "Franchise Seller" },
     { key: "Investor", label: "Investor" },
     { key: "Business Idea Lister", label: "Business Idea Lister" },
     { key: "Asset Seller", label: "Asset Seller" },
