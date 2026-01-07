@@ -15,6 +15,7 @@ import Loader from "../Loaders/Loader";
 
 export default function UserGrowthChart() {
   const currentYear = new Date().getFullYear();
+  console.log("Current Year:", currentYear);
   const [year, setYear] = useState(currentYear);
   const [years] = useState(() => {
     const startYear = 2023;
@@ -41,40 +42,34 @@ export default function UserGrowthChart() {
   };
 
   const { data: apiData, isLoading } = useGetUserGrowthQuery({ year });
+  // console.log("User Growth API Data:", apiData);
 
   const { monthlyData, maxUsers } = useMemo(() => {
-    const monthlyValues = new Array(12).fill(0);
-    if (apiData?.data?.result && Array.isArray(apiData.data.result)) {
-      apiData.data.result.forEach((item) => {
-        let itemYear = null;
-        if (item.year) {
-          itemYear = item.year;
-        } else if (item.createdAt) {
-          itemYear = new Date(item.createdAt).getFullYear();
-        }
 
+    const monthlyValues = new Array(12).fill(0);
+
+    if (Array.isArray(apiData?.data?.result)) {
+      apiData.data.result.forEach((item) => {
         if (item.month >= 1 && item.month <= 12) {
-          if (year === 2025) {
-            monthlyValues[item.month - 1] = item.totalBusinesses || 0;
-          } else if (itemYear === year) {
-            monthlyValues[item.month - 1] = item.totalBusinesses || 0;
-          }
+          monthlyValues[item.month - 1] = item.totalBusinesses || 0;
         }
       });
     }
 
-    const processedData = monthlyValues;
     const maxUsers =
-      Math.max(...processedData) > 0 ? Math.max(...processedData) + 5 : 50;
+      Math.max(...monthlyValues) > 0
+        ? Math.max(...monthlyValues) + 5
+        : 50;
 
     return {
       monthlyData: Object.keys(monthMap).map((month, index) => ({
         name: month,
-        totalUser: processedData[index] || 0,
+        totalUser: monthlyValues[index],
       })),
       maxUsers,
     };
-  }, [apiData, year]);
+  }, [apiData]);
+
 
   if (isLoading) {
     return <Loader />;
