@@ -4,7 +4,7 @@ import { AiOutlineMail, AiOutlinePhone, AiOutlineDelete } from "react-icons/ai";
 import { FaRegEye } from "react-icons/fa";
 import { MdBlockFlipped } from "react-icons/md";
 
-import img from "../../assets/block.png";
+import img from "../../assets/icons/user.png";
 import ActiveListings from "../../pages/User/ActiveListings";
 import UserStats from "../../pages/User/UserStatics";
 import {
@@ -14,6 +14,7 @@ import {
 } from "../../redux/api/userApi";
 import Loader from "../../Components/Loaders/Loader";
 import { useDebounced } from "../../Utils/hook";
+import { getImageBaseUrl } from "../../config/envConfig";
 
 export default function AllUsers({ search }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -42,7 +43,7 @@ export default function AllUsers({ search }) {
   const metaPage = usersData?.meta?.page || page || 1;
   const metaLimit = usersData?.meta?.limit || 10;
   const metaTotal = usersData?.meta?.total || users?.length || 0;
-
+  // console.log("All users: ",users);
   const showModal = (user) => {
     setSelectedUser(user);
     setIsModalOpen(true);
@@ -81,9 +82,7 @@ export default function AllUsers({ search }) {
       render: (_, record, index) => (
         <div className="flex items-center gap-3">
           <img
-            src={
-              record.img || `https://avatar.iran.liara.run/public/${index + 1}`
-            }
+            src={ record?.image ? `${getImageBaseUrl()}/profile-image/${record?.image}` : img }
             className="w-10 h-10 object-cover rounded-full"
             alt="User Avatar"
           />
@@ -242,7 +241,7 @@ export default function AllUsers({ search }) {
               <img
                 // src={imageUrl(selectedUser?.img)}
                 // src={img}
-                src="https://avatar.iran.liara.run/public/44"
+                src={ selectedUser?.image ? `${getImageBaseUrl()}/profile-image/${selectedUser?.image}` : img }
                 alt="Profile avatar"
                 className="w-full h-full object-cover"
               />

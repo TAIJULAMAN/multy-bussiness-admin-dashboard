@@ -126,9 +126,9 @@ function ChangePassword() {
               className="absolute right-3 bottom-4 flex items-center text-[#6A6D76]"
             >
               {showPassword ? (
-                <IoEyeOffOutline className="w-5 h-5" />
-              ) : (
                 <IoEyeOutline className="w-5 h-5" />
+              ) : (
+                <IoEyeOffOutline className="w-5 h-5" />
               )}
             </button>
           </div>
@@ -153,9 +153,9 @@ function ChangePassword() {
               className="absolute right-3 bottom-4 flex items-center text-[#6A6D76]"
             >
               {showPassword ? (
-                <IoEyeOffOutline className="w-5 h-5" />
-              ) : (
                 <IoEyeOutline className="w-5 h-5" />
+              ) : (
+                <IoEyeOffOutline className="w-5 h-5" />
               )}
             </button>
           </div>
@@ -183,9 +183,9 @@ function ChangePassword() {
               className="absolute right-3 bottom-4 flex items-center text-[#6A6D76]"
             >
               {showPassword ? (
-                <IoEyeOffOutline className="w-5 h-5" />
-              ) : (
                 <IoEyeOutline className="w-5 h-5" />
+              ) : (
+                <IoEyeOffOutline className="w-5 h-5" />
               )}
             </button>
           </div>
