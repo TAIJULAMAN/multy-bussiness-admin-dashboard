@@ -43,7 +43,7 @@ export default function AllUsers({ search }) {
   const metaPage = usersData?.meta?.page || page || 1;
   const metaLimit = usersData?.meta?.limit || 10;
   const metaTotal = usersData?.meta?.total || users?.length || 0;
-  // console.log("All users: ",users);
+  console.log("All users: ",users);
   const showModal = (user) => {
     setSelectedUser(user);
     setIsModalOpen(true);

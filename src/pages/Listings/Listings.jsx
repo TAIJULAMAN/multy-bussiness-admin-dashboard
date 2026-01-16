@@ -10,7 +10,7 @@ const ListingsTabs = () => {
     { key: "listingsUnderApproval", label: "Listings Under Approval" },
     { key: "Seller", label: "Business Listings" },
     { key: "Asset Seller", label: "Asset Seller" },
-    { key: "Francise Seller", label: "Francise Seller" },
+    { key: "Francise Seller", label: "Franchise Seller" },
     { key: "Business Idea Lister", label: "Business Idea Lister" },
     { key: "Broker", label: "Broker" },
   ];

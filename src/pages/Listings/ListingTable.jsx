@@ -13,6 +13,7 @@ import {
 import Loader from "../../Components/Loaders/Loader";
 import { getImageBaseUrl } from "../../config/envConfig";
 import Swal from "sweetalert2";
+import img from "../../assets/icons/user.png";
 
 export default function ListingTable({ businessRole = "", status = "" }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -167,11 +168,7 @@ export default function ListingTable({ businessRole = "", status = "" }) {
       render: (_, record) => (
         <div className="flex items-center gap-2">
           <img
-            src={
-              record?.userImg
-                ? `${getImageBaseUrl()}/profile-image/${record?.userImg}`
-                : "https://avatar.iran.liara.run/public/23"
-            }
+            src={record?.userImg ? `${getImageBaseUrl()}/profile-image/${record?.userImg}`: img }
             className="w-10 h-10 object-cover rounded-full"
             alt="User Avatar"
           />
