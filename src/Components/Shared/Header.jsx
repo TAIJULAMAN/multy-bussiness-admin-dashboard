@@ -10,6 +10,7 @@ import { useSelector } from "react-redux";
 import ProfileMini from "../profile/ProfileMini";
 import { CiBarcode } from "react-icons/ci";
 import { PiSidebarLight } from "react-icons/pi";
+import { BiSidebar } from "react-icons/bi";
 
 export default function Header({ onToggle }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -27,15 +28,17 @@ export default function Header({ onToggle }) {
     <div className="px-6 h-20 flex justify-between items-center bg-white shadow fixed top-0 left-0 right-0 z-50">
       <div className="flex items-center gap-4">
         {/* ☰ BAR ICON */}
-        <button
-          onClick={onToggle}
-          className="p-2 rounded hover:bg-gray-200 transition"
-        >
-        
-         <PiSidebarLight size={30}/>
-        </button>
+      
 
         <img className="h-12" src={logo} alt="Logo" />
+          <button
+          onClick={onToggle}
+          className="p-1 rounded bg-[#cce9ff]  hover:bg-gray-200 transition"
+        >
+        
+     
+         <BiSidebar className="text-[#43a2eb]" size={24}/>
+        </button>
       </div>
 
       <div className="flex items-center gap-5">
