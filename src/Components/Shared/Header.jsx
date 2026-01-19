@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FiMenu } from "react-icons/fi";
 import logo from "../../assets/icons/logo.png";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import NotificationsModal from "../notification/NotificationsModal";
@@ -7,10 +8,11 @@ import { useGetAllNotificationQuery } from "../../redux/api/notificationApi";
 import { useGetUserProfileQuery } from "../../redux/api/profileApi";
 import { useSelector } from "react-redux";
 import ProfileMini from "../profile/ProfileMini";
+import { CiBarcode } from "react-icons/ci";
+import { PiSidebarLight } from "react-icons/pi";
 
-export default function Header() {
+export default function Header({ onToggle }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isOpen, setIsOpen] = useState(true);
 
   const token = useSelector((state) => state.auth.token);
   const decodedToken = decodeAuthToken(token);
@@ -21,17 +23,25 @@ export default function Header() {
 
   const { data: notificationsData } = useGetAllNotificationQuery();
 
-  if (!isOpen) return null;
-
   return (
-    <div className="px-10 h-20 flex justify-between items-center bg-white shadow">
-      <img className="h-12" src={logo} alt="Dudu" />
+    <div className="px-6 h-20 flex justify-between items-center bg-white shadow fixed top-0 left-0 right-0 z-50">
+      <div className="flex items-center gap-4">
+        {/* ☰ BAR ICON */}
+        <button
+          onClick={onToggle}
+          className="p-2 rounded hover:bg-gray-200 transition"
+        >
+        
+         <PiSidebarLight size={30}/>
+        </button>
+
+        <img className="h-12" src={logo} alt="Logo" />
+      </div>
 
       <div className="flex items-center gap-5">
-        {/* Notifications */}
         <button
           onClick={() => setIsModalOpen(true)}
-          className="relative bg-[#cce9ff] p-[15px] rounded-full transition"
+          className="relative bg-[#cce9ff] p-[15px] rounded-full"
         >
           <IoIosNotificationsOutline size={22} />
           {notificationsData?.data?.length > 0 && (
@@ -41,7 +51,6 @@ export default function Header() {
           )}
         </button>
 
-        {/* Profile */}
         <ProfileMini
           image={profileData?.data?.image}
           name={profileData?.data?.name || "Admin Person"}
@@ -49,7 +58,6 @@ export default function Header() {
         />
       </div>
 
-      {/* Notifications Modal */}
       <NotificationsModal
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}

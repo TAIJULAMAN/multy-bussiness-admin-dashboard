@@ -1,54 +1,35 @@
-import { useRef, useState, useEffect } from "react";
-import { Link, NavLink, useLocation } from "react-router";
+import { NavLink, useLocation, Link } from "react-router";
 import { SidebarLink } from "../../Utils/Sideber/SidebarLink.jsx";
 import { RiLogoutBoxLine } from "react-icons/ri";
 
-const Sidebar = () => {
+const Sidebar = ({ collapsed, isMobile, onClose }) => {
   const location = useLocation();
-  const [open, setOpen] = useState(false);
-  const [setting_active, set_setting_active] = useState(false);
-  const ref = useRef(null);
-  useEffect(() => {
-    if (!ref.current) return;
-    if (ref.current.querySelector(".active")) {
-      setOpen(true);
-      set_setting_active(true);
-    } else {
-      set_setting_active(false);
-    }
-  }, [ref, location.pathname]);
 
   return (
-    <div className="px-4 pb-10 flex justify-start flex-col gap-3 sidebar">
-      {SidebarLink?.map((item) => (
+    <div className="h-full px-2 pt-4 pb-6 flex flex-col gap-3">
+      {SidebarLink.map((item) => (
         <NavLink
-          onClick={() => {
-            setOpen(false);
-            set_setting_active(false);
-          }}
-          to={item?.path}
-          style={{
-            width: "100%",
-            justifyContent: "start",
-            paddingLeft: "14px",
-            paddingRight: "14px",
-          }}
-          className={`button-white w-full ${
-            item?.path === location.pathname
-              ? "!bg-[#0091FF] !text-white"
-              : "!bg-white !text-[#111]"
-          } whitespace-nowrap links`}
-          key={item?.path}
+          key={item.path}
+          to={item.path}
+          onClick={isMobile ? onClose : undefined}
+          className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all
+            ${
+              item.path === location.pathname
+                ? "bg-[#0091FF] text-white"
+                : "bg-white text-[#111]"
+            }`}
         >
-          {item?.icon} {item?.label}
+          <span className="text-xl">{item.icon}</span>
+          {(!collapsed || isMobile) && <span>{item.label}</span>}
         </NavLink>
       ))}
-      {/* Logout Button */}
-      <div className="mt-10 w-full px-4 text-gray-800 hover:text-white">
+
+      {/* Logout */}
+      <div className="mt-auto">
         <Link to="/login">
-          <button className="flex items-center gap-4 w-full py-3 rounded-lg bg-[#bbe5fc] hover:bg-[#0091FF] duration-200  text-white justify-center ">
-            <RiLogoutBoxLine className="w-5 h-5 font-bold" />
-            <span>Logout</span>
+          <button className="flex items-center gap-3 w-full py-3 rounded-lg bg-[#bbe5fc] hover:bg-[#0091FF] text-white justify-center transition">
+            <RiLogoutBoxLine size={18} />
+            {(!collapsed || isMobile) && <span>Logout</span>}
           </button>
         </Link>
       </div>

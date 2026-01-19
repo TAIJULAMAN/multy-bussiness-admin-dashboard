@@ -1,20 +1,59 @@
+import { useState } from "react";
 import Sidebar from "../Components/Shared/Sidebar.jsx";
 import Header from "../Components/Shared/Header.jsx";
 import { Outlet } from "react-router";
+
 export default function Dashboard() {
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const isMobile = window.innerWidth < 768;
+
   return (
-    <div className="max-h-screen bg-[#f0f6ff] overflow-hidden">
-      <Header />
-      <div className="scroll-bar-hide flex gap-0 h-screen overflow-y-scroll">
-        <div className="scroll-bar-hide pt-4 w-[300px] h-[calc(100vh-64px)] overflow-y-scroll pb-10 box-border bg-[var(--color-white)]">
-          <Sidebar />
-        </div>
-        <div className="w-[calc(100%-300px)] bg-[var(--color-gray-20)] h-screen">
-          <div className="bg-[#f0f6ff] scroll-bar-hide w-full p-5 rounded-md h-[calc(100vh-110px)] overflow-y-scroll">
+    <div className=" bg-[#f0f6ff] ">
+      <Header
+        onToggle={() => {
+          if (isMobile) {
+            setMobileOpen(!mobileOpen);
+          } else {
+            setCollapsed(!collapsed);
+          }
+        }}
+      />
+
+      <div className="flex pt-20 h-[calc(100vh)]">
+        {/* Sidebar */}
+        <aside
+          className={`
+            bg-white transition-all duration-300 ease-in-out
+            ${isMobile ? "absolute z-40" : "relative"}
+            ${mobileOpen || !isMobile ? "translate-x-0" : "-translate-x-full"}
+            ${collapsed && !isMobile ? "w-[80px]" : "w-[300px]"}
+            h-full overflow-y-auto
+          `}
+        >
+          <Sidebar
+            collapsed={collapsed}
+            isMobile={isMobile}
+            onClose={() => setMobileOpen(false)}
+          />
+        </aside>
+
+        {/* Overlay (Mobile only) */}
+        {isMobile && mobileOpen && (
+          <div
+            onClick={() => setMobileOpen(false)}
+            className="absolute inset-0 bg-black/40 z-30"
+          />
+        )}
+
+        {/* Main Content */}
+        <main className="flex-1 overflow-hidden bg-[var(--color-gray-20)]">
+          <div className="h-full overflow-y-auto p-5">
             <Outlet />
           </div>
-        </div>
+        </main>
       </div>
     </div>
   );
-};
+}
