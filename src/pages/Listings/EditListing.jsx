@@ -255,6 +255,9 @@ const EditListing = () => {
     if (listingData) {
       form.setFieldsValue({
         title: listingData?.title || "",
+          metaTitle: listingData?.metaTitle || "",
+      metaDescription: listingData?.metaDescription || "",
+      metaKeywords: listingData?.metaKeywords || [],
         category: listingData?.category || "",
         subCategory: listingData?.subCategory || "",
         businessType: listingData?.businessType || "",
@@ -298,6 +301,12 @@ const EditListing = () => {
         const formData = new FormData();
         formData.append("title", values.title);
         formData.append("category", values.category);
+         formData.append("metaTitle", values.metaTitle || "");
+      formData.append("metaDescription", values.metaDescription || "");
+      formData.append(
+        "metaKeywords",
+        JSON.stringify(values.metaKeywords || [])
+      );
         formData.append("reason", values.reason);
         formData.append("subCategory", values.subCategory ?? "");
         formData.append("state", values.state ?? "");
@@ -324,6 +333,9 @@ const EditListing = () => {
         const updateData = {
           title: values.title,
           category: values.category,
+          metaTitle: values.metaTitle,
+          metaDescription: values.metaDescription,
+          metaKeywords: values.metaKeywords || [],
           image: currentImages || values.image || "",
           reason: values.reason,
           subCategory: values.subCategory,
@@ -443,9 +455,39 @@ const EditListing = () => {
               }}
             />
           )}
+<Form.Item
+          name="metaTitle"
+          label="Meta Title"
+          rules={[{ required: true, message: "Please enter meta title" }]}
+        >
+          <Input placeholder="Enter meta title" />
+        </Form.Item>
+
+        <Form.Item
+          name="metaDescription"
+          label="Meta Description"
+          rules={[{ required: true, message: "Please enter meta description" }]}
+        >
+          <Input.TextArea rows={3} placeholder="Enter meta description" />
+        </Form.Item>
+
+        <Form.Item
+          name="metaKeywords"
+          label="Meta Keywords"
+          rules={[
+            { required: true, message: "Please enter at least one keyword" },
+          ]}
+        >
+          <Select
+            mode="tags"
+            tokenSeparators={[","]}
+            placeholder="Type and press Enter to add keywords"
+          />
+        </Form.Item>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Left Column */}
+            
             <div className="space-y-4">
               <Form.Item
                 label="Title"
