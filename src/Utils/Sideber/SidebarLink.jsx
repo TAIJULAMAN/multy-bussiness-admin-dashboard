@@ -61,6 +61,11 @@ export const SidebarLink = [
     icon: <BiCategory size={24} />,
   },
   {
+    path: "/admin",
+    label: "Admin Panal ",
+    icon: <BiCategory size={24} />,
+  },
+  {
     path: "/profile",
     label: "Profile Setting",
     icon: <RiUserSettingsLine size={24} />,
