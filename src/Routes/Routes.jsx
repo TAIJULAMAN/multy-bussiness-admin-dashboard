@@ -26,6 +26,7 @@ import FormationDetail from "../pages/formation/FormationDetail";
 import SubcategoryManagement from "../pages/Categories/SubcategoryManagement";
 import PrivateRoute from "./PrivetRoute";
 import RefundPolicy from "../pages/refundPolicy/RefundPolicy";
+import Admin from "../pages/adminPanal/Admin";
 
 export const Routes = createBrowserRouter([
   {
@@ -55,6 +56,10 @@ export const Routes = createBrowserRouter([
       {
         path: "/subscription",
         element: <MainSubscriptionPage />,
+      },
+      {
+        path: "/admin",
+        element: <Admin />,
       },
       {
         path: "/all-subscriber",

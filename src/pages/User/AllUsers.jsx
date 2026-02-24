@@ -111,7 +111,7 @@ export default function AllUsers({ search }) {
       title: "Subscription",
       key: "subscription",
       render: (_, record) =>
-        record?.subscriptionPlanType || "Free Plan",
+        record?.subscriptionPlanType || "No Subscription",
     },
     {
       title: "Action",
